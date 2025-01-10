@@ -16,4 +16,13 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static class SwerveConstants {
+    public static final double WheelRadius = 2;
+    public static final double GearRatio = 10000; //todo, put in an actual value
+    public static final double turnMotorMaxOutputVolts = 7;
+    public static final double angleKP = 0.04; //todo, put in actual values for all pids
+    public static final double angleKI = 0;
+    public static final double angleKD = 0;
+    public static final double maxVelocity = 5;
+  }
 }
