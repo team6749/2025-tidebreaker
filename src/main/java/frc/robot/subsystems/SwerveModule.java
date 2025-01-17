@@ -71,6 +71,10 @@ public class SwerveModule extends SubsystemBase {
       return state;
     }
 
+    public SwerveModulePosition getModulePosition() {
+      return new SwerveModulePosition(getDrivePosition(), getAngle());
+    }
+
     public SwerveModuleState getState() {
       return new SwerveModuleState(getDriveVelocity(),getAngle());
     }
