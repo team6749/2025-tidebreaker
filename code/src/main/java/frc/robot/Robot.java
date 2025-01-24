@@ -27,7 +27,9 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
-    // Enable Logging
+    // !!! IMPORTANT !!!!
+    // ensure that all real robots have a usb drive for log data. Otherwise it will
+    // be written to the roborio's SD card/internal storage, which has limited write endurance
     DataLogManager.start();
     Epilogue.configure(config -> {
       if (isSimulation()) {

@@ -20,23 +20,23 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 @Logged
 public class SwerveDrive extends SubsystemBase {
 
-    SwerveModule frontLeft;
-    SwerveModule frontRight;
-    SwerveModule backLeft;
-    SwerveModule backRight;
+    SwerveModuleBase frontLeft;
+    SwerveModuleBase frontRight;
+    SwerveModuleBase backLeft;
+    SwerveModuleBase backRight;
 
     @NotLogged
-    SwerveModule[] modules = new SwerveModule[4];
+    SwerveModuleBase[] modules = new SwerveModuleBase[4];
 
     // For logging purposes right now.
     ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
 
     public SwerveDrive() {
         if (RobotBase.isSimulation()) {
-            frontLeft = new SwerveModule();
-            frontRight = new SwerveModule();
-            backLeft = new SwerveModule();
-            backRight = new SwerveModule();
+            frontLeft = new SwerveModuleSim();
+            frontRight = new SwerveModuleSim();
+            backLeft = new SwerveModuleSim();
+            backRight = new SwerveModuleSim();
         } else {
             // TODO Robot is real, so use real swerve module definitions
         }
@@ -50,13 +50,11 @@ public class SwerveDrive extends SubsystemBase {
     @Override
     public void periodic() {
         if (RobotState.isDisabled()) {
-            // Set outputs to zero, if we are disabled
             stop();
         }
 
-        // This method will be called once per scheduler run
-        for (SwerveModule module : modules) {
-            module.periodic();
+        for(int i = 0; i < modules.length; i++) {
+            modules[i].periodic();
         }
     }
 
@@ -77,27 +75,27 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     /// Chassis Speeds can saturate the modules, this method desaturates the modules
-    public void setChassisSpeeds(ChassisSpeeds speeds) {
+    public void runChassisSpeeds(ChassisSpeeds speeds) {
         loggedTargetChassisSpeeds = speeds;
-        setModuleStates(SwerveConstants.kinematics.toSwerveModuleStates(speeds));
+        runModuleStates(SwerveConstants.kinematics.toSwerveModuleStates(speeds));
     }
 
-    public void stop() {
-        for (SwerveModule module : modules) {
-            module.stop();
+    public void runModuleStates(SwerveModuleState[] states) {
+        loggedTargetChassisSpeeds = SwerveConstants.kinematics.toChassisSpeeds(states);
+        for (int i = 0; i < states.length; i++) {
+            modules[i].runTarget(states[i]);
         }
     }
 
-    public void setModuleStates(SwerveModuleState[] states) {
-        loggedTargetChassisSpeeds = SwerveConstants.kinematics.toChassisSpeeds(states);
-        for (int i = 0; i < states.length; i++) {
-            modules[i].setState(states[i]);
+    public void stop() {
+        for (SwerveModuleBase module : modules) {
+            module.stop();
         }
     }
 
     public Command constantChassisSpeedsCommand(ChassisSpeeds speeds) {
         Command command = Commands.runEnd(() -> {
-            setChassisSpeeds(speeds);
+            runChassisSpeeds(speeds);
         }, () -> {
             stop();
         }, this);
@@ -117,7 +115,7 @@ public class SwerveDrive extends SubsystemBase {
             // Desaturate the input
             SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(targetSpeeds);
             SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConstants.maxLinearVelocity);
-            setModuleStates(states);
+            runModuleStates(states);
 
         }, () -> {
             stop();

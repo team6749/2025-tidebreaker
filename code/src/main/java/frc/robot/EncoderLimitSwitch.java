@@ -5,10 +5,12 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
+@Logged
 public class EncoderLimitSwitch {
     
     Supplier<Voltage> motorVolts;

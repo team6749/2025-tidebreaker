@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
 @Logged
-public class SwerveModule {
+public class SwerveModuleSim implements SwerveModuleBase {
 
     private static final DCMotor driveMotorModel = DCMotor.getKrakenX60(1);
     private static final DCMotor turnMotorModel = DCMotor.getKrakenX60(1);
@@ -33,25 +33,31 @@ public class SwerveModule {
             turnMotorModel);
 
     private PIDController driveController = new PIDController(2, 0, 0);
-    private PIDController turnController = new PIDController(3, 0, 0);
+    private PIDController turnController = new PIDController(4, 0, 0);
 
-    SwerveModuleState targetState = new SwerveModuleState();
-
-    SwerveModule () {
+    SwerveModuleSim() {
         turnController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
-    void periodic() {
-        SwerveModuleState currentState = getState();
+    @Override
+    public void periodic() {
+        driveSim.update(Constants.simulationTimestep.in(Seconds));
+        turnSim.update(Constants.simulationTimestep.in(Seconds));
+    }
 
+    @Override
+    public void runTarget(SwerveModuleState targetState) {
+        SwerveModuleState currentState = getState();
+        
         targetState.optimize(currentState.angle);
         targetState.cosineScale(currentState.angle);
 
         driveController.setSetpoint(targetState.speedMetersPerSecond);
         turnController.setSetpoint(targetState.angle.getRadians());
-        
+
         // Jank easy feed forward
-        Double driveVolts = (targetState.speedMetersPerSecond * 2.2) + driveController.calculate(currentState.speedMetersPerSecond);
+        Double driveVolts = (targetState.speedMetersPerSecond * 2.2)
+                + driveController.calculate(currentState.speedMetersPerSecond);
         Double turnVolts = turnController.calculate(currentState.angle.getRadians());
 
         // Test max speed
@@ -64,11 +70,15 @@ public class SwerveModule {
 
         driveSim.setInputVoltage(clampVolts(driveVolts, 12));
         turnSim.setInputVoltage(clampVolts(turnVolts, 12));
-        driveSim.update(Constants.simulationTimestep.in(Seconds));
-        turnSim.update(Constants.simulationTimestep.in(Seconds));
     }
 
-    @Logged
+    @Override
+    public void runOpenLoop(double velocity, double speed) {
+        driveSim.setInputVoltage(velocity);
+        turnSim.setInputVoltage(speed);
+    }
+
+    @Override
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 driveSim.getAngularPosition().in(Rotations)
@@ -76,7 +86,7 @@ public class SwerveModule {
                 Rotation2d.fromRadians(turnSim.getAngularPositionRad()));
     }
 
-    @Logged
+    @Override
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 MetersPerSecond.of(driveSim.getAngularVelocity().in(RotationsPerSecond)
@@ -84,12 +94,8 @@ public class SwerveModule {
                 Rotation2d.fromRadians(turnSim.getAngularPositionRad()));
     }
 
-    public void setState(SwerveModuleState state) {
-        targetState = state;
-    }
-
-    void stop() {
-        targetState = new SwerveModuleState();
+    @Override
+    public void stop() {
         driveSim.setInputVoltage(0);
         turnSim.setInputVoltage(0);
     }
@@ -97,4 +103,10 @@ public class SwerveModule {
     private double clampVolts(double input, double maxVoltage) {
         return Math.min(Math.max(input, -maxVoltage), maxVoltage);
     }
+
+    @Override
+    public void setBrakeMode(boolean brake) {
+        // Virtual Swerve module has no brake mode.
+    }
+
 }
