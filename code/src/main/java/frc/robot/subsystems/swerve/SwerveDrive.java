@@ -31,9 +31,7 @@ public class SwerveDrive extends SubsystemBase {
     // For logging purposes right now.
     ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
 
-    /** Creates a new SwerveSim. */
     public SwerveDrive() {
-
         if (RobotBase.isSimulation()) {
             frontLeft = new SwerveModule();
             frontRight = new SwerveModule();
@@ -98,18 +96,19 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command constantChassisSpeedsCommand(ChassisSpeeds speeds) {
-        return Commands.runEnd(() -> {
+        Command command = Commands.runEnd(() -> {
             setChassisSpeeds(speeds);
         }, () -> {
             stop();
         }, this);
-
+        command.setName("Constant Chasssis Speeds Command");
+        return command;
     }
 
     // Simple robot relative drive with no field oriented control, response curves,
     // deadbands, or slew rates
     public Command basicDriveCommand(XboxController controller) {
-        return Commands.runEnd(() -> {
+        Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
                     SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxLinearVelocity.times(-controller.getLeftY()),
@@ -123,5 +122,7 @@ public class SwerveDrive extends SubsystemBase {
         }, () -> {
             stop();
         }, this);
+        command.setName("Base Drive Command");
+        return command;
     }
 }
