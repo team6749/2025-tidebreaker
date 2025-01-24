@@ -5,32 +5,35 @@
 package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Localization;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveDrive;
 
 @Logged
 public class RobotContainer {
 
-  Swerve swerveSubsystem;
+  SwerveDrive swerveSubsystem;
   Localization localizationSubsystem;
 
   XboxController controller = new XboxController(0);
 
   public RobotContainer() {
-    swerveSubsystem = new Swerve();
+    swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
 
+
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
     configureBindings();
   }
 
   private void configureBindings() {
-    
+
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return swerveSubsystem.constantChassisSpeedsCommand(
+        new ChassisSpeeds(2, 0, 2));
   }
 }

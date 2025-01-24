@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.epilogue.Logged;
@@ -14,25 +13,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
 public class Localization extends SubsystemBase {
 
-  /// Loop time of the Localization update loop
-  static Time fixedTimestep = Milliseconds.of(20);
-
   @NotLogged
-  Swerve swerve;
+  SwerveDrive swerve;
 
   ADIS16470_IMU gyro = new ADIS16470_IMU();
-
-  Rotation2d simulatorAngle = new Rotation2d();
 
   @NotLogged
   SwerveDriveOdometry odometry;
@@ -40,11 +34,14 @@ public class Localization extends SubsystemBase {
   @NotLogged
   SwerveDrivePoseEstimator poseEstimator;
 
-  public Localization(Swerve swerve) {
+  // Simulation
+  ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
+
+  public Localization(SwerveDrive swerve) {
     this.swerve = swerve;
 
     odometry = new SwerveDriveOdometry(
-      SwerveConstants.kinematics,
+        SwerveConstants.kinematics,
         getGyroAngle(),
         swerve.getModulePositions());
 
@@ -52,12 +49,10 @@ public class Localization extends SubsystemBase {
         swerve.getModulePositions(), Pose2d.kZero);
   }
 
-
   /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
   private Rotation2d getGyroAngle() {
     return Rotation2d.fromDegrees(gyro.getAngle());
   }
-
 
   public Pose2d getRobotPose() {
     return poseEstimator.getEstimatedPosition();
@@ -65,10 +60,6 @@ public class Localization extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (Robot.isSimulation()) {
-      // Only run simulation periodic on simulated robots
-      return;
-    }
 
     odometry.update(getGyroAngle(), swerve.getModulePositions());
     poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
@@ -82,11 +73,12 @@ public class Localization extends SubsystemBase {
 
     /// Estimate the angle of the robot purely from the wheel encoders, this is good
     /// enough for a simulated robot.
-    ChassisSpeeds chassisSpeedsFromOdometry = SwerveConstants.kinematics.toChassisSpeeds(swerve.getModuleStates());
-    simulatorAngle = simulatorAngle
-        .plus(Rotation2d.fromRadians(chassisSpeedsFromOdometry.omegaRadiansPerSecond * fixedTimestep.in(Seconds)));
+    ChassisSpeeds chassisSpeedsFromKinematics = SwerveConstants.kinematics.toChassisSpeeds(swerve.getModuleStates());
+    
+    // Update the gyro with the simulated data
+    gyroSim.setGyroRateZ(Rotation2d.fromRadians(chassisSpeedsFromKinematics.omegaRadiansPerSecond).getDegrees());
+    gyroSim.setGyroAngleZ(gyro.getAngle() + (gyro.getRate() * Constants.simulationTimestep.in(Seconds)));
 
-    odometry.update(simulatorAngle, swerve.getModulePositions());
-    poseEstimator.update(simulatorAngle, swerve.getModulePositions());
   }
+
 }
