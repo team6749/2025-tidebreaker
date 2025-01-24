@@ -24,5 +24,9 @@ public final class Constants {
     public static final double angleKI = 0;
     public static final double angleKD = 0;
     public static final double maxVelocity = 5;
+    public static final double bodyHeading = 13; //todo, put in actual heading
+  }
+  public static class DrivingConstants {
+    public static final double deadZone = 0.1;
   }
 }
