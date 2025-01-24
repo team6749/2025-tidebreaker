@@ -10,7 +10,6 @@ public class SwerveModule {
 
     CANcoder encoder;
 
-
     /// Module Position Relative to the robot
     @NotLogged
     Translation2d position;

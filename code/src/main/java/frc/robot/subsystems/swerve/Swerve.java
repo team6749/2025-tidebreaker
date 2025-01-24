@@ -7,33 +7,40 @@ package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @Logged
-public class SwerveSim extends SubsystemBase implements SwerveBase {
+public class Swerve extends SubsystemBase {
 
-  SwerveModuleSim fl = new SwerveModuleSim();
-  SwerveModuleSim fr = new SwerveModuleSim();
-  SwerveModuleSim bl = new SwerveModuleSim();
-  SwerveModuleSim br = new SwerveModuleSim();
+  SwerveModuleSim frontLeft;
+  SwerveModuleSim frontRight;
+  SwerveModuleSim backLeft;
+  SwerveModuleSim backRight;
 
   @NotLogged
-  SwerveModuleSim[] modules = {
-    fl,
-    fr,
-    bl,
-    br,
-  };
-
-  static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.moduleLocations);
+  SwerveModuleSim[] modules = new SwerveModuleSim[4];
 
   /** Creates a new SwerveSim. */
-  public SwerveSim() {
+  public Swerve() {
+    
+    if(RobotBase.isSimulation()) {
+      frontLeft = new SwerveModuleSim();
+      frontRight = new SwerveModuleSim();
+      backLeft = new SwerveModuleSim();
+      backRight = new SwerveModuleSim();
+    } else {
+      // TODO Robot is real, so use real swerve module definitions
+    }
+
+    modules[0] = frontLeft;
+    modules[1] = frontRight;
+    modules[2] = backLeft;
+    modules[3] = backRight;
+
   }
 
   @Override
@@ -47,7 +54,6 @@ public class SwerveSim extends SubsystemBase implements SwerveBase {
     }
   }
 
-  @Override
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] modulePositions = new SwerveModulePosition[modules.length];
         for (int i = 0; i < modules.length; i++) {
@@ -55,8 +61,7 @@ public class SwerveSim extends SubsystemBase implements SwerveBase {
         }
         return modulePositions;
   }
-
-  @Override
+  
   public SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] moduleStates = new SwerveModuleState[modules.length];
     for (int i = 0; i < modules.length; i++) {
@@ -65,22 +70,16 @@ public class SwerveSim extends SubsystemBase implements SwerveBase {
     return moduleStates;
   }
 
-  @Override
   public void setChassisSpeeds(ChassisSpeeds speeds) {
-    setModuleStates(kinematics.toSwerveModuleStates(speeds));
+    setModuleStates(SwerveConstants.kinematics.toSwerveModuleStates(speeds));
   }
 
-  @Override
   public void stop() {
-    setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
+    for(SwerveModuleSim module : modules) {
+      module.stop();
+    }
   }
 
-  @Override @NotLogged
-  public SwerveDriveKinematics getKinematics() {
-    return kinematics;
-  }
-
-  @Override
   public void setModuleStates(SwerveModuleState[] states) {
     for (int i = 0; i < states.length; i++) {
       modules[i].setState(states[i]);

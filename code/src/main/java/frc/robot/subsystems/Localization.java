@@ -18,7 +18,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.swerve.SwerveBase;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
 public class Localization extends SubsystemBase {
@@ -27,7 +28,7 @@ public class Localization extends SubsystemBase {
   static Time fixedTimestep = Milliseconds.of(20);
 
   @NotLogged
-  SwerveBase swerve;
+  Swerve swerve;
 
   ADIS16470_IMU gyro = new ADIS16470_IMU();
 
@@ -39,15 +40,15 @@ public class Localization extends SubsystemBase {
   @NotLogged
   SwerveDrivePoseEstimator poseEstimator;
 
-  public Localization(SwerveBase swerve) {
+  public Localization(Swerve swerve) {
     this.swerve = swerve;
 
     odometry = new SwerveDriveOdometry(
-        swerve.getKinematics(),
+      SwerveConstants.kinematics,
         getGyroAngle(),
         swerve.getModulePositions());
 
-    poseEstimator = new SwerveDrivePoseEstimator(swerve.getKinematics(), getGyroAngle(),
+    poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics, getGyroAngle(),
         swerve.getModulePositions(), Pose2d.kZero);
   }
 
@@ -81,7 +82,7 @@ public class Localization extends SubsystemBase {
 
     /// Estimate the angle of the robot purely from the wheel encoders, this is good
     /// enough for a simulated robot.
-    ChassisSpeeds chassisSpeedsFromOdometry = swerve.getKinematics().toChassisSpeeds(swerve.getModuleStates());
+    ChassisSpeeds chassisSpeedsFromOdometry = SwerveConstants.kinematics.toChassisSpeeds(swerve.getModuleStates());
     simulatorAngle = simulatorAngle
         .plus(Rotation2d.fromRadians(chassisSpeedsFromOdometry.omegaRadiansPerSecond * fixedTimestep.in(Seconds)));
 

@@ -43,6 +43,6 @@ public class SwerveConstants {
             modules[3].position,
     };
 
-    static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.moduleLocations);
+    public static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.moduleLocations);
 
 }
