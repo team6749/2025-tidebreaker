@@ -48,7 +48,7 @@ public class SwerveDrive extends SubsystemBase {
     desiredX = Math.cos(controller.getLeftX()) * Constants.SwerveConstants.bodyHeading;
     desiredY = Math.sin(controller.getLeftY()) * Constants.SwerveConstants.bodyHeading;
     desiredRotation = Rotation2d.fromDegrees(controller.getRightX() * 360);
-    desiredSpeeds = Math.sqrt(Math.pow(desiredX, 2) + Math.pow(desiredY, 2));
+    desiredSpeeds = ControllerCurve(deadZone(Math.sqrt(Math.pow(desiredX, 2) + Math.pow(desiredY, 2))));
     Translation2d[] ModuleLocation = new Translation2d[modules.length];
     kinematics = new SwerveDriveKinematics(ModuleLocation);
     poseEstimator = new SwerveDrivePoseEstimator(kinematics, getGyroRotation(), getModulePositions(), new Pose2d(0,0,getGyroRotation())); // The pose estimator is odometry and provides positioning. It takes the kinematics, the module positions, the heading rotation, and the initial pose
@@ -85,10 +85,11 @@ public class SwerveDrive extends SubsystemBase {
   public double ControllerCurve(double input) {
     return Math.pow(input, 3);
   }
-  public void deadZone(double input) {
-    if(input < Math.abs(Constants.DrivingConstants.)) {
-
+  public double deadZone(double input) {
+    if(input < Math.abs(Constants.DrivingConstants.deadZone)) {
+        input = 0;
     }
+    return input;
   }
 
 
