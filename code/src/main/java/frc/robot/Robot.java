@@ -6,10 +6,16 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.logging.FileBackend;
+import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
+import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -21,12 +27,24 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
-    m_robotContainer = new RobotContainer();
     // Enable Logging
     DataLogManager.start();
+    Epilogue.configure(config -> {
+      if (isSimulation()) {
+        // If running in simulation, then we'd want to re-throw any errors that
+        // occur so we can debug and fix them!
+        config.errorHandler = ErrorHandler.crashOnError();
+        // Data passed into network tables is logged by the DataLogManager
+        config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+      }
+      if (isReal()) {
+        config.errorHandler = ErrorHandler.printErrorMessages();
+        // On the real robot only log to disk, to avoid too much network bandwidth
+        // Dashboard values are sent separately
+        config.backend = new FileBackend(DataLogManager.getLog());
+      }
+    });
     Epilogue.bind(this);
-
-    
 
     // Configure logging for the command scheduler
     CommandScheduler.getInstance()
@@ -34,28 +52,35 @@ public class Robot extends TimedRobot {
             command -> {
               Shuffleboard.addEventMarker(
                   "Command initialized", command.getName(), EventImportance.kNormal);
-                  DataLogManager.log("Command initialized: " + command.getName());
+              DataLogManager.log("Command initialized: " + command.getName());
             });
     CommandScheduler.getInstance()
         .onCommandInterrupt(
             command -> {
-              
+
               Shuffleboard.addEventMarker(
                   "Command interrupted", command.getName(), EventImportance.kNormal);
-                  DataLogManager.log("Command interrupted: " + command.getName());
+              DataLogManager.log("Command interrupted: " + command.getName());
             });
     CommandScheduler.getInstance()
         .onCommandFinish(
             command -> {
               Shuffleboard.addEventMarker(
                   "Command finished", command.getName(), EventImportance.kNormal);
-                  DataLogManager.log("Command finished: " + command.getName());
+              DataLogManager.log("Command finished: " + command.getName());
             });
+
+    // Initialize Robot
+    m_robotContainer = new RobotContainer();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    // Log Match Timer to Dashboard
+    SmartDashboard.putNumber("Match Timer", Timer.getMatchTime());
+
   }
 
   @Override

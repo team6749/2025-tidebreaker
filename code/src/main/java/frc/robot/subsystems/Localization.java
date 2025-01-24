@@ -13,8 +13,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants;
@@ -23,62 +26,70 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 @Logged
 public class Localization extends SubsystemBase {
 
-  @NotLogged
-  SwerveDrive swerve;
+    @NotLogged
+    SwerveDrive swerve;
 
-  ADIS16470_IMU gyro = new ADIS16470_IMU();
+    ADIS16470_IMU gyro = new ADIS16470_IMU();
 
-  @NotLogged
-  SwerveDriveOdometry odometry;
+    @NotLogged
+    SwerveDriveOdometry odometry;
 
-  @NotLogged
-  SwerveDrivePoseEstimator poseEstimator;
+    @NotLogged
+    SwerveDrivePoseEstimator poseEstimator;
 
-  // Simulation
-  ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
+    // Simulation
+    ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
 
-  public Localization(SwerveDrive swerve) {
-    this.swerve = swerve;
+    Field2d dashboardField = new Field2d();
 
-    odometry = new SwerveDriveOdometry(
-        SwerveConstants.kinematics,
-        getGyroAngle(),
-        swerve.getModulePositions());
+    public Localization(SwerveDrive swerve) {
+        this.swerve = swerve;
 
-    poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics, getGyroAngle(),
-        swerve.getModulePositions(), Pose2d.kZero);
-  }
+        odometry = new SwerveDriveOdometry(
+                SwerveConstants.kinematics,
+                getGyroAngle(),
+                swerve.getModulePositions());
 
-  /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
-  private Rotation2d getGyroAngle() {
-    return Rotation2d.fromDegrees(gyro.getAngle());
-  }
+        poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics, getGyroAngle(),
+                swerve.getModulePositions(), Pose2d.kZero);
 
-  public Pose2d getRobotPose() {
-    return poseEstimator.getEstimatedPosition();
-  }
+        SmartDashboard.putData("Field", dashboardField);
+    }
 
-  @Override
-  public void periodic() {
+    /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
+    private Rotation2d getGyroAngle() {
+        return Rotation2d.fromDegrees(gyro.getAngle());
+    }
 
-    odometry.update(getGyroAngle(), swerve.getModulePositions());
-    poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
+    public Pose2d getRobotPose() {
+        return poseEstimator.getEstimatedPosition();
+    }
 
-    // TODO add vision measurements
-  }
+    @Override
+    public void periodic() {
 
-  @Override
-  public void simulationPeriodic() {
-    super.simulationPeriodic();
+        odometry.update(getGyroAngle(), swerve.getModulePositions());
+        poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
 
-    /// Estimate the angle of the robot purely from the wheel encoders, this is good
-    /// enough for a simulated robot.
-    ChassisSpeeds chassisSpeedsFromKinematics = SwerveConstants.kinematics.toChassisSpeeds(swerve.getModuleStates());
-    
-    // Update the gyro with the simulated data
-    gyroSim.setGyroRateZ(Rotation2d.fromRadians(chassisSpeedsFromKinematics.omegaRadiansPerSecond).getDegrees());
-    gyroSim.setGyroAngleZ(gyro.getAngle() + (gyro.getRate() * Constants.simulationTimestep.in(Seconds)));
+        // TODO add vision measurements
 
-  }
+        // Update Dashboard (this is for elastic/driver)
+        dashboardField.setRobotPose(getRobotPose());
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        super.simulationPeriodic();
+
+        /// Estimate the angle of the robot purely from the wheel encoders, this is good
+        /// enough for a simulated robot.
+        ChassisSpeeds chassisSpeedsFromKinematics = SwerveConstants.kinematics
+                .toChassisSpeeds(swerve.getModuleStates());
+
+        // Update the gyro with the simulated data
+        gyroSim.setGyroRateZ(Rotation2d.fromRadians(chassisSpeedsFromKinematics.omegaRadiansPerSecond).getDegrees());
+        gyroSim.setGyroAngleZ(gyro.getAngle() + (gyro.getRate() * Constants.simulationTimestep.in(Seconds)));
+
+    }
 
 }
