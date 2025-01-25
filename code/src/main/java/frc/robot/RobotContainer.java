@@ -24,7 +24,7 @@ public class RobotContainer {
     localizationSubsystem = new Localization(swerveSubsystem);
 
 
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+
     configureBindings();
   }
 

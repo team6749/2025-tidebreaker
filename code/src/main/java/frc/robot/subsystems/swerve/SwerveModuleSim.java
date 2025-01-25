@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
@@ -46,7 +48,7 @@ public class SwerveModuleSim implements SwerveModuleBase {
     }
 
     @Override
-    public void runTarget(SwerveModuleState targetState) {
+    public void runClosedLoop(SwerveModuleState targetState) {
         SwerveModuleState currentState = getState();
         
         targetState.optimize(currentState.angle);
@@ -73,9 +75,9 @@ public class SwerveModuleSim implements SwerveModuleBase {
     }
 
     @Override
-    public void runOpenLoop(double velocity, double speed) {
-        driveSim.setInputVoltage(velocity);
-        turnSim.setInputVoltage(speed);
+    public void runOpenLoop(Voltage drive, Voltage turn) {
+        driveSim.setInputVoltage(drive.in(Volts));
+        turnSim.setInputVoltage(turn.in(Volts));
     }
 
     @Override

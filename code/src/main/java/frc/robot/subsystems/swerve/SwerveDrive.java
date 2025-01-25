@@ -83,7 +83,7 @@ public class SwerveDrive extends SubsystemBase {
     public void runModuleStates(SwerveModuleState[] states) {
         loggedTargetChassisSpeeds = SwerveConstants.kinematics.toChassisSpeeds(states);
         for (int i = 0; i < states.length; i++) {
-            modules[i].runTarget(states[i]);
+            modules[i].runClosedLoop(states[i]);
         }
     }
 
