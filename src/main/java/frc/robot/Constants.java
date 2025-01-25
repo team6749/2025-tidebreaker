@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.subsystems.SwerveModule;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -25,7 +28,29 @@ public final class Constants {
     public static final double angleKD = 0;
     public static final double maxVelocity = 5;
     public static final double bodyHeading = 13; //todo, put in actual heading
-  }
+    public static final double XCenterDistanceIn = 13; 
+    public static final double YCenterDistanceIn = 16; 
+    public static class SwerveModules {
+        public static final SwerveModule FLModule = new SwerveModule("FL",
+         0
+         , 0,
+          new Translation2d(-XCenterDistanceIn,YCenterDistanceIn));
+        public static final SwerveModule FRModule = new SwerveModule("FR",
+         0
+         , 0,
+          new Translation2d(XCenterDistanceIn,YCenterDistanceIn));
+        public static final SwerveModule BLModule = new SwerveModule("BL",
+         0
+         , 0,
+          new Translation2d(-XCenterDistanceIn,-YCenterDistanceIn));
+        public static final SwerveModule BRModule = new SwerveModule("BR",
+         0
+         , 0,
+          new Translation2d(XCenterDistanceIn,-YCenterDistanceIn));
+
+    public static final SwerveModule[] modules = {SwerveModules.FLModule, SwerveModules.FRModule, SwerveModules.BLModule, SwerveModules.BRModule};
+}
+    };
   public static class DrivingConstants {
     public static final double deadZone = 0.1;
   }

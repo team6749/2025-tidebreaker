@@ -31,9 +31,11 @@ public class SwerveModule extends SubsystemBase {
   public PIDController drivePID = new PIDController(0, 0, 0);
   public Translation2d locationFromMotor;
   public SwerveModuleState state;
+  public SwerveModuleState desiredState;
   public int moduleNumber;
   /** Creates a new SwerveModule. */
   public SwerveModule(String ModuleName, int DriveMotorPort, int AngleMotorPort, Translation2d ModuleLocation) {
+
     driveMotor = new TalonFX(DriveMotorPort);
     angleMotor = new TalonFX(AngleMotorPort);
     locationFromMotor = ModuleLocation;
@@ -45,8 +47,9 @@ public class SwerveModule extends SubsystemBase {
   @Override
   public void periodic() {
     getDesiredState(state);
-    double power = drivePID.calculate(state.speedMetersPerSecond);
-    double angle = state.angle.getDegrees();
+    getState();
+    double power = drivePID.calculate(state.speedMetersPerSecond, desiredState.speedMetersPerSecond);
+    double angle = anglePID.calculate(state.angle.getDegrees(), desiredState.angle.getDegrees());
     driveMotor.set((feedForward + power) / Constants.SwerveConstants.maxVelocity);
     angleMotor.set(angle);
     // This method will be called once per scheduler run
@@ -63,13 +66,12 @@ public class SwerveModule extends SubsystemBase {
     }
 
 
-    public SwerveModuleState getDesiredState(SwerveModuleState desiredStates) {
-      if (Math.abs(desiredStates.speedMetersPerSecond) < 0.001) {
+    public SwerveModuleState getDesiredState(SwerveModuleState desiredState) {
+      if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
         stop();
       }
-      desiredStates.optimize(getAngle());
-      state = desiredStates;
-      return state;
+      desiredState.optimize(getAngle());
+      return desiredState;
     }
 
     public SwerveModulePosition getModulePosition() {
@@ -77,7 +79,8 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public SwerveModuleState getState() {
-      return new SwerveModuleState(getDriveVelocity(),getAngle());
+      state = new SwerveModuleState(getDriveVelocity(),getAngle());
+      return state;
     }
     public void stop() {
       driveMotor.stopMotor();
