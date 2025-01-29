@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Localization;
 
 @Logged
 public class SwerveDrive extends SubsystemBase {
@@ -38,7 +39,10 @@ public class SwerveDrive extends SubsystemBase {
             backLeft = new SwerveModuleSim();
             backRight = new SwerveModuleSim();
         } else {
-            // TODO Robot is real, so use real swerve module definitions
+           frontLeft = new SwerveModuleReal(getName(), 0, 0);
+           frontRight = new SwerveModuleReal(getName(), 0, 0);
+           backLeft = new SwerveModuleReal(getName(), 0, 0);
+           backRight = new SwerveModuleReal(getName(), 0, 0);
         }
 
         modules[0] = frontLeft;
