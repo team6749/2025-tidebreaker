@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -12,10 +12,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorCommands;
+import frc.robot.commands.ArmCommands;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -38,6 +38,8 @@ public class RobotContainer {
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
+  Arm armSubsystem;
+  ArmCommands armCommands;
 
   XboxController controller = new XboxController(0);
 
@@ -52,12 +54,13 @@ public class RobotContainer {
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     elevatorCommands = new ElevatorCommands(elevatorSubsystem);
-
+    armSubsystem = new Arm();
+    armCommands = new ArmCommands(armSubsystem);
 
     // Bind Path planner commands
-    if(Robot.isSimulation()) {
+    if (Robot.isSimulation()) {
       // For now, simulate a delay on intake
-      NamedCommands.registerCommand("intake", new WaitCommand(1.5).andThen(intakeCommand()));
+      NamedCommands.registerCommand("intake", new WaitCommand(1).andThen(intakeCommand()));
     } else {
       NamedCommands.registerCommand("intake", intakeCommand());
     }
@@ -107,7 +110,8 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    configureBindings();
+    // configureBindings();
+    configureBindingsArmTest();
   }
 
   private void configureBindings() {
@@ -119,16 +123,32 @@ public class RobotContainer {
     aButton.onTrue(elevatorCommands.positionLevel3());
   }
 
+  private void configureBindingsArmTest() {
+    xButton.whileTrue(armSubsystem.goToPositionCommand(Degrees.of(-45)));
+    bButton.whileTrue(armSubsystem.goToPositionCommand(Degrees.of(45)));
+    aButton.whileTrue(Commands.repeatingSequence(armSubsystem.goToPositionCommand(Degrees.of(-45)),
+        armSubsystem.goToPositionCommand(Degrees.of(45))));
+    yButton.whileTrue(Commands.runEnd(() -> {
+      armSubsystem.runVolts(Volts.of(0.6));
+    }, () -> {
+      armSubsystem.stop();
+    }, armSubsystem));
+  }
+
   public Command scoreLevel3() {
-    Command command = Commands.sequence(elevatorCommands.idlePosition(),
-        /* Arm Intake angle command, */ elevatorCommands.positionLevel3(), elevatorCommands.idlePosition());
-    command.setName("Score Level 2");
+    Command command = Commands.sequence(
+      elevatorCommands.idlePosition(), 
+      armCommands.intakePosition(),
+      elevatorCommands.positionLevel3(),
+      armCommands.scoreLevel2And3(),
+      Commands.parallel(elevatorCommands.idlePosition(), armCommands.intakePosition()));
+    command.setName("Score Level 3");
     return command;
   }
 
   public Command intakeCommand() {
-    Command command = Commands.sequence(elevatorCommands.idlePosition(),
-        /* Arm Intake angle command, */ elevatorCommands.intakePosition(), elevatorCommands.idlePosition());
+    Command command = Commands.sequence(elevatorCommands.idlePosition(), armCommands.intakePosition(),
+        elevatorCommands.intakePosition(), elevatorCommands.idlePosition());
     command.setName("Intake Command");
     return command;
   }

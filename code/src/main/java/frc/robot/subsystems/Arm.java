@@ -1,0 +1,248 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Robot;
+
+// NOTE THIS ARM DOES NOT SUPPORT ROLLOVER.
+// THERE IS NO DETECTION FOR ROLLOVER ON THE
+// ENCODER, PID CONTROLLER, FEEDFORWARD, OR MOTION PROFILE
+// THIS MEANS THE ENCODER ZERO POSITION CANNOT BE WITHIN
+// THE TRAVEL RANGE.
+@Logged
+public class Arm extends SubsystemBase {
+
+  Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
+
+  // Constants
+  public static Distance armLength = Meters.of(0.4);
+  public static Mass armMass = Kilograms.of(5);
+  public static int armReduction = 20 * 2; // 15 for gearbox, 2 for the sproket
+  public static double outputRatio = (1.0 / armReduction);
+  // Offset to apply to the encoder to make the arm have a zero position parallel to the floor
+  public static Angle angleOffset = Degrees.of(0);
+  public static Angle minAngle = Degrees.of(-90);
+  public static Angle maxAngle = Degrees.of(90);
+  public static Angle simStartAngle = Degrees.of(0);
+  public static Angle toleranceOnReachedGoal = Degrees.of(2);
+  public static AngularVelocity maxVelocity = DegreesPerSecond.of(60);
+  public static AngularAcceleration maxAccerleration = DegreesPerSecondPerSecond.of(60);
+
+
+  private final DCMotor m_armGearbox = DCMotor.getFalcon500(1);
+
+  // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/tuning-vertical-arm.html
+  private final PIDController controller = new PIDController(8, 0, 0);
+  // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/feedforward.html#armfeedforward
+  private final ArmFeedforward feedforward = new ArmFeedforward(
+      0,
+      0.6, // Most important value
+      0,
+      0);
+
+  // TODO convert from using a trapezoidal profile to an ExponentialProfile sysid
+  private final TrapezoidProfile profile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
+          maxAccerleration.in(RadiansPerSecondPerSecond)));
+
+  // Intermediate goal position, used for closed loop control.
+  private TrapezoidProfile.State setpoint = new TrapezoidProfile.State(0, 0);
+  private boolean isRunningClosedLoop = false;
+
+  private final TalonFX m_motor = new TalonFX(1);
+  private final DutyCycleEncoder encoder = new DutyCycleEncoder(2);
+  private boolean encoderConnected = true;
+
+  private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(
+      m_armGearbox,
+      armReduction,
+      SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms)),
+      armLength.in(Meters),
+      minAngle.in(Radians),
+      maxAngle.in(Radians),
+      true,
+      0,
+      simStartAngle.in(Radians),
+      0.0 // Add noise with a std-dev of 1 tick
+  );
+
+  // Simulation Control
+  private final DutyCycleEncoderSim m_encoderSim = new DutyCycleEncoderSim(encoder);
+
+  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+  private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
+  private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
+  private final MechanismLigament2d m_armTower = m_armPivot
+      .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90));
+  private final MechanismLigament2d m_arm = m_armPivot.append(
+      new MechanismLigament2d(
+          "Arm",
+          30,
+          simStartAngle.in(Degrees),
+          6,
+          new Color8Bit(Color.kYellow)));
+
+  // Returns angles where zero is parallel to the floor (gravity). Values can be negative
+  public Angle getPosition() {
+    // The duty cycle encoder does not handle rollover
+    // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html#duty-cycle-encoders-the-dutycycleencoder-class
+    return Rotations.of(encoder.get() * outputRatio).plus(angleOffset);
+  }
+
+  public AngularVelocity getVelocity () {
+    // TODO implement
+    return RotationsPerSecond.of(0);
+  }
+
+  /** Creates a new ArmSubsystem. */
+  public Arm() {
+    setDefaultCommand(holdPositionAtSetpointCommand());
+
+    SmartDashboard.putData("Arm Sim", m_mech2d);
+  }
+
+  public void runGoal(Angle goal) {
+    isRunningClosedLoop = true;
+    if (encoderConnected == false) {
+      System.out.println("WARNING: Arm encoder disconnected");
+      // Resetting state to avoid sudden movement when reconnected
+      resetProfileState();
+      stop();
+      return;
+    }
+    var currentPosition = getPosition();
+    var goalState = new TrapezoidProfile.State(goal.in(Radians), 0);
+    var next = profile.calculate(Constants.simulationTimestep.in(Seconds), setpoint, goalState);
+
+    Voltage pidOutput = Volts.of(controller.calculate(currentPosition.in(Radians), setpoint.position));
+    Voltage feedForwardOutput = Volts.of(feedforward.calculate(setpoint.position, setpoint.velocity));
+    // For some reason this feed forward breaks.. not sure why. but it just makes everything nan after 1 iteration
+    // Voltage feedForwardOutput = Volts.of(feedforward.calculateWithVelocities(currentPosition.in(Radians), setpoint.velocity,
+    // next.velocity));
+
+    runVoltsPrivate(pidOutput.plus(feedForwardOutput));
+    setpoint = next;
+  }
+
+  // runs the elevator with a specific voltage.
+  public void runVolts(Voltage volts) {
+    isRunningClosedLoop = false;
+    runVoltsPrivate(volts);
+  }
+
+  private void runVoltsPrivate (Voltage volts) {
+    m_motor.setVoltage(volts.in(Volts));
+    if (Robot.isSimulation()) {
+      m_armSim.setInputVoltage(volts.in(Volts));
+    }
+  }
+
+  public void stop() {
+    m_motor.setVoltage(0);
+    m_armSim.setInputVoltage(0);
+  }
+
+  @Override
+  public void periodic() {
+    encoderConnected = encoder.isConnected();
+    encoderDisconnectedAlert.set(encoderConnected == false);
+
+    // if(isRunningClosedLoop) {
+    //   // This ensures that the arm angle is held even during command groups.
+    //   runGoal(Radians.of(setpoint.position));
+    // }
+
+    // Telemetry
+    m_arm.setAngle(getPosition().in(Degrees));
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // Next, we update it. The standard loop time is 20ms.
+    m_armSim.update(Constants.simulationTimestep.in(Seconds));
+    m_encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) / outputRatio);
+  }
+
+  // resets the profile to the current state
+  public void resetProfileState() {
+    setpoint = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
+  }
+
+  public boolean atGoalPosition(Angle position) {
+    return getPosition().isNear(position, toleranceOnReachedGoal);
+  }
+
+  // Holds position at the current measured location
+  // Note, elevator hold can possibly be unstable when it is started at a high
+  // speed
+  public Command holdPositionAtSetpointCommand() {
+    Command command = Commands.startRun(() -> {
+      if (getPosition().isNear(Radians.of(setpoint.position), toleranceOnReachedGoal) == false) {
+        System.out.println(
+            "WARNING: Elevator Hold started far away from setpoint, resetting setpoint to avoid rapid movement");
+        setpoint = new TrapezoidProfile.State(getPosition().in(Radians), 0);
+        // If we are near the setpoint, we should use that, otherwise, just use the
+        // current hold position.
+      }
+    }, () -> {
+      runGoal(Radians.of(setpoint.position));
+    }, this).finallyDo(() -> {
+      stop();
+    });
+    command.setName("Arm Hold Command");
+    return command;
+  }
+
+  // Runs the elevator to a specific position and then holds there, until the
+  // command is interrupted
+  public Command goToPositionCommand(Angle position) {
+    return Commands.startRun(() -> {
+      resetProfileState();
+    }, () -> {
+      runGoal(position);
+    }, this).until(() -> atGoalPosition(position)).andThen(() -> stop());
+  }
+}
