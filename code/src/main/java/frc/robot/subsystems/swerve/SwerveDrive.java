@@ -108,8 +108,11 @@ public class SwerveDrive extends SubsystemBase {
     public Command basicDriveCommand(XboxController controller) {
         Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
-                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
+                    // TODO: To support both keyboard and controller, we should be using
+                    // a DriverControls input class that properly maps unique inputs to the 
+                    // robot rather than directly using an xbox controller to represent both
                     SwerveConstants.maxLinearVelocity.times(-controller.getLeftY()),
+                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxAngularVelocity.times(-controller.getRightX()));
 
             // Desaturate the input

@@ -32,6 +32,10 @@ public class RobotContainer {
 
   }
 
+  public Command getTeleopCommand() {
+    return swerveSubsystem.basicDriveCommand(controller);
+  }
+
   public Command getAutonomousCommand() {
     return swerveSubsystem.constantChassisSpeedsCommand(
         new ChassisSpeeds(2, 0, 2));
