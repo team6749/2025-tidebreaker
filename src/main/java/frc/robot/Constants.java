@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import java.util.PrimitiveIterator.OfDouble;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.SwerveModule;
+import edu.wpi.first.distance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -17,11 +20,18 @@ import frc.robot.subsystems.SwerveModule;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int driverControllerPort = 0;
   }
   public static class SwerveConstants {
-    public static final double WheelRadius = 2;
-    public static final double GearRatio = 10000; //todo, put in an actual value
+    public static final Distance WheelRadius = Inches.of(2);
+    public static final Distance wheelCircumference = WheelRadius.times(Math.PI);
+    //put in a real value\/\/\/\/\/
+     //put in a real value\/\/\/\/\/
+      //put in a real value\/\/\/\/\/
+    public static final double GearRatio = 6.82; //todo, put in an actual value
+     //put in a real value^^^^^^^
+      //put in a real value^^^^^^
+      //put in a real value^^^^^^^
     public static final double turnMotorMaxOutputVolts = 7;
     public static final double angleKP = 0.04; //todo, put in actual values for all pids
     public static final double angleKI = 0;
