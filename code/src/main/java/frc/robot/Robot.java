@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
@@ -27,6 +29,7 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
+    super( isSimulation() ? Constants.simulationTimestep.in(Seconds) : Robot.kDefaultPeriod);
     // !!! IMPORTANT !!!!
     // ensure that all real robots have a usb drive for log data. Otherwise it will
     // be written to the roborio's SD card/internal storage, which has limited write endurance
