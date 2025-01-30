@@ -80,6 +80,10 @@ public class SwerveDrive extends SubsystemBase {
         return moduleStates;
     }
 
+    public ChassisSpeeds getChassisSpeeds() {
+        return SwerveConstants.kinematics.toChassisSpeeds(getModuleStates());
+      }
+
     /// Chassis Speeds can saturate the modules, this method desaturates the modules
     public void runChassisSpeeds(ChassisSpeeds speeds) {
         loggedTargetChassisSpeeds = speeds;

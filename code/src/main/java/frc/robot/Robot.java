@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
@@ -77,6 +79,9 @@ public class Robot extends TimedRobot {
 
     // Initialize Robot
     m_robotContainer = new RobotContainer();
+
+    // https://pathplanner.dev/pplib-follow-a-single-path.html#java-warmup
+    FollowPathCommand.warmupCommand().schedule();
   }
 
   @Override

@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "start_l score_h"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score_l3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "score_h coral_l"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "coral_l score_j"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score_l3"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -52,6 +54,17 @@ public class Localization extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics, getGyroAngle(),
                 swerve.getModulePositions(), Pose2d.kZero);
 
+        // Configure path planner logging
+        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            // Logging callback for target robot pose
+            dashboardField.getObject("target pose").setPose(pose);
+        });
+
+        PathPlannerLogging.setLogActivePathCallback((poses) -> {
+            // Logging callback for the active path, this is sent as a list of poses
+            dashboardField.getObject("path").setPoses(poses);
+        });
+
         SmartDashboard.putData("Field", dashboardField);
     }
 
@@ -62,6 +75,11 @@ public class Localization extends SubsystemBase {
 
     public Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    public void resetPose(Pose2d newPose) {
+        odometry.resetPose(newPose);
+        poseEstimator.resetPose(newPose);
     }
 
     @Override
@@ -78,8 +96,6 @@ public class Localization extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        super.simulationPeriodic();
-
         /// Estimate the angle of the robot purely from the wheel encoders, this is good
         /// enough for a simulated robot.
         ChassisSpeeds chassisSpeedsFromKinematics = SwerveConstants.kinematics
