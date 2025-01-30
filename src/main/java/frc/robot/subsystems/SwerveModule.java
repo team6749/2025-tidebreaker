@@ -48,21 +48,21 @@ public class SwerveModule extends SubsystemBase {
   public void periodic() {
     getDesiredState(state);
     getState();
-    double power = drivePID.calculate(state.speedMetersPerSecond, desiredState.speedMetersPerSecond);
-    double angle = anglePID.calculate(state.angle.getDegrees(), desiredState.angle.getDegrees());
-    driveMotor.set((feedForward + power) / Constants.SwerveConstants.maxVelocity);
-    angleMotor.set(angle);
+    Voltage power = drivePID.calculate(state.speedMetersPerSecond, desiredState.speedMetersPerSecond);
+    Radians angle = anglePID.calculate(state.angle.getDegrees(), desiredState.angle.getDegrees());
+    driveMotor.setVoltage((feedForward + power) / Constants.SwerveConstants.maxVelocity);
+    angleMotor.setVoltage(angle);
     // This method will be called once per scheduler run
     }
 
     public double getDriveVelocity() {  
-      return driveMotor.getVelocity().getValueAsDouble() * Constants.SwerveConstants.WheelRadius * 2 * Math.PI;
+      return driveMotor.getVelocity().getValueAsDouble() * Constants.SwerveConstants.WheelRadius * 2 * Math.PI / Constants.SwerveConstants.GearRatio;
     }
     public Rotation2d getAngle() {
       return Rotation2d.fromDegrees(angleMotor.getVelocity().getValueAsDouble() * 360);
     }
     public double getDrivePosition() {
-      return driveMotor.getPosition().getValueAsDouble() * Constants.SwerveConstants.WheelRadius * 2 * Math.PI;
+      return driveMotor.getPosition().getValueAsDouble() * Constants.SwerveConstants.WheelRadius * 2 * Math.PI / Constants.SwerveConstants.GearRatio;
     }
 
 
