@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Localization;
 
 @Logged
 public class SwerveDrive extends SubsystemBase {
@@ -105,12 +106,16 @@ public class SwerveDrive extends SubsystemBase {
 
     // Simple robot relative drive with no field oriented control, response curves,
     // deadbands, or slew rates
-    public Command basicDriveCommand(XboxController controller) {
+    public Command basicDriveCommand(XboxController controller, Localization localizationSubsystem){
+
+
+
         Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
-                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxLinearVelocity.times(-controller.getLeftY()),
+                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxAngularVelocity.times(-controller.getRightX()));
+                    //targetSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeeds, localizationSubsystem.getRobotPose().getRotation());
 
             // Desaturate the input
             SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(targetSpeeds);
