@@ -43,19 +43,19 @@ public class SwerveConstants {
 
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.moduleLocations);
 
-    public static int FRDriveMotorPort = ;
-    public static int FRAngleMotorPort = ;
-    public static int FREncoderPort = ;
+    public static int FLAngleMotorPort = 1;
+    public static int FLEncoderPort = 2;
+    public static int FLDriveMotorPort = 3;
 
-    public static int FLDriveMotorPort = ;
-    public static int FLAngleMotorPort = ;
-    public static int FLEncoderPort = ;
+    public static int FRAngleMotorPort = 4;
+    public static int FREncoderPort = 5;
+    public static int FRDriveMotorPort = 6;
 
-    public static int BLDriveMotorPort = ;
-    public static int BLAngleMotorPort = ;
-    public static int BLEncoderPort = ;
+    public static int BRAngleMotorPort = 7;
+    public static int BREncoderPort = 8;
+    public static int BRDriveMotorPort = 9;
 
-    public static int BRDriveMotorPort = ;
-    public static int BRAngleMotorPort = ;
-    public static int BREncoderPort = ;
+    public static int BLAngleMotorPort = 10;
+    public static int BLEncoderPort = 11;
+    public static int BLDriveMotorPort = 12;
 }
