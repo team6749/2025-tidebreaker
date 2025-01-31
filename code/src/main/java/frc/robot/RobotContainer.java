@@ -29,7 +29,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
   }
 
   public Command getAutonomousCommand() {
