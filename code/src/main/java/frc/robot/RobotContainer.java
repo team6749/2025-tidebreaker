@@ -111,9 +111,9 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // configureBindings();
+    configureBindings();
     // configureBindingsArmTest();
-    configureBindingsElevatorTest();
+    // configureBindingsElevatorTest();
   }
 
   private void configureBindings() {
@@ -131,7 +131,7 @@ public class RobotContainer {
     aButton.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Meters.of(1.2)),
         elevatorSubsystem.goToPositionCommand(Meters.of(0.2))));
     yButton.whileTrue(Commands.runEnd(() -> {
-      elevatorSubsystem.runVolts(Volts.of(6));
+      elevatorSubsystem.runOpenLoop(Volts.of(6));
     }, () -> {
       elevatorSubsystem.stop();
     }, elevatorSubsystem));
@@ -143,7 +143,7 @@ public class RobotContainer {
     aButton.whileTrue(Commands.repeatingSequence(armSubsystem.goToPositionCommand(Degrees.of(-45)),
         armSubsystem.goToPositionCommand(Degrees.of(45))));
     yButton.whileTrue(Commands.runEnd(() -> {
-      armSubsystem.runVolts(Volts.of(0.6));
+      armSubsystem.runOpenLoop(Volts.of(0.6));
     }, () -> {
       armSubsystem.stop();
     }, armSubsystem));

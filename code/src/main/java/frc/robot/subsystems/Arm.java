@@ -116,6 +116,7 @@ public class Arm extends SubsystemBase {
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
   private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
   private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
+  @SuppressWarnings("unused")
   private final MechanismLigament2d m_armTower = m_armPivot
       .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90, 2, new Color8Bit(Color.kAqua)));
   private final MechanismLigament2d m_arm = m_armPivot.append(
@@ -144,25 +145,26 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putData("Arm Sim", m_mech2d);
   }
 
-  public void runGoal(Angle goal) {
+  public void setGoalAndEnableClosedLoop(Angle goal) {
     isRunningClosedLoop = true;
     goalState = new TrapezoidProfile.State(goal.in(Radians), 0);
   }
 
-  // runs the elevator with a specific voltage.
-  public void runVolts(Voltage volts) {
+  public void runOpenLoop(Voltage volts) {
     isRunningClosedLoop = false;
-    runVoltsPrivate(volts);
+    setVolts(volts);
   }
 
-  private void runVoltsPrivate(Voltage volts) {
+  private void setVolts(Voltage volts) {
     m_motor.setVoltage(volts.in(Volts));
     if (Robot.isSimulation()) {
       m_armSim.setInputVoltage(volts.in(Volts));
     }
   }
 
+  // Stops motors and disables closed loop control if it was enabled.
   public void stop() {
+    isRunningClosedLoop = false;
     m_motor.setVoltage(0);
     m_armSim.setInputVoltage(0);
   }
@@ -192,7 +194,7 @@ public class Arm extends SubsystemBase {
       // setpoint.velocity,
       // next.velocity));
 
-      runVoltsPrivate(pidOutput.plus(feedForwardOutput));
+      setVolts(pidOutput.plus(feedForwardOutput));
       setpoint = next;
     }
 
@@ -216,13 +218,17 @@ public class Arm extends SubsystemBase {
     return getPosition().isNear(position, toleranceOnReachedGoal);
   }
 
-  // Runs the elevator to a specific position and then holds there, until the
-  // command is interrupted
+  // Runs the elevator to a specific position and then holds there.
+  // If the command is interrupted the system will hold at the position it is currently at
+  // Call stop() to disable all output power
   public Command goToPositionCommand(Angle position) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
-      runGoal(position);
-    }, this).until(() -> isAtGoalPosition(position)).andThen(() -> stop());
+      setGoalAndEnableClosedLoop(position);
+    }, this).until(() -> isAtGoalPosition(position)).handleInterrupt(() -> {
+      System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
+      goalState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
+    });
   }
 }

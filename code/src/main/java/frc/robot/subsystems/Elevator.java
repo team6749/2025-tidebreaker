@@ -134,25 +134,26 @@ public class Elevator extends SubsystemBase {
     return limitSwitch.getAsBoolean();
   }
 
-  public void runGoal(Distance goal) {
+  public void setGoalAndEnableClosedLoop(Distance goal) {
     goalState = new TrapezoidProfile.State(goal.in(Meters), 0);
     isRunningClosedLoop = true;
   }
 
-  // runs the elevator with a specific voltage. Does not care about home state
-  public void runVolts(Voltage volts) {
+  public void runOpenLoop(Voltage volts) {
     isRunningClosedLoop = false;
-    runVoltsPrivate(volts);
+    setVolts(volts);
   }
 
-  private void runVoltsPrivate(Voltage volts) {
+  private void setVolts(Voltage volts) {
     m_motor.setVoltage(volts.in(Volts));
     if (Robot.isSimulation()) {
       m_elevatorSim.setInput(volts.in(Volts));
     }
   }
 
+  // Stops motors and disables closed loop control if it was enabled.
   public void stop() {
+    isRunningClosedLoop = false;
     m_motor.setVoltage(0);
     m_elevatorSim.setInput(0);
   }
@@ -160,7 +161,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     if (isHomed == false) {
-      runVoltsPrivate(Volts.of(-1));
+      setVolts(Volts.of(-2));
       if (getLimitSwitch()) {
         isHomed = true;
         m_motor.setPosition(minHeight.in(Meters) / outputRatio);
@@ -178,7 +179,7 @@ public class Elevator extends SubsystemBase {
       Voltage pidOutput = Volts.of(controller.calculate(getPosition().in(Meters), setpoint.position));
 
       Voltage feedforwardOutput = Volts.of(feedforward.calculateWithVelocities(setpoint.velocity, next.velocity));
-      runVoltsPrivate(pidOutput.plus(feedforwardOutput));
+      setVolts(pidOutput.plus(feedforwardOutput));
 
       setpoint = next;
     }
@@ -203,13 +204,18 @@ public class Elevator extends SubsystemBase {
     return getPosition().isNear(position, toleranceOnReachedGoal);
   }
 
-  // Runs the elevator to a specific position
+  // Runs the elevator to a specific position and then holds there.
+  // If the command is interrupted the system will hold at the position it is currently at
+  // Call stop() to disable all output power
   public Command goToPositionCommand(Distance position) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
-      runGoal(position);
-    }, this).until(() -> isAtGoalPosition(position)).andThen(() -> stop());
+      setGoalAndEnableClosedLoop(position);
+    }, this).until(() -> isAtGoalPosition(position)).handleInterrupt(() -> {
+      System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
+      goalState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+    });
   }
 
 }
