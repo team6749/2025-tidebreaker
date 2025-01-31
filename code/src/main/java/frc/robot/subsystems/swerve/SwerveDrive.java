@@ -39,10 +39,10 @@ public class SwerveDrive extends SubsystemBase {
             backLeft = new SwerveModuleSim();
             backRight = new SwerveModuleSim();
         } else {
-           frontLeft = new SwerveModuleReal(getName(), 0, 0);
-           frontRight = new SwerveModuleReal(getName(), 0, 0);
-           backLeft = new SwerveModuleReal(getName(), 0, 0);
-           backRight = new SwerveModuleReal(getName(), 0, 0);
+           frontLeft = new SwerveModuleReal(getName(), SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort, SwerveConstants.FLEncoderPort);
+           frontRight = new SwerveModuleReal(getName(), SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort, SwerveConstants.FREncoderPort);
+           backLeft = new SwerveModuleReal(getName(),SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort, SwerveConstants.BLEncoderPort);
+           backRight = new SwerveModuleReal(getName(), SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort, SwerveConstants.BREncoderPort);
         }
 
         modules[0] = frontLeft;
