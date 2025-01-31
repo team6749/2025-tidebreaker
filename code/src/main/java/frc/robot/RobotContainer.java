@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -111,7 +112,8 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // configureBindings();
-    configureBindingsArmTest();
+    // configureBindingsArmTest();
+    configureBindingsElevatorTest();
   }
 
   private void configureBindings() {
@@ -121,6 +123,18 @@ public class RobotContainer {
     // Bind buttons and trigger behavior
     bButton.onTrue(intakeCommand());
     aButton.onTrue(elevatorCommands.positionLevel3());
+  }
+
+  private void configureBindingsElevatorTest() {
+    xButton.whileTrue(elevatorSubsystem.goToPositionCommand(Meters.of(1.2)));
+    bButton.whileTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.2)));
+    aButton.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Meters.of(1.2)),
+        elevatorSubsystem.goToPositionCommand(Meters.of(0.2))));
+    yButton.whileTrue(Commands.runEnd(() -> {
+      elevatorSubsystem.runVolts(Volts.of(6));
+    }, () -> {
+      elevatorSubsystem.stop();
+    }, elevatorSubsystem));
   }
 
   private void configureBindingsArmTest() {
@@ -137,11 +151,11 @@ public class RobotContainer {
 
   public Command scoreLevel3() {
     Command command = Commands.sequence(
-      elevatorCommands.idlePosition(), 
-      armCommands.intakePosition(),
-      elevatorCommands.positionLevel3(),
-      armCommands.scoreLevel2And3(),
-      Commands.parallel(elevatorCommands.idlePosition(), armCommands.intakePosition()));
+        elevatorCommands.idlePosition(),
+        armCommands.intakePosition(),
+        elevatorCommands.positionLevel3(),
+        armCommands.scoreLevel2And3(),
+        Commands.parallel(elevatorCommands.idlePosition(), armCommands.intakePosition()));
     command.setName("Score Level 3");
     return command;
   }

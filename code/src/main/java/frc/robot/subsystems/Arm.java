@@ -60,9 +60,10 @@ public class Arm extends SubsystemBase {
   // Constants
   public static Distance armLength = Meters.of(0.4);
   public static Mass armMass = Kilograms.of(5);
-  public static int armReduction = 20 * 2; // 15 for gearbox, 2 for the sproket
+  public static int armReduction = 25 * 2; // 15 for gearbox, 2 for the sproket
   public static double outputRatio = (1.0 / armReduction);
-  // Offset to apply to the encoder to make the arm have a zero position parallel to the floor
+  // Offset to apply to the encoder to make the arm have a zero position parallel
+  // to the floor
   public static Angle angleOffset = Degrees.of(0);
   public static Angle minAngle = Degrees.of(-90);
   public static Angle maxAngle = Degrees.of(90);
@@ -71,11 +72,10 @@ public class Arm extends SubsystemBase {
   public static AngularVelocity maxVelocity = DegreesPerSecond.of(60);
   public static AngularAcceleration maxAccerleration = DegreesPerSecondPerSecond.of(60);
 
-
   private final DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
   // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/tuning-vertical-arm.html
-  private final PIDController controller = new PIDController(8, 0, 0);
+  private final PIDController controller = new PIDController(12, 0, 0);
   // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/feedforward.html#armfeedforward
   private final ArmFeedforward feedforward = new ArmFeedforward(
       0,
@@ -90,6 +90,7 @@ public class Arm extends SubsystemBase {
 
   // Intermediate goal position, used for closed loop control.
   private TrapezoidProfile.State setpoint = new TrapezoidProfile.State(0, 0);
+  private TrapezoidProfile.State goalState = setpoint;
   private boolean isRunningClosedLoop = false;
 
   private final TalonFX m_motor = new TalonFX(1);
@@ -116,7 +117,7 @@ public class Arm extends SubsystemBase {
   private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
   private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
   private final MechanismLigament2d m_armTower = m_armPivot
-      .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90));
+      .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90, 2, new Color8Bit(Color.kAqua)));
   private final MechanismLigament2d m_arm = m_armPivot.append(
       new MechanismLigament2d(
           "Arm",
@@ -125,46 +126,27 @@ public class Arm extends SubsystemBase {
           6,
           new Color8Bit(Color.kYellow)));
 
-  // Returns angles where zero is parallel to the floor (gravity). Values can be negative
+  // Returns angles where zero is parallel to the floor (gravity). Values can be
+  // negative
   public Angle getPosition() {
     // The duty cycle encoder does not handle rollover
     // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html#duty-cycle-encoders-the-dutycycleencoder-class
     return Rotations.of(encoder.get() * outputRatio).plus(angleOffset);
   }
 
-  public AngularVelocity getVelocity () {
+  public AngularVelocity getVelocity() {
     // TODO implement
     return RotationsPerSecond.of(0);
   }
 
   /** Creates a new ArmSubsystem. */
   public Arm() {
-    setDefaultCommand(holdPositionAtSetpointCommand());
-
     SmartDashboard.putData("Arm Sim", m_mech2d);
   }
 
   public void runGoal(Angle goal) {
     isRunningClosedLoop = true;
-    if (encoderConnected == false) {
-      System.out.println("WARNING: Arm encoder disconnected");
-      // Resetting state to avoid sudden movement when reconnected
-      resetProfileState();
-      stop();
-      return;
-    }
-    var currentPosition = getPosition();
-    var goalState = new TrapezoidProfile.State(goal.in(Radians), 0);
-    var next = profile.calculate(Constants.simulationTimestep.in(Seconds), setpoint, goalState);
-
-    Voltage pidOutput = Volts.of(controller.calculate(currentPosition.in(Radians), setpoint.position));
-    Voltage feedForwardOutput = Volts.of(feedforward.calculate(setpoint.position, setpoint.velocity));
-    // For some reason this feed forward breaks.. not sure why. but it just makes everything nan after 1 iteration
-    // Voltage feedForwardOutput = Volts.of(feedforward.calculateWithVelocities(currentPosition.in(Radians), setpoint.velocity,
-    // next.velocity));
-
-    runVoltsPrivate(pidOutput.plus(feedForwardOutput));
-    setpoint = next;
+    goalState = new TrapezoidProfile.State(goal.in(Radians), 0);
   }
 
   // runs the elevator with a specific voltage.
@@ -173,7 +155,7 @@ public class Arm extends SubsystemBase {
     runVoltsPrivate(volts);
   }
 
-  private void runVoltsPrivate (Voltage volts) {
+  private void runVoltsPrivate(Voltage volts) {
     m_motor.setVoltage(volts.in(Volts));
     if (Robot.isSimulation()) {
       m_armSim.setInputVoltage(volts.in(Volts));
@@ -190,10 +172,29 @@ public class Arm extends SubsystemBase {
     encoderConnected = encoder.isConnected();
     encoderDisconnectedAlert.set(encoderConnected == false);
 
-    // if(isRunningClosedLoop) {
-    //   // This ensures that the arm angle is held even during command groups.
-    //   runGoal(Radians.of(setpoint.position));
-    // }
+    if (isRunningClosedLoop) {
+      if (encoderConnected == false) {
+        System.out.println("WARNING: Arm encoder disconnected");
+        // Resetting state to avoid sudden movement when reconnected
+        resetProfileState();
+        stop();
+        return;
+      }
+      var currentPosition = getPosition();
+      var next = profile.calculate(Constants.simulationTimestep.in(Seconds), setpoint, goalState);
+
+      Voltage pidOutput = Volts.of(controller.calculate(currentPosition.in(Radians), setpoint.position));
+      Voltage feedForwardOutput = Volts.of(feedforward.calculate(setpoint.position, setpoint.velocity));
+      // For some reason this feed forward breaks.. not sure why. but it just makes
+      // everything nan after 1 iteration
+      // Voltage feedForwardOutput =
+      // Volts.of(feedforward.calculateWithVelocities(currentPosition.in(Radians),
+      // setpoint.velocity,
+      // next.velocity));
+
+      runVoltsPrivate(pidOutput.plus(feedForwardOutput));
+      setpoint = next;
+    }
 
     // Telemetry
     m_arm.setAngle(getPosition().in(Degrees));
@@ -211,29 +212,8 @@ public class Arm extends SubsystemBase {
     setpoint = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
   }
 
-  public boolean atGoalPosition(Angle position) {
+  public boolean isAtGoalPosition(Angle position) {
     return getPosition().isNear(position, toleranceOnReachedGoal);
-  }
-
-  // Holds position at the current measured location
-  // Note, elevator hold can possibly be unstable when it is started at a high
-  // speed
-  public Command holdPositionAtSetpointCommand() {
-    Command command = Commands.startRun(() -> {
-      if (getPosition().isNear(Radians.of(setpoint.position), toleranceOnReachedGoal) == false) {
-        System.out.println(
-            "WARNING: Elevator Hold started far away from setpoint, resetting setpoint to avoid rapid movement");
-        setpoint = new TrapezoidProfile.State(getPosition().in(Radians), 0);
-        // If we are near the setpoint, we should use that, otherwise, just use the
-        // current hold position.
-      }
-    }, () -> {
-      runGoal(Radians.of(setpoint.position));
-    }, this).finallyDo(() -> {
-      stop();
-    });
-    command.setName("Arm Hold Command");
-    return command;
   }
 
   // Runs the elevator to a specific position and then holds there, until the
@@ -243,6 +223,6 @@ public class Arm extends SubsystemBase {
       resetProfileState();
     }, () -> {
       runGoal(position);
-    }, this).until(() -> atGoalPosition(position)).andThen(() -> stop());
+    }, this).until(() -> isAtGoalPosition(position)).andThen(() -> stop());
   }
 }

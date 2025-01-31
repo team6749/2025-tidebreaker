@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -26,6 +27,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -45,26 +47,26 @@ public class Elevator extends SubsystemBase {
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(1.45);
   public static Distance simStartHeight = Meters.of(1);
-  public static int gearboxRatio = 25;
-  public static double carriageWeightKg = 15;
+  public static int gearboxRatio = 20;
+  public static Mass carriageMass = Kilograms.of(15);
   public static Distance sproketDiameter = Inches.of(3);
   // Total Ratio of the mechanism from rotations to meters
   public static double outputRatio = (1.0 / gearboxRatio) * sproketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.02);
 
   public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
-  public static LinearAcceleration maxAccerleration = MetersPerSecondPerSecond.of(0.5);
+  public static LinearAcceleration maxAccerleration = MetersPerSecondPerSecond.of(1);
 
   // Hardware
   private final TalonFX m_motor = new TalonFX(1);
 
   private final PIDController controller = new PIDController(
-      4,
+      20,
       0,
       0);
   private final ElevatorFeedforward feedforward = new ElevatorFeedforward(
       0,
-      1.15, // Most important value
+      1.25, // Most important value
       5,
       0);
 
@@ -80,6 +82,7 @@ public class Elevator extends SubsystemBase {
 
   // Intermediate goal position, used for closed loop control.
   private TrapezoidProfile.State setpoint = new TrapezoidProfile.State(0, 0);
+  private TrapezoidProfile.State goalState = setpoint;
   private boolean isRunningClosedLoop = false;
 
   private BooleanSupplier limitSwitch;
@@ -93,7 +96,7 @@ public class Elevator extends SubsystemBase {
   private final ElevatorSim m_elevatorSim = new ElevatorSim(
       m_elevatorGearbox,
       gearboxRatio,
-      carriageWeightKg,
+      carriageMass.in(Kilograms),
       sproketDiameter.in(Meters),
       minHeight.in(Meters),
       maxHeight.in(Meters),
@@ -110,12 +113,8 @@ public class Elevator extends SubsystemBase {
 
   /** Creates a new Elevator. */
   public Elevator() {
-    setDefaultCommand(holdPositionAtSetpointCommand());
-
     if (Robot.isSimulation()) {
-      // TODO this is bugged for some reason it returns true right away, use the
-      // debugger to investigate!?
-      limitSwitch = () -> m_elevatorSim.wouldHitLowerLimit(getPosition().in(Meters));
+      limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
     } else {
       // TODO implement real limit switch
     }
@@ -135,20 +134,9 @@ public class Elevator extends SubsystemBase {
     return limitSwitch.getAsBoolean();
   }
 
-  // Runs the elevator if it is homed
   public void runGoal(Distance goal) {
+    goalState = new TrapezoidProfile.State(goal.in(Meters), 0);
     isRunningClosedLoop = true;
-    if (isHomed == false) {
-      return;
-    }
-    var goalState = new TrapezoidProfile.State(goal.in(Meters), 0);
-    var next = profile.calculate(Constants.simulationTimestep.in(Seconds), setpoint, goalState);
-
-    Voltage pidOutput = Volts.of(controller.calculate(getPosition().in(Meters), setpoint.position));
-    Voltage feedforwardOutput = Volts.of(feedforward.calculateWithVelocities(setpoint.velocity, next.velocity));
-    runVoltsPrivate(pidOutput.plus(feedforwardOutput));
-
-    setpoint = next;
   }
 
   // runs the elevator with a specific voltage. Does not care about home state
@@ -179,10 +167,21 @@ public class Elevator extends SubsystemBase {
       }
     }
 
-    // if(isRunningClosedLoop) {
-    //   // This ensures that the arm angle is held even during command groups.
-    //   runGoal(Meters.of(setpoint.position));
-    // }
+    if (isRunningClosedLoop) {
+      if (isHomed == false) {
+        System.out.println("WARNING: Elevator not homed, but closed loop control is enabled");
+        resetProfileState();
+        return;
+      }
+      var next = profile.calculate(Constants.simulationTimestep.in(Seconds), setpoint, goalState);
+
+      Voltage pidOutput = Volts.of(controller.calculate(getPosition().in(Meters), setpoint.position));
+
+      Voltage feedforwardOutput = Volts.of(feedforward.calculateWithVelocities(setpoint.velocity, next.velocity));
+      runVoltsPrivate(pidOutput.plus(feedforwardOutput));
+
+      setpoint = next;
+    }
 
     // Telemetry
     m_elevatorMech2d.setLength(getPosition().in(Meters));
@@ -200,29 +199,8 @@ public class Elevator extends SubsystemBase {
     setpoint = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
-  public boolean atGoalPosition(Distance position) {
+  public boolean isAtGoalPosition(Distance position) {
     return getPosition().isNear(position, toleranceOnReachedGoal);
-  }
-
-  // Holds position at the current measured location
-  // Note, elevator hold can possibly be unstable when it is started at a high
-  // speed
-  public Command holdPositionAtSetpointCommand() {
-    Command command = Commands.startRun(() -> {
-      if (getPosition().isNear(Meters.of(setpoint.position), toleranceOnReachedGoal) == false) {
-        System.out.println(
-            "WARNING: Elevator Hold started far away from setpoint, resetting setpoint to avoid rapid movement");
-        setpoint = new TrapezoidProfile.State(getPosition().in(Meters), 0);
-        // If we are near the setpoint, we should use that, otherwise, just use the
-        // current hold position.
-      }
-    }, () -> {
-      runGoal(Meters.of(setpoint.position));
-    }, this).finallyDo(() -> {
-      stop();
-    });
-    command.setName("Elevator Hold Command");
-    return command;
   }
 
   // Runs the elevator to a specific position
@@ -231,7 +209,7 @@ public class Elevator extends SubsystemBase {
       resetProfileState();
     }, () -> {
       runGoal(position);
-    }, this).until(() -> atGoalPosition(position)).andThen(() -> stop());
+    }, this).until(() -> isAtGoalPosition(position)).andThen(() -> stop());
   }
 
 }
