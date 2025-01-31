@@ -8,11 +8,14 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -20,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
@@ -32,6 +36,8 @@ public class Localization extends SubsystemBase {
 
     @NotLogged
     SwerveDriveOdometry odometry;
+
+    boolean doRejectUpdate = false;
 
     @NotLogged
     SwerveDrivePoseEstimator poseEstimator;
@@ -55,6 +61,7 @@ public class Localization extends SubsystemBase {
         SmartDashboard.putData("Field", dashboardField);
     }
 
+
     /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
     private Rotation2d getGyroAngle() {
         return Rotation2d.fromDegrees(gyro.getAngle());
@@ -64,11 +71,15 @@ public class Localization extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
+
     @Override
     public void periodic() {
 
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
+        poseEstimator.addVisionMeasurement(getRobotPose(), 0);
+        poseEstimator.setVisionMeasurementStdDevs(null);
+
 
         // TODO add vision measurements
 
@@ -76,6 +87,21 @@ public class Localization extends SubsystemBase {
         dashboardField.setRobotPose(getRobotPose());
     }
 
+    public void setVision() {
+        LimelightHelpers.SetRobotOrientation("limelight", poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        if(mt2.tagCount == 0)
+        {
+          doRejectUpdate = true;
+        }
+        if(!doRejectUpdate)
+        {
+          poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+          poseEstimator.addVisionMeasurement(
+              mt2.pose,
+              mt2.timestampSeconds);
+        }
+    }
     @Override
     public void simulationPeriodic() {
         super.simulationPeriodic();
