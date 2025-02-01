@@ -29,7 +29,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    // swerveSubsystem.setDefaultCommand(swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(0,0,0.1)));
   }
 
   public Command getAutonomousCommand() {

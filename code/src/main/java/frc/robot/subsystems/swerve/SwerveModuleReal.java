@@ -18,6 +18,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -36,30 +37,32 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import pabeles.concurrency.IntOperatorTask.Min;
 
+@Logged
 public class SwerveModuleReal implements SwerveModuleBase {
   public TalonFX driveMotor;
   public TalonFX angleMotor;
   public CANcoder encoder;
-  public String name;
   private LinearVelocity velocity = MetersPerSecond.zero();
   private Rotation2d angle = Rotation2d.kZero;
   private Distance position = Meters.zero();
-  public PIDController anglePID = new PIDController(0, 0, 0);
   public PIDController drivePID = new PIDController(0, 0, 0);
+  public PIDController anglePID = new PIDController(0.1, 0, 0);
   public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(1,2);
   /** Creates a new SwerveModule. */
-  public SwerveModuleReal(int DriveMotorPort, int AngleMotorPort, int encoder) {
+  public SwerveModuleReal(int driveMotorPort, int angleMotorPort, int encoderPort) {
 
-    driveMotor = new TalonFX(DriveMotorPort);
-    angleMotor = new TalonFX(AngleMotorPort);
+    driveMotor = new TalonFX(driveMotorPort);
+    angleMotor = new TalonFX(angleMotorPort);
     drivePID.enableContinuousInput(-Math.PI, Math.PI);
+    encoder = new CANcoder(encoderPort);
   }
 // hello, i dont do code for a reason -Austin
 
   @Override
   public void periodic() {
     velocity = MetersPerSecond.of(driveMotor.getVelocity().getValue().in(RotationsPerSecond) / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
-    angle = Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble() * 360);
+    angle = Rotation2d.fromDegrees(encoder.getAbsolutePosition().getValueAsDouble() * 360);//This is in radians
+    //angle = Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble() * 360);
     position = Meters.of(driveMotor.getPosition().getValue().in(Rotations) / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
     // This method will be called once per scheduler run
     }

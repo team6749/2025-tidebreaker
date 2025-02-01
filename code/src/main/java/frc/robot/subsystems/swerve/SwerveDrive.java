@@ -6,6 +6,7 @@ package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -28,6 +29,13 @@ public class SwerveDrive extends SubsystemBase {
 
     @NotLogged
     SwerveModuleBase[] modules = new SwerveModuleBase[4];
+
+    SwerveModuleState[] states = {
+        new SwerveModuleState(0, Rotation2d.kZero),
+        new SwerveModuleState(0, Rotation2d.kZero),
+        new SwerveModuleState(0, Rotation2d.kZero),
+        new SwerveModuleState(0, Rotation2d.kZero),
+    };
 
     // For logging purposes right now.
     ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
@@ -56,6 +64,8 @@ public class SwerveDrive extends SubsystemBase {
         if (RobotState.isDisabled()) {
             stop();
         }
+
+        runModuleStates(states);
 
         for(int i = 0; i < modules.length; i++) {
             modules[i].periodic();
@@ -127,4 +137,5 @@ public class SwerveDrive extends SubsystemBase {
         command.setName("Base Drive Command");
         return command;
     }
+
 }
