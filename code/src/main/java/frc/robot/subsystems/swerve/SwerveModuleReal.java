@@ -41,26 +41,25 @@ public class SwerveModuleReal implements SwerveModuleBase {
   public TalonFX angleMotor;
   public CANcoder encoder;
   public String name;
-  private LinearVelocity velocity;
-  private Rotation2d angle;
-  private Distance position;
+  private LinearVelocity velocity = MetersPerSecond.zero();
+  private Rotation2d angle = Rotation2d.kZero;
+  private Distance position = Meters.zero();
   public PIDController anglePID = new PIDController(0, 0, 0);
   public PIDController drivePID = new PIDController(0, 0, 0);
   public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(1,2);
   /** Creates a new SwerveModule. */
-  public SwerveModuleReal(String ModuleName, int DriveMotorPort, int AngleMotorPort) {
+  public SwerveModuleReal(int DriveMotorPort, int AngleMotorPort, int encoder) {
 
     driveMotor = new TalonFX(DriveMotorPort);
     angleMotor = new TalonFX(AngleMotorPort);
     drivePID.enableContinuousInput(-Math.PI, Math.PI);
-    name = ModuleName;
   }
 // hello, i dont do code for a reason -Austin
 
   @Override
   public void periodic() {
     velocity = MetersPerSecond.of(driveMotor.getVelocity().getValue().in(RotationsPerSecond) / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
-    angle = Rotation2d.fromDegrees(angleMotor.getVelocity().getValueAsDouble() * 360);
+    angle = Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble() * 360);
     position = Meters.of(driveMotor.getPosition().getValue().in(Rotations) / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
     // This method will be called once per scheduler run
     }
