@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -12,6 +13,10 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 
 public class SwerveConstants {
+
+    public static final SlewRateLimiter driveLimiterX = new SlewRateLimiter(20);
+    public static final SlewRateLimiter driveLimiterY = new SlewRateLimiter(20);
+    public static final SlewRateLimiter driveLimiterTheta = new SlewRateLimiter(27.5);
 
     // Max linear velocity of the module (how fast it can spin)
     public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(4.5);
