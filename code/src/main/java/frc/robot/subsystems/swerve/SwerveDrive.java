@@ -30,13 +30,6 @@ public class SwerveDrive extends SubsystemBase {
     @NotLogged
     SwerveModuleBase[] modules = new SwerveModuleBase[4];
 
-    SwerveModuleState[] states = {
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-    };
-
     // For logging purposes right now.
     ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
 
@@ -64,8 +57,6 @@ public class SwerveDrive extends SubsystemBase {
         if (RobotState.isDisabled()) {
             stop();
         }
-
-        runModuleStates(states);
 
         for(int i = 0; i < modules.length; i++) {
             modules[i].periodic();
@@ -122,8 +113,8 @@ public class SwerveDrive extends SubsystemBase {
     public Command basicDriveCommand(XboxController controller) {
         Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
-                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxLinearVelocity.times(-controller.getLeftY()),
+                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxAngularVelocity.times(-controller.getRightX()));
 
             // Desaturate the input
@@ -138,4 +129,15 @@ public class SwerveDrive extends SubsystemBase {
         return command;
     }
 
+    public Command testModuleSpeeds(SwerveModuleState target) {
+        Command command = Commands.runEnd(() -> {
+            //targetSpeeds = new ChassisSpeeds(1,0,0);
+            //targetSpeeds = new ChassisSpeeds(3,0,0);
+            //targetSpeeds = new ChassisSpeeds(0,0.5,0);
+            //targetSpeeds = new ChassisSpeeds(0,0,1);
+            runModuleStates(new SwerveModuleState[]{target,target,target,target});
+        }, () -> {
+            stop();}, this); 
+        return command;
+    }
 }

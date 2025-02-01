@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -19,6 +21,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,6 +30,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutVelocity;
@@ -43,64 +47,75 @@ public class SwerveModuleReal implements SwerveModuleBase {
   public TalonFX angleMotor;
   public CANcoder encoder;
   private LinearVelocity velocity = MetersPerSecond.zero();
-  private Rotation2d angle = Rotation2d.kZero;
+  private Angle angle = Radians.zero();
   private Distance position = Meters.zero();
-  public PIDController drivePID = new PIDController(0, 0, 0);
-  public PIDController anglePID = new PIDController(0.1, 0, 0);
-  public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(1,2);
+  public PIDController drivePID = new PIDController(1.8, 0, 0);
+  public PIDController anglePID = new PIDController(3.7,0, 0);
+  public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(1, 2);
+
   /** Creates a new SwerveModule. */
   public SwerveModuleReal(int driveMotorPort, int angleMotorPort, int encoderPort) {
 
     driveMotor = new TalonFX(driveMotorPort);
     angleMotor = new TalonFX(angleMotorPort);
-    drivePID.enableContinuousInput(-Math.PI, Math.PI);
+    anglePID.enableContinuousInput(-Math.PI, Math.PI);
     encoder = new CANcoder(encoderPort);
+    angleMotor.setNeutralMode(NeutralModeValue.Brake);
   }
-// hello, i dont do code for a reason -Austin
+  // hello, i dont do code for a reason -Austin
 
   @Override
   public void periodic() {
-    velocity = MetersPerSecond.of(driveMotor.getVelocity().getValue().in(RotationsPerSecond) / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
-    angle = Rotation2d.fromDegrees(encoder.getAbsolutePosition().getValueAsDouble() * 360);//This is in radians
-    //angle = Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble() * 360);
-    position = Meters.of(driveMotor.getPosition().getValue().in(Rotations) / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
+    velocity = MetersPerSecond.of(driveMotor.getVelocity().getValue().in(RotationsPerSecond)
+        / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
+    angle = Rotations.of(encoder.getAbsolutePosition().getValueAsDouble());// This is in radians
+    // angle = Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble() *
+    // 360);
+    position = Meters.of(driveMotor.getPosition().getValue().in(Rotations) / SwerveConstants.driveReduction
+        * SwerveConstants.wheelCircumference.in(Meters));
     // This method will be called once per scheduler run
-    }
-    @Override
-    public SwerveModuleState getState() {
-      return new SwerveModuleState(velocity,angle);
-    }
-    public void stop() {
-      driveMotor.stopMotor();
-      angleMotor.stopMotor();
-    }
-
-    @Override
-    public void runClosedLoop(SwerveModuleState inState) {
-      SwerveModuleState currentState = getState();
-      SwerveModuleState desiredState = new SwerveModuleState(inState.speedMetersPerSecond,inState.angle);
-      desiredState.optimize(currentState.angle);
-      desiredState.cosineScale(currentState.angle);
-      Voltage driveOutput = Volts.of(drivePID.calculate(currentState.speedMetersPerSecond, desiredState.speedMetersPerSecond));
-      Voltage angleOutput = Volts.of(anglePID.calculate(currentState.angle.getRadians(), desiredState.angle.getRadians()));
-      driveMotor.setVoltage((driveFeedForward.calculate(desiredState.speedMetersPerSecond) + driveOutput.in(Volts)));
-      angleMotor.setVoltage(angleOutput.in(Volts));
-    }
-
-    @Override
-    public void runOpenLoop(Voltage drive, Voltage turn) {
-      driveMotor.setVoltage(drive.in(Volts));
-      angleMotor.setVoltage(turn.in(Volts));
-    }
-
-    @Override
-    public SwerveModulePosition getPosition() {
-      return new SwerveModulePosition(position, angle);
-    }
-
-    @Override
-    public void setBrakeMode(boolean brake) {
-      driveMotor.setNeutralMode(brake ? NeutralModeValue.Brake:NeutralModeValue.Coast);
-    }
-
   }
+
+  @Override
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(velocity, Rotation2d.fromRadians(angle.in(Radians)));
+  }
+
+  public void stop() {
+    driveMotor.stopMotor();
+    angleMotor.stopMotor();
+  }
+
+  @Override
+  public void runClosedLoop(SwerveModuleState inState) {
+    SwerveModuleState currentState = getState();
+    SwerveModuleState desiredState = new SwerveModuleState(inState.speedMetersPerSecond, inState.angle);
+    desiredState.optimize(currentState.angle);
+    desiredState.cosineScale(currentState.angle);
+    Voltage driveOutput = Volts
+        .of(drivePID.calculate(currentState.speedMetersPerSecond, desiredState.speedMetersPerSecond));
+
+    Voltage angleOutput = Volts
+        .of(anglePID.calculate(MathUtil.angleModulus(currentState.angle.getRadians()),
+          desiredState.angle.getRadians()));
+    driveMotor.setVoltage((driveFeedForward.calculate(desiredState.speedMetersPerSecond) + driveOutput.in(Volts)));
+    angleMotor.setVoltage(-angleOutput.in(Volts));
+  }
+
+  @Override
+  public void runOpenLoop(Voltage drive, Voltage turn) {
+    driveMotor.setVoltage(drive.in(Volts));
+    angleMotor.setVoltage(turn.in(Volts));
+  }
+
+  @Override
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(position, Rotation2d.fromRadians(angle.in(Radians)));
+  }
+
+  @Override
+  public void setBrakeMode(boolean brake) {
+    driveMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+  }
+
+}
