@@ -6,6 +6,7 @@ package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Localization;
 
 @Logged
 public class SwerveDrive extends SubsystemBase {
@@ -38,7 +40,10 @@ public class SwerveDrive extends SubsystemBase {
             backLeft = new SwerveModuleSim();
             backRight = new SwerveModuleSim();
         } else {
-            // TODO Robot is real, so use real swerve module definitions
+           frontLeft = new SwerveModuleReal(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort, SwerveConstants.FLEncoderPort);
+           frontRight = new SwerveModuleReal(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort, SwerveConstants.FREncoderPort);
+           backLeft = new SwerveModuleReal(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort, SwerveConstants.BLEncoderPort);
+           backRight = new SwerveModuleReal(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort, SwerveConstants.BREncoderPort);
         }
 
         modules[0] = frontLeft;
@@ -108,8 +113,8 @@ public class SwerveDrive extends SubsystemBase {
     public Command basicDriveCommand(XboxController controller) {
         Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
-                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxLinearVelocity.times(-controller.getLeftY()),
+                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
                     SwerveConstants.maxAngularVelocity.times(-controller.getRightX()));
 
             // Desaturate the input
@@ -121,6 +126,18 @@ public class SwerveDrive extends SubsystemBase {
             stop();
         }, this);
         command.setName("Base Drive Command");
+        return command;
+    }
+
+    public Command testModuleSpeeds(SwerveModuleState target) {
+        Command command = Commands.runEnd(() -> {
+            //targetSpeeds = new ChassisSpeeds(1,0,0);
+            //targetSpeeds = new ChassisSpeeds(3,0,0);
+            //targetSpeeds = new ChassisSpeeds(0,0.5,0);
+            //targetSpeeds = new ChassisSpeeds(0,0,1);
+            runModuleStates(new SwerveModuleState[]{target,target,target,target});
+        }, () -> {
+            stop();}, this); 
         return command;
     }
 }

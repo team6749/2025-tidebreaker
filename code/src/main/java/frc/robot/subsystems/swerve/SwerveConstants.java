@@ -14,21 +14,21 @@ import edu.wpi.first.units.measure.LinearVelocity;
 public class SwerveConstants {
 
     // Max linear velocity of the module (how fast it can spin)
-    public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(4.5);
+    public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(4);
 
     // This should be based on physical properties of the the max wheel speeds in a circle
     public static final AngularVelocity maxAngularVelocity = DegreesPerSecond.of(360);
 
     public static final double angleReduction = (150.0 / 7.0);
-    public static final double driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
+    public static final double driveReduction = 6.82;
 
     public static final Distance wheelDiameter = Inches.of(4);
     public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
 
     // Distance between the center of wheels along the width of the robot(Y axis)
-    public static final Distance trackWidth = Meters.of(0.5);
+    public static final Distance trackWidth = Meters.of(0.6858);
     // Distance between the center of wheels along the depth of the robot (X axis)
-    public static final Distance trackHeight = Meters.of(0.7);
+    public static final Distance trackHeight = Meters.of(0.5334);
 
     public static final Translation2d[] moduleLocations = {
             // Front left
@@ -43,4 +43,19 @@ public class SwerveConstants {
 
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.moduleLocations);
 
+    public static int FLAngleMotorPort = 1;
+    public static int FLEncoderPort = 2;
+    public static int FLDriveMotorPort = 3;
+
+    public static int FRAngleMotorPort = 4;
+    public static int FREncoderPort = 5;
+    public static int FRDriveMotorPort = 6;
+
+    public static int BRAngleMotorPort = 7;
+    public static int BREncoderPort = 8;
+    public static int BRDriveMotorPort = 9;
+
+    public static int BLAngleMotorPort = 10;
+    public static int BLEncoderPort = 11;
+    public static int BLDriveMotorPort = 12;
 }

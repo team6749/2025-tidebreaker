@@ -13,5 +13,6 @@ public class Constants {
 
     // How long each frame of the simulation is
     public static final Time simulationTimestep = Hertz.of(50).asPeriod();
+    public static final int armMotorPort = 100000;
 
 }
