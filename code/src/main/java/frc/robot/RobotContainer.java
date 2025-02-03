@@ -13,6 +13,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
@@ -20,6 +22,7 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 public class RobotContainer {
 
   SwerveDrive swerveSubsystem;
+  Arm arm;
   Localization localizationSubsystem;
 
   XboxController controller = new XboxController(0);
@@ -35,11 +38,31 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    runArmCommand(); 
+    
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
 
   public Command getAutonomousCommand() {
     return swerveSubsystem.constantChassisSpeedsCommand(
         new ChassisSpeeds(2, 0, 2));
+  }
+
+  public Command runArmCommand() {
+    Command command = Commands.run(() -> {
+      if(controller.getBButton()) {
+        arm.armCommand(null);
+        System.out.println("l4");
+      }
+      else if (controller.getAButton()){
+        arm.armCommand(null);
+        System.out.println("l3");
+      }
+      else if(controller.getYButton()) {
+        arm.armCommand(null);
+        System.out.println("l2");
+      }
+    }, arm);
+    return command; /*Replace the controller buttons with button board(which we probaly will use), and fill in the actual desired angles */
   }
 }

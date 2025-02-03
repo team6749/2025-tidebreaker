@@ -15,4 +15,5 @@ public class Constants {
     public static final Time simulationTimestep = Hertz.of(50).asPeriod();
     public static final int armMotorPort = 100000;
 
+    public static final double armGearRatio = (1/5) * (1/5) * (16/30); // gearbox:1/5, gearbox2:1/5, chain:16/30 no clue about chain, double check that
 }
