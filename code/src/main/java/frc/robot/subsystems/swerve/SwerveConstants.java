@@ -22,7 +22,7 @@ public class SwerveConstants {
     public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(4);
 
     // This should be based on physical properties of the the max wheel speeds in a circle
-    public static final AngularVelocity maxAngularVelocity = DegreesPerSecond.of(360);
+    public static final AngularVelocity maxAngularVelocity = DegreesPerSecond.of(90);
 
     public static final double angleReduction = (150.0 / 7.0);
     public static final double driveReduction = 6.82;
