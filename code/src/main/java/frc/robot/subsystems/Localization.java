@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.Queue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -15,8 +18,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -24,12 +30,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
 public class Localization extends SubsystemBase {
 
-    Alert gyroDisconnectAlert = new Alert("Gyro disconnected, falling back to kinematics", AlertType.kError);
+    static final Time gyroTimeoutDuration = Milliseconds.of(500);
+
+    Alert gyroDisconnectAlert = new Alert("Gyro disconnected. Falling back to kinematics", AlertType.kError);
 
     @NotLogged
     SwerveDrive swerve;
@@ -39,6 +48,9 @@ public class Localization extends SubsystemBase {
 
     boolean isGyroConnected = true;
     ADIS16470_IMU gyro = new ADIS16470_IMU();
+
+    double lastGyroReading = 0;
+    double lastGyroReadingChangedTime = 0;
 
     @NotLogged
     SwerveDriveOdometry odometry;
@@ -81,10 +93,25 @@ public class Localization extends SubsystemBase {
     @Override
     public void periodic() {
         chassisRotation = chassisRotation.plus(Radians.of(Constants.simulationTimestep.in(Seconds) * SwerveConstants.kinematics.toChassisSpeeds(swerve.getModuleStates()).omegaRadiansPerSecond));
-        isGyroConnected = gyro.isConnected();
+        
+        // TODO refactor this into a DetectGyroProblems class
+        double reading = getGyroAngle().getRadians();
+        if(lastGyroReading != reading) {
+            lastGyroReadingChangedTime = Timer.getFPGATimestamp();
+            lastGyroReading = reading;
+        }
+        if(Timer.getFPGATimestamp() - gyroTimeoutDuration.in(Seconds) > lastGyroReadingChangedTime && Robot.isReal()) {
+            isGyroConnected = false;
+        } else {
+            isGyroConnected = true;
+        }
+        // End of refactor block
+        
         gyroDisconnectAlert.set(isGyroConnected == false);
         if(isGyroConnected) {
             chassisRotation = getGyroAngle().getMeasure();
+        } else {
+            System.out.println("WARNING: " + gyroDisconnectAlert.getText());
         }
 
         odometry.update(getGyroAngle(), swerve.getModulePositions());
