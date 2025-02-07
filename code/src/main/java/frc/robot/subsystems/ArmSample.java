@@ -191,7 +191,7 @@
 //     }
   
 //     @Override
-//     public void simulationPeriodic() {]
+//     public void simulationPeriodic() {
 //       // Next, we update it. The standard loop time is 20ms.
 //       m_armSim.update(Constants.simulationTimestep.in(Seconds));
 //       m_encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) / outputRatio);

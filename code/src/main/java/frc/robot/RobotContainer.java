@@ -22,7 +22,7 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 public class RobotContainer {
 
   SwerveDrive swerveSubsystem;
-  Arm arm;
+  Arm arm = new Arm();
   Localization localizationSubsystem;
 
   XboxController controller = new XboxController(0);
@@ -38,7 +38,9 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
-    runArmCommand(); 
+    if(controller.getAButton() || controller.getBButton() || controller.getYButton()) {
+      runArmCommand();
+    }
     
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
@@ -51,15 +53,15 @@ public class RobotContainer {
   public Command runArmCommand() {
     Command command = Commands.run(() -> {
       if(controller.getBButton()) {
-        arm.armCommand(null);
+        arm.armCommand(Rotation2d.fromRadians(2 * Math.PI));
         System.out.println("l4");
       }
       else if (controller.getAButton()){
-        arm.armCommand(null);
+        arm.armCommand(Rotation2d.fromRadians(Math.PI));
         System.out.println("l3");
       }
       else if(controller.getYButton()) {
-        arm.armCommand(null);
+        arm.armCommand(Rotation2d.fromRadians(0));
         System.out.println("l2");
       }
     }, arm);

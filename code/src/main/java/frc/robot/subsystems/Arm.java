@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -35,6 +36,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -52,7 +54,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 public class Arm extends SubsystemBase {
-  public static Angle simStartAngle = Degrees.of(0);
+  public static Angle simStartAngle = Radians.of(0);
   PIDController armPID = new PIDController(0, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0,0);
   TalonFX armMotor = new TalonFX(Constants.armMotorPort);//todo put in actual motor
@@ -60,6 +62,8 @@ public class Arm extends SubsystemBase {
   
   public static Distance armLength = Meters.of(0.4);
   public static Mass armMass = Kilograms.of(1);
+
+DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one on the arm but, for the sake of the simulation, let's try it.
 
   Rotation2d angle = Rotation2d.kZero;
   Angle maxAngle = Radians.of(Math.PI);
@@ -72,29 +76,21 @@ public class Arm extends SubsystemBase {
 
     private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(
         m_armGearbox,
-        Constants.armGearRatio,
+        1 / Constants.armGearRatio,
         SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms)),
         armLength.in(Meters),
         minAngle.in(Radians),
         maxAngle.in(Radians),
         true,
-        0,
-        simStartAngle.in(Radians),
-        0.0 // Add noise with a std-dev of 1 tick
+        simStartAngle.in(Radians) // Add noise with a std-dev of 1 tick
     );
+    private final DutyCycleEncoderSim m_encoderSim = new DutyCycleEncoderSim(encoder);
     // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
     private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
     private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
     @SuppressWarnings("unused")
     private final MechanismLigament2d m_armTower = m_armPivot
         .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90, 2, new Color8Bit(Color.kAqua)));
-    private final MechanismLigament2d m_arm = m_armPivot.append(
-        new MechanismLigament2d(
-            "Arm",
-            30,
-            simStartAngle.in(Degrees),
-            6,
-            new Color8Bit(Color.kYellow)));
 
 
   private final DCMotorSim armSim = new DCMotorSim(
@@ -104,6 +100,15 @@ public class Arm extends SubsystemBase {
 
   /** Creates a new Arm. */
   public Arm() {}
+
+  public void simulationPeriodic() {
+    if (m_encoderSim != null) {
+      m_armSim.update(Constants.simulationTimestep.in(Seconds));
+      m_encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) * Constants.armGearRatio);
+  } else {
+      System.out.println("Simulated encoder is not initialized.");
+    }
+  }
 
   public AngularVelocity getVelocity() {
     return RadiansPerSecond.of(armMotor.getVelocity().getValueAsDouble());
@@ -126,13 +131,16 @@ public class Arm extends SubsystemBase {
     Voltage output = Volts.of(armPID.calculate(currentState.position,nextState.position));
     Voltage feedForwardSystem = Volts.of(feedForward.calculate(currentState.velocity,nextState.velocity));
     armMotor.setVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
+    if(RobotBase.isSimulation()) {
+    armSim.setInputVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
+    }
     //Spencer's code says this doesn't work so that'll be fun to debug.
   }
 
   public Command armCommand(Rotation2d desiredAngle) {
     Command command = Commands.run(() ->{
       runClosedLoop(desiredAngle);
-    });
+    }, this);
     return command;
   }
 
