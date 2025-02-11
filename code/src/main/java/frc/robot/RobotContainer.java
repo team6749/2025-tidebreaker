@@ -38,9 +38,9 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
-    if(controller.getAButton() || controller.getBButton() || controller.getYButton()) {
-      runArmCommand();
-    }
+    // if(controller.getAButton() || controller.getBButton() || controller.getYButton()) {
+    //   runArmCommand();
+    // }
     
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
@@ -50,21 +50,21 @@ public class RobotContainer {
         new ChassisSpeeds(2, 0, 2));
   }
 
-  public Command runArmCommand() {
-    Command command = Commands.run(() -> {
-      if(controller.getBButton()) {
-        arm.armCommand(Rotation2d.fromRadians(2 * Math.PI));
-        System.out.println("l4");
-      }
-      else if (controller.getAButton()){
-        arm.armCommand(Rotation2d.fromRadians(Math.PI));
-        System.out.println("l3");
-      }
-      else if(controller.getYButton()) {
-        arm.armCommand(Rotation2d.fromRadians(0));
-        System.out.println("l2");
-      }
-    }, arm);
-    return command; /*Replace the controller buttons with button board(which we probaly will use), and fill in the actual desired angles */
-  }
+  // public Command runArmCommand() {
+  //   Command command = Commands.run(() -> {
+  //     if(controller.getBButton()) {
+  //       arm.armCommand(Rotation2d.fromRadians(2 * Math.PI));
+  //       System.out.println("l4");
+  //     }
+  //     else if (controller.getAButton()){
+  //       arm.armCommand(Rotation2d.fromRadians(Math.PI));
+  //       System.out.println("l3");
+  //     }
+  //     else if(controller.getYButton()) {
+  //       arm.armCommand(Rotation2d.fromRadians(0));
+  //       System.out.println("l2");
+  //     }
+  //   }, arm);
+  //   return command; /*Replace the controller buttons with button board(which we probaly will use), and fill in the actual desired angles */
+  // }
 }

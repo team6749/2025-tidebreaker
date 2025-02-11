@@ -93,7 +93,6 @@
 //         minAngle.in(Radians),
 //         maxAngle.in(Radians),
 //         true,
-//         0,
 //         simStartAngle.in(Radians),
 //         0.0 // Add noise with a std-dev of 1 tick
 //     );

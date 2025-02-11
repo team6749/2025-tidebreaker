@@ -84,31 +84,25 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
         true,
         simStartAngle.in(Radians) // Add noise with a std-dev of 1 tick
     );
-    private final DutyCycleEncoderSim m_encoderSim = new DutyCycleEncoderSim(encoder);
+    private final DutyCycleEncoderSim encoderSim = new DutyCycleEncoderSim(encoder);
     // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
-    private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
-    @SuppressWarnings("unused")
-    private final MechanismLigament2d m_armTower = m_armPivot
-        .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90, 2, new Color8Bit(Color.kAqua)));
-
-
-  private final DCMotorSim armSim = new DCMotorSim(
-    LinearSystemId.createDCMotorSystem(m_armGearbox, 0.03, Constants.armGearRatio),
-    m_armGearbox);
-
+    // private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
+    // private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
+    // @SuppressWarnings("unused")
+    // private final MechanismLigament2d m_armTower = m_armPivot
+    //     .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90, 2, new Color8Bit(Color.kAqua)));
 
   /** Creates a new Arm. */
   public Arm() {}
 
-  public void simulationPeriodic() {
-    if (m_encoderSim != null) {
-      m_armSim.update(Constants.simulationTimestep.in(Seconds));
-      m_encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) * Constants.armGearRatio);
-  } else {
-      System.out.println("Simulated encoder is not initialized.");
-    }
-  }
+   public void simulationPeriodic() {
+     //if (encoderSim != null) {
+       m_armSim.update(Constants.simulationTimestep.in(Seconds));
+  //     encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) * Constants.armGearRatio);
+  // } else {
+  //     System.out.println("Simulated encoder is not initialized.");
+  //   }
+   }
 
   public AngularVelocity getVelocity() {
     return RadiansPerSecond.of(armMotor.getVelocity().getValueAsDouble());
@@ -116,9 +110,6 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
 
   @Override
   public void periodic() {
-    if(RobotBase.isSimulation()) {
-      armSim.update(Constants.simulationTimestep.in(Seconds));
-    }
     angle = Rotation2d.fromRotations(armMotor.getPosition().getValueAsDouble()/ Constants.armGearRatio);
     // This method will be called once per scheduler run
   }
@@ -132,7 +123,7 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
     Voltage feedForwardSystem = Volts.of(feedForward.calculate(currentState.velocity,nextState.velocity));
     armMotor.setVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
     if(RobotBase.isSimulation()) {
-    armSim.setInputVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
+      m_armSim.setInputVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
     }
     //Spencer's code says this doesn't work so that'll be fun to debug.
   }
