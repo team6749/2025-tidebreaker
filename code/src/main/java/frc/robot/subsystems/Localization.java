@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -52,6 +54,18 @@ public class Localization extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics, getGyroAngle(),
                 swerve.getModulePositions(), Pose2d.kZero);
 
+                // Logging callback for target robot pose
+        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            // Do whatever you want with the pose here
+            dashboardField.getObject("target pose").setPose(pose);
+        });
+
+        // Logging callback for the active path, this is sent as a list of poses
+        PathPlannerLogging.setLogActivePathCallback((poses) -> {
+            // Do whatever you want with the poses here
+            dashboardField.getObject("path").setPoses(poses);
+        });
+
         SmartDashboard.putData("Field", dashboardField);
     }
 
@@ -62,6 +76,10 @@ public class Localization extends SubsystemBase {
 
     public Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+    public void resetPose(Pose2d newPose) {
+        odometry.resetPose(newPose);
+        poseEstimator.resetPose(newPose);
     }
 
     @Override
