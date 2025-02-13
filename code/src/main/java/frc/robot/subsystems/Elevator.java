@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase {
   // TODO: input real values
   boolean isHomed = false;
   boolean closedLoop = false;
-  boolean openLoop = true;
+  boolean openLoop;
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.1);
@@ -61,7 +61,7 @@ public class Elevator extends SubsystemBase {
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.04);
-  public static TalonFX elevatorMotor = new TalonFX(111);
+  public static TalonFX elevatorMotor = new TalonFX(11);
 
   public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
@@ -77,7 +77,9 @@ public class Elevator extends SubsystemBase {
       minHeight.in(Meters),
       maxHeight.in(Meters),
       true,
-      simStartHeight.in(Meters));
+      simStartHeight.in(Meters), 
+      0.0,0
+      );
 
   private final Mechanism2d mech2d = new Mechanism2d(2, 
   maxHeight.in(Meters));
@@ -130,10 +132,17 @@ public class Elevator extends SubsystemBase {
       setVolts(PIDOutput.in(Volts) + feedForwardOutput.in(Volts));
     }
     if(openLoop) {
-      setVolts(7);
+      setVolts(0.6);
     }
     elevatorMech2d.setLength(getPosition().in(Meters)); 
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void simulationPeriodic() {
+      simElevator.update(Constants.simulationTimestep.in(Seconds));
+      simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio);
+      simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio);
   }
 
   public Distance getPosition() {
@@ -152,15 +161,8 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  @Override
-  public void simulationPeriodic() {
-      simElevator.update(Constants.simulationTimestep.in(Seconds));
-      simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio);
-      simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio);
-  }
-
-  public void runClosedLoopSetGoal(Distance goalM) {
-    desiredState = new TrapezoidProfile.State(goalM.in(Meters), 0);
+  public void runClosedLoopSetGoal(Distance goal) {
+    desiredState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
 
@@ -185,5 +187,10 @@ public class Elevator extends SubsystemBase {
 
   public boolean getLimitSwitch() {
     return limitSwitch.getAsBoolean();
+  }
+
+  public void stop() {
+    elevatorMotor.setVoltage(0);
+    simElevator.setInputVoltage(0);
   }
 }

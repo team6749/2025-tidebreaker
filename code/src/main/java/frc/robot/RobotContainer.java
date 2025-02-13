@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -26,6 +28,8 @@ public class RobotContainer {
   Elevator elevatorSubsystem;
 
   XboxController controller = new XboxController(0);
+  JoystickButton a = new JoystickButton(controller, 1);
+  JoystickButton b = new JoystickButton(controller, 2);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -38,7 +42,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
-    
+    b.onTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.3)));
+    a.onTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.55)));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
 
@@ -46,4 +51,6 @@ public class RobotContainer {
     return swerveSubsystem.constantChassisSpeedsCommand(
         new ChassisSpeeds(2, 0, 2));
   }
+
+
 }
