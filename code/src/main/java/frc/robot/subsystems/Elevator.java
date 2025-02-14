@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
@@ -51,13 +52,12 @@ public class Elevator extends SubsystemBase {
   public static Distance simStartHeight = Meters.of(0.65);
   public static double gearboxRatio = 20;
   public static Mass carriageMass = Kilograms.of(4);
-  public static Distance sprocketDiameter = Inches.of(2.5);
+  public static Distance sprocketDiameter = Centimeters.of(6.5);
   public BooleanSupplier limitSwitch; 
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.01);
-  public static TalonFX elevatorMotor = new TalonFX(11);
-
+  public static TalonFX elevatorMotor = new TalonFX(18);
   public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
@@ -97,11 +97,12 @@ public class Elevator extends SubsystemBase {
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.6, 5);
 
   public Elevator() {
+    elevatorMotor.setInverted(true);
     if (Robot.isSimulation()) {
       limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
     }
     else {
-      //todo
+      limitSwitch = () -> true;
     }
     SmartDashboard.putData("Elevator Sim", mech2d);
   }
