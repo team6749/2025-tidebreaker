@@ -54,6 +54,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 public class Arm extends SubsystemBase {
+  boolean closedLoop = false;
+
   public static Angle simStartAngle = Radians.of(0);
   PIDController armPID = new PIDController(0, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0,0);
@@ -62,6 +64,7 @@ public class Arm extends SubsystemBase {
   
   public static Distance armLength = Meters.of(0.4);
   public static Mass armMass = Kilograms.of(1);
+  public static Angle tolerance = Radians.of(0.08);
 
 DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one on the arm but, for the sake of the simulation, let's try it.
 
@@ -82,15 +85,33 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
         minAngle.in(Radians),
         maxAngle.in(Radians),
         true,
-        simStartAngle.in(Radians) // Add noise with a std-dev of 1 tick
+        simStartAngle.in(Radians),0,0 // Add noise with a std-dev of 1 tick. Add std-dev with 2 arguments otherwise it breaks.
     );
     private final DutyCycleEncoderSim encoderSim = new DutyCycleEncoderSim(encoder);
-    // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    // private final Mechanism2d m_mech2d = new Mechanism2d(2, 2);
-    // private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 1, 1);
-    // @SuppressWarnings("unused")
-    // private final MechanismLigament2d m_armTower = m_armPivot
-    //     .append(new MechanismLigament2d("ArmTower", armLength.in(Meters), -90, 2, new Color8Bit(Color.kAqua)));
+    //Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+    private final Mechanism2d mech2d = new Mechanism2d(2, 2);
+    private final MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 1, 1);
+    @SuppressWarnings("unused")
+    private final MechanismLigament2d armTower = armPivot
+        .append(new MechanismLigament2d(
+          "ArmTower", 
+          armLength.in(Meters), 
+          -90, 
+          2, 
+          new Color8Bit(Color.kAqua)
+          )
+          );
+
+        private final MechanismLigament2d armMech = armPivot.append(
+        new MechanismLigament2d(
+            "Arm",
+            30,
+            simStartAngle.in(Degrees),
+            6,
+            new Color8Bit(Color.kYellow)));
+
+    TrapezoidProfile.State desiredState = new State(getPosition().in(Radians),0);
+    TrapezoidProfile.State currentState;
 
   /** Creates a new Arm. */
   public Arm() {}
@@ -98,34 +119,47 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
    public void simulationPeriodic() {
      //if (encoderSim != null) {
        m_armSim.update(Constants.simulationTimestep.in(Seconds));
-  //     encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) * Constants.armGearRatio);
+       encoderSim.set(Radians.of(m_armSim.getAngleRads()).in(Rotations) * Constants.armGearRatio);
   // } else {
   //     System.out.println("Simulated encoder is not initialized.");
   //   }
    }
 
   public AngularVelocity getVelocity() {
-    return RadiansPerSecond.of(armMotor.getVelocity().getValueAsDouble());
+    return RadiansPerSecond.of(armMotor.getVelocity().getValueAsDouble() * Constants.armGearRatio * Math.PI * 2);
   }
 
   @Override
   public void periodic() {
+    if(closedLoop) {
+      Rotation2d currentAngle = getAngle();
+      TrapezoidProfile.State currentState = new State(currentAngle.getRadians(),getVelocity().in(RadiansPerSecond));
+      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
+      Voltage output = Volts.of(armPID.calculate(currentState.position,nextState.position));
+      Voltage feedForwardSystem = Volts.of(feedForward.calculate(currentState.velocity,nextState.velocity));
+      if(RobotBase.isSimulation()) {
+        m_armSim.setInputVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
+      }
+      else {
+        armMotor.setVoltage(output.in(Volts) + feedForwardSystem.in(Volts)); //porbably should do a seperate implementation here but this works for now
+      }
+    } else { //open loop
+      if(RobotBase.isSimulation()) {
+        m_armSim.setInputVoltage(1);
+      }
+      else {
+        armMotor.setVoltage(1); 
+      }
+    }
     angle = Rotation2d.fromRotations(armMotor.getPosition().getValueAsDouble()/ Constants.armGearRatio);
+    armMech.setAngle(getPosition().in(Radians));
+    
     // This method will be called once per scheduler run
   }
 
   public void runClosedLoop(Rotation2d desiredAngle) {
-    Rotation2d currentAngle = getAngle();
-    TrapezoidProfile.State currentState = new State(currentAngle.getRadians(),getVelocity().in(RadiansPerSecond));
-    TrapezoidProfile.State desiredState = new State(desiredAngle.getRadians(),0);
-    var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
-    Voltage output = Volts.of(armPID.calculate(currentState.position,nextState.position));
-    Voltage feedForwardSystem = Volts.of(feedForward.calculate(currentState.velocity,nextState.velocity));
-    armMotor.setVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
-    if(RobotBase.isSimulation()) {
-      m_armSim.setInputVoltage(output.in(Volts) + feedForwardSystem.in(Volts));
-    }
-    //Spencer's code says this doesn't work so that'll be fun to debug.
+    desiredState = new State(desiredAngle.getRadians(),0);
+    closedLoop = true;
   }
 
   public Command armCommand(Rotation2d desiredAngle) {
@@ -142,6 +176,32 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
   public Rotation2d getAngle() {
       return angle;
   }
+
+  public Angle getPosition() {
+    return Radians.of(armMotor.getPosition().getValueAsDouble() * Constants.armGearRatio * Math.PI * 2);
+  }
+
+  public Boolean isAtTarget(Angle position) {
+    return getPosition().isNear(position, tolerance);
+  }
+
+  public void resetProfileState() {
+    currentState = new TrapezoidProfile.State(getPosition().in(Rotations), getVelocity().in(RadiansPerSecond));
+  }
+
+  public Command goToPositionArm(Angle desiredAngle) {
+    Rotation2d goalAngle = Rotation2d.fromRadians(desiredAngle.in(Radians));
+    Command command = Commands.startRun(() -> {
+      resetProfileState();
+    },
+      () -> {runClosedLoop(goalAngle);},
+      this
+    ).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
+      System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
+      desiredState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
+    });
+    return command;
+}
 }
   
 

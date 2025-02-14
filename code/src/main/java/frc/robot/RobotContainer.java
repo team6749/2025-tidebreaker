@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -26,6 +27,11 @@ public class RobotContainer {
   Localization localizationSubsystem;
 
   XboxController controller = new XboxController(0);
+    JoystickButton a = new JoystickButton(controller, 1);
+    JoystickButton b = new JoystickButton(controller, 2);
+    JoystickButton x = new JoystickButton(controller, 3);
+    JoystickButton y = new JoystickButton(controller, 4);
+    JoystickButton rightBumper = new JoystickButton(controller, 6);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -38,10 +44,11 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
-    // if(controller.getAButton() || controller.getBButton() || controller.getYButton()) {
-    //   runArmCommand();
-    // }
-    
+    a.onTrue(arm.goToPositionArm(Radians.of(0.6)));
+    y.onTrue(arm.goToPositionArm(Radians.of(0.8)));
+    b.onTrue(arm.goToPositionArm(Radians.of(Math.PI / 2)));
+    x.onTrue(arm.goToPositionArm(Radians.of(Math.PI * 3 / 2))); //find real values
+    rightBumper.onTrue(arm.goToPositionArm(Radians.of(0)));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
 
@@ -49,22 +56,4 @@ public class RobotContainer {
     return swerveSubsystem.constantChassisSpeedsCommand(
         new ChassisSpeeds(2, 0, 2));
   }
-
-  // public Command runArmCommand() {
-  //   Command command = Commands.run(() -> {
-  //     if(controller.getBButton()) {
-  //       arm.armCommand(Rotation2d.fromRadians(2 * Math.PI));
-  //       System.out.println("l4");
-  //     }
-  //     else if (controller.getAButton()){
-  //       arm.armCommand(Rotation2d.fromRadians(Math.PI));
-  //       System.out.println("l3");
-  //     }
-  //     else if(controller.getYButton()) {
-  //       arm.armCommand(Rotation2d.fromRadians(0));
-  //       System.out.println("l2");
-  //     }
-  //   }, arm);
-  //   return command; /*Replace the controller buttons with button board(which we probaly will use), and fill in the actual desired angles */
-  // }
 }
