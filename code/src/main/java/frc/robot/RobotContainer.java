@@ -42,12 +42,12 @@ public class RobotContainer {
     elevatorSubsystem = new Elevator();
 
 
-    //configureBindings();
-    elevatorTest();
+    configureBindings();
+    //elevatorTest();
   }
 
   private void configureBindings() {
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    //swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
     
     rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
