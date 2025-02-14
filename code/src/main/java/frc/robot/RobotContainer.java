@@ -7,6 +7,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -44,13 +46,18 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    //swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
     
+    // y.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
+    // b.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.3)));
+    // a.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.1)));
+    // x.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.2)));
+    // rightBumper.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
     rightBumper.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
-    y.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
-    a.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
-    x.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
+    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
+    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
+    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
 

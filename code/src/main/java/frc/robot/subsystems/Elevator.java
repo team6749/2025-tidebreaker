@@ -47,6 +47,7 @@ public class Elevator extends SubsystemBase {
   // TODO: input real values
   boolean isHomed = false;
   boolean closedLoop = false;
+  boolean motorInverted = true;
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.65);
@@ -58,7 +59,7 @@ public class Elevator extends SubsystemBase {
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.01);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.2);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
@@ -91,13 +92,13 @@ public class Elevator extends SubsystemBase {
           maxVelocity.in(MetersPerSecond),
           maxAcceleration.in(MetersPerSecondPerSecond)));
   TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
-  TrapezoidProfile.State desiredState;
+  TrapezoidProfile.State desiredState = new State(0, 0);
 
   PIDController elevatorPID = new PIDController(28, 0, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.6, 5);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.4, 5);
 
   public Elevator() {
-    elevatorMotor.setInverted(true);
+    elevatorMotor.setInverted(motorInverted);
     if (Robot.isSimulation()) {
       limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
     }
@@ -110,7 +111,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     if (isHomed == false) {
-      setVolts(-2);
+      setVolts(Volts.of(-2));
       if (getLimitSwitch()) {
         isHomed = true;
         elevatorMotor.setPosition(minHeight.in(Meters) / outputRatio);
@@ -124,13 +125,10 @@ public class Elevator extends SubsystemBase {
         return;
       }
       var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
-      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), desiredState.position));
+      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), currentState.position));
       Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
-      setVolts(PIDOutput.plus(feedForwardOutput).in(Volts));
-    }
-    else {
-      closedLoop = false;
-      setVolts(-1);
+      setVolts(PIDOutput.plus(feedForwardOutput));
+      currentState = next;
     }
     elevatorMech2d.setLength(getPosition().in(Meters)); 
     // This method will be called once per scheduler run
@@ -139,8 +137,8 @@ public class Elevator extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
       simElevator.update(Constants.simulationTimestep.in(Seconds));
-      simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio);
-      simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio);
+      simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio * (motorInverted ? -1: 1));
+      simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio * (motorInverted ? -1:1));
   }
 
   public boolean isAtTarget(Distance position) {
@@ -155,12 +153,17 @@ public class Elevator extends SubsystemBase {
     return MetersPerSecond.of(elevatorMotor.getVelocity().getValueAsDouble() * outputRatio);
   }
 
-  public void setVolts(double voltInput) {
+  private void setVolts(Voltage voltInput) {
     if (RobotBase.isSimulation()) {
-      simElevator.setInputVoltage(voltInput);
+      simElevator.setInputVoltage(voltInput.in(Volts));
     } else {
-      elevatorMotor.setVoltage(voltInput);
+      elevatorMotor.setVoltage(voltInput.in(Volts));
     }
+  }
+
+  public void runVolts(Voltage voltInput) {
+    setVolts(voltInput);
+    closedLoop = false;
   }
 
   public void runClosedLoopSetGoal(Distance goal) {
@@ -170,6 +173,10 @@ public class Elevator extends SubsystemBase {
 
   public void resetProfileState() {
     currentState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+  }
+
+  public Command runOpenLoopCommand(Voltage Volts) {
+    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
   }
 
   public Command goToPositionCommand(Distance position) {
@@ -190,5 +197,6 @@ public class Elevator extends SubsystemBase {
   public void stop() {
     elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
+    closedLoop = false;
   }
 }
