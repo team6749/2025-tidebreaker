@@ -13,8 +13,6 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -33,7 +31,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -43,24 +40,22 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @Logged
 public class Elevator extends SubsystemBase {
   // TODO: input real values
   boolean isHomed = false;
   boolean closedLoop = false;
-  boolean openLoop;
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
-  public static Distance simStartHeight = Meters.of(0.1);
+  public static Distance simStartHeight = Meters.of(0.65);
   public static double gearboxRatio = 20;
   public static Mass carriageMass = Kilograms.of(4);
   public static Distance sprocketDiameter = Inches.of(2.5);
   public BooleanSupplier limitSwitch; 
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
-  public static Distance toleranceOnReachedGoal = Meters.of(0.02);
+  public static Distance toleranceOnReachedGoal = Meters.of(0.01);
   public static TalonFX elevatorMotor = new TalonFX(11);
 
   public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
@@ -77,8 +72,9 @@ public class Elevator extends SubsystemBase {
       minHeight.in(Meters),
       maxHeight.in(Meters),
       true,
-      simStartHeight.in(Meters), 
-      0.0,0
+      simStartHeight.in(Meters),
+      0,
+      0
       );
 
   private final Mechanism2d mech2d = new Mechanism2d(2, 
@@ -97,8 +93,8 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   TrapezoidProfile.State desiredState;
 
-  PIDController elevatorPID = new PIDController(0.3, 0, 0.4);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(1, 0, 0);
+  PIDController elevatorPID = new PIDController(28, 0, 0);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.6, 5);
 
   public Elevator() {
     if (Robot.isSimulation()) {
@@ -129,10 +125,11 @@ public class Elevator extends SubsystemBase {
       var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
       Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), desiredState.position));
       Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
-      setVolts(PIDOutput.in(Volts) + feedForwardOutput.in(Volts));
+      setVolts(PIDOutput.plus(feedForwardOutput).in(Volts));
     }
-    if(openLoop) {
-      setVolts(0.6);
+    else {
+      closedLoop = false;
+      setVolts(-1);
     }
     elevatorMech2d.setLength(getPosition().in(Meters)); 
     // This method will be called once per scheduler run
@@ -144,7 +141,7 @@ public class Elevator extends SubsystemBase {
       simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio);
       simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio);
   }
-  
+
   public boolean isAtTarget(Distance position) {
     return getPosition().isNear(position, toleranceOnReachedGoal);
   }

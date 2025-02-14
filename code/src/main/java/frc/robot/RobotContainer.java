@@ -30,6 +30,9 @@ public class RobotContainer {
   XboxController controller = new XboxController(0);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton b = new JoystickButton(controller, 2);
+  JoystickButton x = new JoystickButton(controller, 3);
+  JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton rightBumper = new JoystickButton(controller, 6);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -42,8 +45,12 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
-    b.onTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.3)));
-    a.onTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.55)));
+    
+    rightBumper.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
+    y.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    b.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
+    a.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
+    x.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
 
