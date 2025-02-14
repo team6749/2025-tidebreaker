@@ -94,10 +94,11 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   TrapezoidProfile.State desiredState = new State(0, 0);
 
-  PIDController elevatorPID = new PIDController(28, 0, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.4, 5);
+  PIDController elevatorPID = new PIDController(15, 0, 0);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
 
   public Elevator() {
+    stop();
     elevatorMotor.setInverted(motorInverted);
     if (Robot.isSimulation()) {
       limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
@@ -111,10 +112,11 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     if (isHomed == false) {
-      setVolts(Volts.of(-2));
+      setVolts(Volts.of(-0.1));
       if (getLimitSwitch()) {
         isHomed = true;
         elevatorMotor.setPosition(minHeight.in(Meters) / outputRatio);
+        stop();
       }
     }
 
@@ -162,8 +164,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runVolts(Voltage voltInput) {
-    setVolts(voltInput);
     closedLoop = false;
+    setVolts(voltInput);
   }
 
   public void runClosedLoopSetGoal(Distance goal) {

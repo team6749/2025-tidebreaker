@@ -42,23 +42,28 @@ public class RobotContainer {
     elevatorSubsystem = new Elevator();
 
 
-    configureBindings();
+    //configureBindings();
+    elevatorTest();
   }
 
   private void configureBindings() {
-    //swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
     
-    // y.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    // b.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.3)));
-    // a.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.1)));
-    // x.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.2)));
-    // rightBumper.onTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    rightBumper.onTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
+    rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
     b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
     a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
     x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
+  }
+  private void elevatorTest() {
+    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
+    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    //y.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
+    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.3)));
+    //a.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.1)));
+    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.2)));
+    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   public Command getAutonomousCommand() {
