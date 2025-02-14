@@ -60,7 +60,7 @@ public class Elevator extends SubsystemBase {
   public BooleanSupplier limitSwitch; 
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
-  public static Distance toleranceOnReachedGoal = Meters.of(0.04);
+  public static Distance toleranceOnReachedGoal = Meters.of(0.02);
   public static TalonFX elevatorMotor = new TalonFX(11);
 
   public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
@@ -97,7 +97,7 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   TrapezoidProfile.State desiredState;
 
-  PIDController elevatorPID = new PIDController(0, 0, 0);
+  PIDController elevatorPID = new PIDController(0.3, 0, 0.4);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(1, 0, 0);
 
   public Elevator() {
@@ -144,6 +144,10 @@ public class Elevator extends SubsystemBase {
       simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio);
       simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio);
   }
+  
+  public boolean isAtTarget(Distance position) {
+    return getPosition().isNear(position, toleranceOnReachedGoal);
+  }
 
   public Distance getPosition() {
     return Meters.of(elevatorMotor.getPosition().getValueAsDouble() * outputRatio);
@@ -168,10 +172,6 @@ public class Elevator extends SubsystemBase {
 
   public void resetProfileState() {
     currentState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
-  }
-
-  public boolean isAtTarget(Distance position) {
-    return getPosition().isNear(position, toleranceOnReachedGoal);
   }
 
   public Command goToPositionCommand(Distance position) {

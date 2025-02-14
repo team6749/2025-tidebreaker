@@ -204,15 +204,15 @@ public class ElevatorSample extends SubsystemBase {
   // Runs the elevator to a specific position and then holds there.
   // If the command is interrupted the system will hold at the position it is currently at
   // Call stop() to disable all output power
-  public Command goToPositionCommand(Distance position) {
-    return Commands.startRun(() -> {
-      resetProfileState();
-    }, () -> {
-      setGoalAndEnableClosedLoop(position);
-    }, this).until(() -> isAtGoalPosition(position)).handleInterrupt(() -> {
-      System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
-      goalState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
-    });
-  }
+  // public Command goToPositionCommand(Distance position) {
+  //   return Commands.startRun(() -> {
+  //     resetProfileState();
+  //   }, () -> {
+  //     setGoalAndEnableClosedLoop(position);
+  //   }, this).until(() -> isAtGoalPosition(position)).handleInterrupt(() -> {
+  //     System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
+  //     goalState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+  //   });
+  // }
 
 }
