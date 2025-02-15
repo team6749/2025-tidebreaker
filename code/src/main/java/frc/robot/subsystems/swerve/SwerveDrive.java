@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,17 +15,23 @@ import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.enums.DriveOrientation;
 import frc.robot.subsystems.Localization;
 
 @Logged
 public class SwerveDrive extends SubsystemBase {
-
+    private final SendableChooser<DriveOrientation> orientationChooser = new SendableChooser<>();
     SwerveModuleBase frontLeft;
     SwerveModuleBase frontRight;
     SwerveModuleBase backLeft;
@@ -40,17 +49,26 @@ public class SwerveDrive extends SubsystemBase {
             frontRight = new SwerveModuleSim();
             backLeft = new SwerveModuleSim();
             backRight = new SwerveModuleSim();
+
         } else {
-           frontLeft = new SwerveModuleReal(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort, SwerveConstants.FLEncoderPort);
-           frontRight = new SwerveModuleReal(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort, SwerveConstants.FREncoderPort);
-           backLeft = new SwerveModuleReal(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort, SwerveConstants.BLEncoderPort);
-           backRight = new SwerveModuleReal(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort, SwerveConstants.BREncoderPort);
+            frontLeft = new SwerveModuleReal(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort,
+                    SwerveConstants.FLEncoderPort);
+            frontRight = new SwerveModuleReal(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort,
+                    SwerveConstants.FREncoderPort);
+            backLeft = new SwerveModuleReal(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort,
+                    SwerveConstants.BLEncoderPort);
+            backRight = new SwerveModuleReal(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort,
+                    SwerveConstants.BREncoderPort);
         }
 
         modules[0] = frontLeft;
         modules[1] = frontRight;
         modules[2] = backLeft;
         modules[3] = backRight;
+
+        orientationChooser.setDefaultOption("Field Orientation", DriveOrientation.FieldOriented);
+        orientationChooser.addOption("Robot Orientation", DriveOrientation.RobotOriented);
+        SmartDashboard.putData("Robot Orientation Mode", orientationChooser);
     }
 
     @Override
@@ -59,9 +77,20 @@ public class SwerveDrive extends SubsystemBase {
             stop();
         }
 
-        for(int i = 0; i < modules.length; i++) {
+        for (int i = 0; i < modules.length; i++) {
             modules[i].periodic();
         }
+    }
+
+    public double deadZone(double input) {
+        if (Math.abs(input) < Constants.deadZone) {
+            input = 0;
+        }
+        return input;
+    };
+
+    public double exponentialResponseCurve(double input) {
+        return Math.pow(input, 3);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -114,12 +143,29 @@ public class SwerveDrive extends SubsystemBase {
 
     // Simple robot relative drive with no field oriented control, response curves,
     // deadbands, or slew rates
-    public Command basicDriveCommand(XboxController controller) {
+    public Command basicDriveCommand(XboxController controller, Localization localizationSubsystem) {
+
         Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
-                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftY()),
-                    SwerveConstants.maxLinearVelocity.times(-controller.getLeftX()),
-                    SwerveConstants.maxAngularVelocity.times(-controller.getRightX()));
+
+                    MetersPerSecond.of(SwerveConstants.driveLimiterY.calculate(SwerveConstants.maxLinearVelocity
+                            .times(exponentialResponseCurve(deadZone(-controller.getLeftY()))).in(MetersPerSecond))),
+                    MetersPerSecond.of(SwerveConstants.driveLimiterX.calculate(SwerveConstants.maxLinearVelocity
+                            .times(exponentialResponseCurve(deadZone(-controller.getLeftX()))).in(MetersPerSecond))),
+                    RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
+                            .times(exponentialResponseCurve(deadZone(-controller.getRightX()))).in(RadiansPerSecond))));
+
+            switch (orientationChooser.getSelected()) {
+                case FieldOriented:
+                    Rotation2d robotRotation2d = localizationSubsystem.getRobotPose().getRotation();
+                    targetSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeeds,
+                            DriverStation.getAlliance().get() == Alliance.Blue ? robotRotation2d
+                                    : robotRotation2d.plus(Rotation2d.fromDegrees(180)));
+
+                    break;
+                default:
+                    break;
+            }
 
             // Desaturate the input
             SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(targetSpeeds);
@@ -135,13 +181,14 @@ public class SwerveDrive extends SubsystemBase {
 
     public Command testModuleSpeeds(SwerveModuleState target) {
         Command command = Commands.runEnd(() -> {
-            //targetSpeeds = new ChassisSpeeds(1,0,0);
-            //targetSpeeds = new ChassisSpeeds(3,0,0);
-            //targetSpeeds = new ChassisSpeeds(0,0.5,0);
-            //targetSpeeds = new ChassisSpeeds(0,0,1);
-            runModuleStates(new SwerveModuleState[]{target,target,target,target});
+            // targetSpeeds = new ChassisSpeeds(1,0,0);
+            // targetSpeeds = new ChassisSpeeds(3,0,0);
+            // targetSpeeds = new ChassisSpeeds(0,0.5,0);
+            // targetSpeeds = new ChassisSpeeds(0,0,1);
+            runModuleStates(new SwerveModuleState[] { target, target, target, target });
         }, () -> {
-            stop();}, this); 
+            stop();
+        }, this);
         return command;
     }
 }
