@@ -43,14 +43,15 @@ public class RobotContainer {
   Elevator elevatorSubsystem;
 
   XboxController controller = new XboxController(0);
-  JoystickButton a = new JoystickButton(controller, 1);
-  JoystickButton x = new JoystickButton(controller, 2);
-  JoystickButton b = new JoystickButton(controller, 3);
-  JoystickButton y = new JoystickButton(controller, 4);
-  JoystickButton rightBumper = new JoystickButton(controller, 6);
-  JoystickButton rightTrigger = new JoystickButton(controller,8);
-  JoystickButton leftBumper = new JoystickButton(controller, 5);
-  JoystickButton leftTrigger = new JoystickButton(controller,7);
+  XboxController controller2 = new XboxController(1);
+  JoystickButton a = new JoystickButton(controller2, 1);
+  JoystickButton x = new JoystickButton(controller2, 2);
+  JoystickButton b = new JoystickButton(controller2, 3);
+  JoystickButton y = new JoystickButton(controller2, 4);
+  JoystickButton rightBumper = new JoystickButton(controller2, 6);
+  JoystickButton rightTrigger = new JoystickButton(controller2,8);
+  JoystickButton leftBumper = new JoystickButton(controller2, 5);
+  JoystickButton leftTrigger = new JoystickButton(controller2,7);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
