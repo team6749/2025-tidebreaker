@@ -6,6 +6,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.EnumSet;
+import java.util.concurrent.Flow.Subscription;
+import java.util.logging.Logger;
+
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.epilogue.Logged;
@@ -16,20 +20,30 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.BooleanTopic;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 @Logged
 public class Localization extends SubsystemBase {
@@ -59,6 +73,9 @@ public class Localization extends SubsystemBase {
 
     Field2d dashboardField = new Field2d();
 
+    private boolean applyLimelightUpdates = false;
+    private final SendableChooser<Boolean> limelightToggleChooser = new SendableChooser<>();
+
     public Localization(SwerveDrive swerve) {
         this.swerve = swerve;
 
@@ -83,6 +100,10 @@ public class Localization extends SubsystemBase {
         });
 
         SmartDashboard.putData("Field", dashboardField);
+
+        limelightToggleChooser.setDefaultOption("Disabled", false);
+        limelightToggleChooser.addOption("Enabled", true);
+        SmartDashboard.putData("Limelight Toggle", limelightToggleChooser);
     }
 
 
@@ -105,16 +126,19 @@ public class Localization extends SubsystemBase {
 
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
+        applyLimelightUpdates = limelightToggleChooser.getSelected();
+        if (applyLimelightUpdates) {
 
-        LimelightHelpers.SetRobotOrientation(LimeLightFront, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
-        PoseEstimate mt2Front = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightFront);
-        frontLimelightFailure.set(mt2Front == null);
-        frontLimelight = applyVisionUpdates(mt2Front);
+            LimelightHelpers.SetRobotOrientation(LimeLightFront, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+            PoseEstimate mt2Front = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightFront);
+            frontLimelightFailure.set(mt2Front == null);
+            frontLimelight = applyVisionUpdates(mt2Front);
 
-        LimelightHelpers.SetRobotOrientation(LimeLightBack, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
-        PoseEstimate mt2Back = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightBack);
-        backLimelightFailure.set(mt2Back == null);
-        backLimelight = applyVisionUpdates(mt2Back);
+            LimelightHelpers.SetRobotOrientation(LimeLightBack, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+            PoseEstimate mt2Back = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightBack);
+            backLimelightFailure.set(mt2Back == null);
+            backLimelight = applyVisionUpdates(mt2Back);
+        }
 
         // Update Dashboard (this is for elastic/driver)
         dashboardField.setRobotPose(getRobotPose());
