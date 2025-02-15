@@ -64,6 +64,7 @@ public class Arm extends SubsystemBase {
 
   boolean closedLoop = false;
   boolean encoderConnected = true;
+  boolean motorInverted = true;
 
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(0);
@@ -129,7 +130,6 @@ public class Arm extends SubsystemBase {
 
   public void simulationPeriodic() {
     simArm.update(Constants.simulationTimestep.in(Seconds));
-    System.out.println(simArm.getAngleRads());
     encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) * Constants.armGearRatio);
   }
 
@@ -176,7 +176,8 @@ public class Arm extends SubsystemBase {
   }
 
   public Angle getPosition() {
-    return Radians.of(encoder.get() / Constants.armGearRatio * Math.PI * 2).plus(angleOffset);
+    System.out.println(encoder.get());
+    return Radians.of(encoder.get() * 2 * Math.PI).plus(angleOffset);
   }
 
   public Boolean isAtTarget(Angle position) {

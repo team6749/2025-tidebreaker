@@ -44,10 +44,13 @@ public class RobotContainer {
 
   XboxController controller = new XboxController(0);
   JoystickButton a = new JoystickButton(controller, 1);
-  JoystickButton b = new JoystickButton(controller, 2);
-  JoystickButton x = new JoystickButton(controller, 3);
+  JoystickButton x = new JoystickButton(controller, 2);
+  JoystickButton b = new JoystickButton(controller, 3);
   JoystickButton y = new JoystickButton(controller, 4);
   JoystickButton rightBumper = new JoystickButton(controller, 6);
+  JoystickButton rightTrigger = new JoystickButton(controller,8);
+  JoystickButton leftBumper = new JoystickButton(controller, 5);
+  JoystickButton leftTrigger = new JoystickButton(controller,7);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -91,25 +94,31 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    //configureBindings();
+    configureBindings();
     //elevatorTest();
-    armTest();
+    //armTest();
   }
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
-    a.onTrue(arm.goToPositionArm(Radians.of(0.6)));
-    y.onTrue(arm.goToPositionArm(Radians.of(0.8)));
-    b.onTrue(arm.goToPositionArm(Radians.of(Math.PI / 2)));
-    x.onTrue(arm.goToPositionArm(Radians.of(Math.PI * 3 / 2))); //find real values
-    rightBumper.onTrue(arm.goToPositionArm(Radians.of(0)));
+    // a.onTrue(arm.goToPositionArm(Radians.of(0)));
+    // y.onTrue(arm.goToPositionArm(Radians.of(0.5)));
+    // b.onTrue(arm.goToPositionArm(Radians.of(1)));
+    // x.onTrue(arm.goToPositionArm(Radians.of(Math.PI / 2))); //find real values
+    // rightBumper.onTrue(arm.goToPositionArm(Radians.of(-Math.PI / 2)));
+    leftTrigger.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-1))); //find real values
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
     
-    rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
-    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
-    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
+    // rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
+    // y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    // b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
+    // a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
+    // x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
+
+    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1)));
+    rightTrigger.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(2)));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
   private void elevatorTest() {
@@ -122,8 +131,8 @@ public class RobotContainer {
 
   private void armTest() {
     a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
   public Command getAutonomousCommand() {
