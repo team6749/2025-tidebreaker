@@ -46,8 +46,9 @@ public class RobotContainer {
     elevatorSubsystem = new Elevator();
 
 
-    configureBindings();
+    //configureBindings();
     //elevatorTest();
+    armTest();
   }
 
   private void configureBindings() {
@@ -57,7 +58,7 @@ public class RobotContainer {
     b.onTrue(arm.goToPositionArm(Radians.of(Math.PI / 2)));
     x.onTrue(arm.goToPositionArm(Radians.of(Math.PI * 3 / 2))); //find real values
     rightBumper.onTrue(arm.goToPositionArm(Radians.of(0)));
-    //swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
     
     rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
@@ -74,6 +75,12 @@ public class RobotContainer {
     rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
+  private void armTest() {
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
+  }
   public Command getAutonomousCommand() {
     return swerveSubsystem.constantChassisSpeedsCommand(
         new ChassisSpeeds(2, 0, 2));

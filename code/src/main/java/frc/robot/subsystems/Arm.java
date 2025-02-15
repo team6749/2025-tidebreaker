@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -64,87 +65,81 @@ public class Arm extends SubsystemBase {
   boolean closedLoop = false;
   boolean encoderConnected = true;
 
-  public static Angle simStartAngle = Radians.of(0);
+  public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(0);
-  PIDController armPID = new PIDController(0, 0, 0);
-  ArmFeedforward feedForward = new ArmFeedforward(0, 0,0);
-  TalonFX armMotor = new TalonFX(Constants.armMotorPort);//todo put in actual motor
+  PIDController armPID = new PIDController(20, 0, 0);
+  ArmFeedforward feedForward = new ArmFeedforward(0, 2, 4);
+  TalonFX armMotor = new TalonFX(Constants.armMotorPort);// todo put in actual motor
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
-  
-  public static Distance armLength = Meters.of(0.4);
-  public static Mass armMass = Kilograms.of(1);
-  public static Angle tolerance = Radians.of(0.08);
 
-DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one on the arm but, for the sake of the simulation, let's try it.
+  public static Distance armLength = Meters.of(0.2);
+  public static Mass armMass = Kilograms.of(0.3);
+  public static Angle tolerance = Radians.of(0.04);
 
-  Angle maxAngle = Radians.of(Math.PI);
-  Angle minAngle = Radians.of(0);
-  AngularVelocity maxVelocity = RadiansPerSecond.of(0.5);
-  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(0.5); //to do, find these values.
+  DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one on the arm but, for the sake of the
+                                                      // simulation, let's try it.
+
+  Angle maxAngle = Degrees.of(90);
+  Angle minAngle = Degrees.of(-90);
+  AngularVelocity maxVelocity = RadiansPerSecond.of(1);
+  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(1.5); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
-    new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
-        maxAcceleration.in(RadiansPerSecondPerSecond)));
+      new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
+          maxAcceleration.in(RadiansPerSecondPerSecond)));
 
-    private final SingleJointedArmSim simArm = new SingleJointedArmSim(
-        m_armGearbox,
-        1 / Constants.armGearRatio,
-        SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms)),
-        armLength.in(Meters),
-        minAngle.in(Radians),
-        maxAngle.in(Radians),
-        true,
-        simStartAngle.in(Radians),0,0 // Add noise with a std-dev of 1 tick. Add std-dev with 2 arguments otherwise it breaks.
-    );
-    private final DutyCycleEncoderSim encoderSim = new DutyCycleEncoderSim(encoder);
-    //Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    private final Mechanism2d mech2d = new Mechanism2d(2, 2);
-    private final MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 1, 1);
-    @SuppressWarnings("unused")
-    private final MechanismLigament2d armTower = armPivot
-        .append(new MechanismLigament2d(
-          "ArmTower", 
-          armLength.in(Meters), 
-          -90, 
-          2, 
-          new Color8Bit(Color.kAqua)
-          )
-          );
+  private final SingleJointedArmSim simArm = new SingleJointedArmSim(
+      m_armGearbox,
+      1 / Constants.armGearRatio,
+      SingleJointedArmSim.estimateMOI(armLength.in(Meters), armMass.in(Kilograms)),
+      armLength.in(Meters),
+      minAngle.in(Radians),
+      maxAngle.in(Radians),
+      true,
+      simStartAngle.in(Radians), 0, 0 // Add noise with a std-dev of 1 tick. Add std-dev with 2 arguments otherwise it
+                                      // breaks.
+  );
+  private final DutyCycleEncoderSim encoderSim = new DutyCycleEncoderSim(encoder);
+  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+  private final Mechanism2d mech2d = new Mechanism2d(2, 2);
+  private final MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 1, 1);
+  @SuppressWarnings("unused")
+  private final MechanismLigament2d armTower = armPivot
+      .append(new MechanismLigament2d(
+          "ArmTower",
+          armLength.in(Meters),
+          -90,
+          2,
+          new Color8Bit(Color.kAqua)));
 
-        private final MechanismLigament2d armMech = armPivot.append(
-        new MechanismLigament2d(
-            "Arm",
-            30,
-            simStartAngle.in(Degrees),
-            6,
-            new Color8Bit(Color.kYellow)));
+  private final MechanismLigament2d armMech = armPivot.append(
+      new MechanismLigament2d(
+          "Arm",
+          0.5,
+          simStartAngle.in(Degrees),
+          3,
+          new Color8Bit(Color.kYellow)));
 
-    TrapezoidProfile.State desiredState = new State(0,0);
-    TrapezoidProfile.State currentState = new State(0,0);
+  TrapezoidProfile.State desiredState = new State(0, 0);
+  TrapezoidProfile.State currentState = new State(0, 0);
 
   /** Creates a new Arm. */
   public Arm() {
     SmartDashboard.putData("Arm Sim", mech2d);
   }
 
-   public void simulationPeriodic() {
-     if (encoderSim != null) {
-       simArm.update(Constants.simulationTimestep.in(Seconds));
-       encoderSim.set(simArm.getAngleRads() * Constants.armGearRatio);}
-  // } else {
-  //     System.out.println("Simulated encoder is not initialized.");
-  //   }
-   }
-
-  public AngularVelocity getVelocity() {
-    return RadiansPerSecond.of(armMotor.getVelocity().getValueAsDouble() * Constants.armGearRatio * Math.PI * 2);
+  public void simulationPeriodic() {
+    simArm.update(Constants.simulationTimestep.in(Seconds));
+    System.out.println(simArm.getAngleRads());
+    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) * Constants.armGearRatio);
   }
 
   @Override
   public void periodic() {
+    simArm.getOutput();
     encoderConnected = encoder.isConnected();
     encoderDisconnectedAlert.set(encoderConnected == false);
 
-    if(closedLoop) {
+    if (closedLoop) {
       if (encoderConnected == false) {
         System.out.println("WARNING: Arm encoder disconnected");
         // Resetting state to avoid sudden movement when reconnected
@@ -154,25 +149,30 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
       }
       var currentAngle = getPosition();
       var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
-      
-      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians),currentState.position));
-      Voltage feedForwardOutput = Volts.of(feedForward.calculate(currentState.position,currentState.velocity));
+
+      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), currentState.position));
+      Voltage feedForwardOutput = Volts.of(feedForward.calculate(currentState.position, currentState.velocity));
 
       setVolts(pidoutput.plus(feedForwardOutput));
       currentState = nextState;
     }
-    armMech.setAngle(getPosition().in(Radians));
-    
+    armMech.setAngle(getPosition().in(Degrees));
+
     // This method will be called once per scheduler run
   }
 
   public void runClosedLoop(Angle desiredAngle) {
-    desiredState = new TrapezoidProfile.State(desiredAngle.in(Radians),0);
+    desiredState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
     closedLoop = true;
   }
 
   public void neutralState() {
     armMotor.setNeutralMode(NeutralModeValue.Brake);
+  }
+
+  public AngularVelocity getVelocity() {
+    // TODO implement
+    return RotationsPerSecond.of(0);
   }
 
   public Angle getPosition() {
@@ -202,14 +202,21 @@ DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
       desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
-}
+  }
 
-public void setVolts(Voltage volts) {
-  armMotor.setVoltage(volts.in(Volts)); //porbably should do a seperate implementation here but this works for now
-  if(RobotBase.isSimulation()) {
-    simArm.setInputVoltage(volts.in(Volts));
+  private void setVolts(Voltage volts) {
+    armMotor.setVoltage(volts.in(Volts)); // porbably should do a seperate implementation here but this works for now
+    if (RobotBase.isSimulation()) {
+      simArm.setInputVoltage(volts.in(Volts));
+    }
+  }
+
+  public void runVolts(Voltage volts) {
+    setVolts(volts);
+    closedLoop = false;
+  }
+
+  public Command runOpenLoopCommand(Voltage Volts) {
+    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
   }
 }
-}
-  
-
