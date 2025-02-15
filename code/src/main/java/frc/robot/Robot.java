@@ -32,19 +32,18 @@ public class Robot extends TimedRobot {
     // be written to the roborio's SD card/internal storage, which has limited write endurance
     DataLogManager.start();
     Epilogue.configure(config -> {
-      if (isSimulation()) {
+      if (isSimulation() || true) {
         // If running in simulation, then we'd want to re-throw any errors that
         // occur so we can debug and fix them!
         config.errorHandler = ErrorHandler.crashOnError();
         // Data passed into network tables is logged by the DataLogManager
         config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
       }
-      if (isReal()) {
+      else{
         config.errorHandler = ErrorHandler.printErrorMessages();
         // On the real robot only log to disk, to avoid too much network bandwidth
         // Dashboard values are sent separately
-        config.backend = new FileBackend(DataLogManager.getLog());
-      }
+        config.backend = new FileBackend(DataLogManager.getLog());}
     });
     Epilogue.bind(this);
 
