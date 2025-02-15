@@ -44,7 +44,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 @Logged
 public class Elevator extends SubsystemBase {
-  // TODO: input real values
   boolean isHomed = false;
   boolean closedLoop = false;
   boolean motorInverted = true;
