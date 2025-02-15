@@ -109,8 +109,8 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-2))); //find real values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(2)));
+    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
+    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
     leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
     rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
     b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
