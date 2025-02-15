@@ -68,8 +68,8 @@ public class Arm extends SubsystemBase {
 
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(0);
-  PIDController armPID = new PIDController(20, 0, 0);
-  ArmFeedforward feedForward = new ArmFeedforward(0, 2, 4);
+  PIDController armPID = new PIDController(15, 0, 0);
+  ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2);
   TalonFX armMotor = new TalonFX(Constants.armMotorPort);// todo put in actual motor
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
@@ -130,7 +130,7 @@ public class Arm extends SubsystemBase {
 
   public void simulationPeriodic() {
     simArm.update(Constants.simulationTimestep.in(Seconds));
-    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) * Constants.armGearRatio);
+    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) / Constants.armGearRatio);
   }
 
   @Override
@@ -176,8 +176,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Angle getPosition() {
-    System.out.println(encoder.get());
-    return Radians.of(encoder.get() * 2 * Math.PI).plus(angleOffset);
+    return Rotations.of(encoder.get()).plus(angleOffset);
   }
 
   public Boolean isAtTarget(Angle position) {
@@ -185,7 +184,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void stop() {
-    armMotor.setVoltage(0);
+    armMotor.setVoltage(0.1);
     simArm.setInputVoltage(0);
     closedLoop = false;
   }
@@ -201,7 +200,7 @@ public class Arm extends SubsystemBase {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
+      desiredState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
     });
   }
 

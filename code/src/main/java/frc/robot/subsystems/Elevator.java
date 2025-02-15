@@ -196,7 +196,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void stop() {
-    elevatorMotor.setVoltage(0);
+    elevatorMotor.setVoltage(0.2);
     simElevator.setInputVoltage(0);
     closedLoop = false;
   }
