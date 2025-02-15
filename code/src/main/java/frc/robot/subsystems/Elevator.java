@@ -41,6 +41,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+/**
+ * The Elevator subsystem controls a linear elevator mechanism for the robot.
+ * 
+ * <p>This class provides both simulation and real-world control, using a 
+ * TalonFX motor for actuation and a trapezoidal motion profile for smooth 
+ * movement.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Supports closed-loop PID control with feedforward compensation</li>
+ *   <li>Simulates elevator motion using WPILib’s {@link ElevatorSim}</li>
+ *   <li>Implements open-loop voltage control for manual operation</li>
+ *   <li>Uses a limit switch or simulated condition for homing</li>
+ *   <li>Provides motion commands for reaching specific heights</li>
+ *   <li>Integrates with SmartDashboard for real-time visualization</li>
+ * </ul>
+ * 
+ * This subsystem allows precise elevator control while supporting both 
+ * simulation and hardware execution.
+ */
 @Logged
 public class Elevator extends SubsystemBase {
   boolean isHomed = false;

@@ -10,8 +10,30 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-// Can be used to trigger when there is a velocity based stall.
-//
+/**
+ * Provides triggers for detecting motor velocity stalls based on expected and measured velocity.
+ * 
+ * <p>This class offers two static methods to create {@link Trigger} objects that activate when 
+ * a motor experiences a velocity-based stall for a specified duration.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Detects stalls when the motor's velocity is below a threshold for a set delay</li>
+ *   <li>Ignores stalls when the motor is not instructed to move</li>
+ *   <li>Uses a {@link Debouncer} to filter transient velocity fluctuations</li>
+ *   <li>Supports directional stall detection using {@link TriggerDirection}</li>
+ * </ul>
+ * 
+ * <p>Methods:
+ * <ul>
+ *   <li>{@link #fromZero(TriggerDirection, AngularVelocity, Supplier, Supplier, Time)} - 
+ *       Triggers when the velocity remains near zero beyond a threshold</li>
+ *   <li>{@link #fromMeasurement(TriggerDirection, AngularVelocity, Supplier, Supplier, Time)} - 
+ *       Triggers when measured velocity deviates from expected velocity for too long</li>
+ * </ul>
+ * 
+ * This utility helps monitor motor stalls without requiring physical limit switches.
+ */
 public class VelocityStallTrigger {
 
     // Triggers when the motor is below the velocity for the stallDelay.

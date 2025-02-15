@@ -19,6 +19,23 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
+/**
+ * Simulated swerve module for use in robot simulation environments.
+ * 
+ * <p>This class implements {@link SwerveModuleBase} and models a swerve module 
+ * using WPILib’s {@link DCMotorSim} to simulate motor behavior.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Simulates drive and turn motors using {@link DCMotorSim}</li>
+ *   <li>Uses PID controllers for closed-loop velocity and angle control</li>
+ *   <li>Applies feedforward control to estimate real-world performance</li>
+ *   <li>Provides module position and state for use in simulation</li>
+ *   <li>Supports both open-loop and closed-loop operation</li>
+ * </ul>
+ * 
+ * This simulation model helps test swerve drive behavior without requiring hardware.
+ */
 @Logged
 public class SwerveModuleSim implements SwerveModuleBase {
 

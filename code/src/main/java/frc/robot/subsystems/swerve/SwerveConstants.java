@@ -12,6 +12,19 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 
+/**
+ * Constants for an FRC swerve drive system.
+ * 
+ * <p>This class defines:
+ * <ul>
+ *   <li>Motion constraints (slew rate limiters, max velocity)</li>
+ *   <li>Gear ratios and wheel dimensions</li>
+ *   <li>Track width, height, and module positions</li>
+ *   <li>Swerve drive kinematics configuration</li>
+ *   <li>Motor and encoder port assignments</li>
+ * </ul>
+ * These constants help configure the robot's swerve drive behavior.
+ */
 public class SwerveConstants {
 
     public static final SlewRateLimiter driveLimiterX = new SlewRateLimiter(20);

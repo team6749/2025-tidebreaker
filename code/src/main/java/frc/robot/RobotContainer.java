@@ -23,6 +23,21 @@ import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
 
+/**
+ * The RobotContainer class initializes and manages all subsystems, input devices, 
+ * and command bindings for the robot.
+ * 
+ * <p>This class is responsible for:
+ * <ul>
+ *   <li>Creating and configuring subsystems ({@link SwerveDrive}, {@link Localization}, {@link Elevator})</li>
+ *   <li>Setting up driver controls with an {@link XboxController} and button bindings</li>
+ *   <li>Configuring autonomous routines using {@link AutoBuilder}</li>
+ *   <li>Providing the selected autonomous command to the {@link Robot}</li>
+ * </ul>
+ * 
+ * This class acts as the central hub for robot control logic, ensuring smooth integration
+ * between subsystems and operator inputs.
+ */
 @Logged
 public class RobotContainer {
   private final SendableChooser<Command> autoChooser;

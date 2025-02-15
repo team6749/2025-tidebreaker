@@ -27,6 +27,23 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
+/**
+ * Represents a real swerve module using TalonFX motors and a CANcoder for control.
+ * 
+ * <p>This class implements the {@link SwerveModuleBase} interface, providing methods
+ * to control the swerve module using closed-loop and open-loop control.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Uses a PID controller for precise angle and velocity control</li>
+ *   <li>Reads module position, velocity, and angle from sensors</li>
+ *   <li>Implements feedforward for better motion control</li>
+ *   <li>Supports open-loop voltage control for system characterization</li>
+ *   <li>Includes brake mode control to adjust stopping behavior</li>
+ * </ul>
+ * 
+ * This class is designed to work with WPILib’s swerve kinematics for coordinated motion.
+ */
 @Logged
 public class SwerveModuleReal implements SwerveModuleBase {
   public TalonFX driveMotor;
