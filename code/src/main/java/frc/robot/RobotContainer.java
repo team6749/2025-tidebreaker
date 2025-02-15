@@ -7,17 +7,23 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 
+import java.util.Queue;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.enums.DriveOrientation;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 @Logged
 public class RobotContainer {
+//  private final SendableChooser<DriveOrientation> orientationChooser = new SendableChooser<>();
 
   SwerveDrive swerveSubsystem;
   Localization localizationSubsystem;
@@ -31,6 +37,10 @@ public class RobotContainer {
 
 
     configureBindings();
+
+    // orientationChooser.setDefaultOption("Field Orientation", DriveOrientation.FieldOriented);
+    // orientationChooser.addOption("Robot Orientation", DriveOrientation.RobotOriented);
+    // SmartDashboard.putData("Robot Orientation Mode", orientationChooser);
   }
 
   private void configureBindings() {

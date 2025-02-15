@@ -18,16 +18,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.enums.DriveOrientation;
 import frc.robot.subsystems.Localization;
 
 @Logged
 public class SwerveDrive extends SubsystemBase {
-
+    private final SendableChooser<DriveOrientation> orientationChooser = new SendableChooser<>();
     SwerveModuleBase frontLeft;
     SwerveModuleBase frontRight;
     SwerveModuleBase backLeft;
@@ -61,6 +64,10 @@ public class SwerveDrive extends SubsystemBase {
         modules[1] = frontRight;
         modules[2] = backLeft;
         modules[3] = backRight;
+
+        orientationChooser.setDefaultOption("Field Orientation", DriveOrientation.FieldOriented);
+        orientationChooser.addOption("Robot Orientation", DriveOrientation.RobotOriented);
+        SmartDashboard.putData("Robot Orientation Mode", orientationChooser);
     }
 
     @Override
@@ -144,10 +151,17 @@ public class SwerveDrive extends SubsystemBase {
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
                             .times(exponentialResponseCurve(deadZone(-controller.getRightX()))).in(RadiansPerSecond))));
 
-            Rotation2d robotRotation2d = localizationSubsystem.getRobotPose().getRotation();
-            targetSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeeds,
-                    DriverStation.getAlliance().get() == Alliance.Blue ? robotRotation2d
-                            : robotRotation2d.unaryMinus());
+            switch (orientationChooser.getSelected()) {
+                case FieldOriented:
+                    Rotation2d robotRotation2d = localizationSubsystem.getRobotPose().getRotation();
+                    targetSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeeds,
+                            DriverStation.getAlliance().get() == Alliance.Blue ? robotRotation2d
+                                    : robotRotation2d.plus(Rotation2d.fromDegrees(180)));
+
+                    break;
+                default:
+                    break;
+            }
 
             // Desaturate the input
             SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(targetSpeeds);
