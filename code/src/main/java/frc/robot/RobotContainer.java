@@ -15,10 +15,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -43,55 +39,59 @@ public class RobotContainer {
   Elevator elevatorSubsystem;
 
   XboxController controller = new XboxController(0);
-  XboxController controller2 = new XboxController(1);
-  JoystickButton a = new JoystickButton(controller2, 1);
-  JoystickButton x = new JoystickButton(controller2, 2);
-  JoystickButton b = new JoystickButton(controller2, 3);
-  JoystickButton y = new JoystickButton(controller2, 4);
-  JoystickButton rightBumper = new JoystickButton(controller2, 6);
-  JoystickButton rightTrigger = new JoystickButton(controller2,8);
-  JoystickButton leftBumper = new JoystickButton(controller2, 5);
-  JoystickButton leftTrigger = new JoystickButton(controller2,7);
+  //XboxController controller2 = new XboxController(1);
+  JoystickButton a = new JoystickButton(controller, 1);
+  JoystickButton x = new JoystickButton(controller, 2);
+  JoystickButton b = new JoystickButton(controller, 3);
+  JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton rightBumper = new JoystickButton(controller, 6);
+  JoystickButton rightTrigger = new JoystickButton(controller,8);
+  JoystickButton leftBumper = new JoystickButton(controller, 5);
+  JoystickButton 
+  leftTrigger = new JoystickButton(controller,7);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
-    
-    try{
+
+    try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
-    AutoBuilder.configure(
-      localizationSubsystem::getRobotPose, // Robot pose supplier
-      localizationSubsystem::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-      swerveSubsystem::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-      (speeds, feedforwards) -> swerveSubsystem.runChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-      new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+      AutoBuilder.configure(
+          localizationSubsystem::getRobotPose, // Robot pose supplier
+          localizationSubsystem::resetPose, // Method to reset odometry (will be called if your auto has a starting
+                                            // pose)
+          swerveSubsystem::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+          (speeds, feedforwards) -> swerveSubsystem.runChassisSpeeds(speeds), // Method that will drive the robot given
+                                                                              // ROBOT RELATIVE ChassisSpeeds. Also
+                                                                              // optionally outputs individual module
+                                                                              // feedforwards
+          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
+                                          // holonomic drive trains
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
               new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-      ),
-      config, // The robot configuration
-      () -> {
-        // Boolean supplier that controls when the path will be mirrored for the red alliance
-        // This will flip the path being followed to the red side of the field.
-        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-    
+          ),
+          config, // The robot configuration
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red
+            // alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-          return alliance.get() == DriverStation.Alliance.Red;
-        }
-        return false;
-      },
-      swerveSubsystem // Reference to this subsystem to set requirements
-);
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          swerveSubsystem // Reference to this subsystem to set requirements
+      );
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
     }
 
-    
-  
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
@@ -101,7 +101,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
     // a.onTrue(arm.goToPositionArm(Radians.of(0)));
     // y.onTrue(arm.goToPositionArm(Radians.of(0.5)));
     // b.onTrue(arm.goToPositionArm(Radians.of(1)));
@@ -110,7 +110,7 @@ public class RobotContainer {
     leftTrigger.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
     b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
     leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-1))); //find real values
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller));
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
     
     // rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
     // y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
@@ -122,8 +122,10 @@ public class RobotContainer {
     rightTrigger.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(2)));
     //swerveSubsystem.setDefaultCommand(swerveSubsystem.testModuleSpeeds(new SwerveModuleState(MetersPerSecond.of(2),Rotation2d.kZero)));
   }
+
   private void elevatorTest() {
-    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
+    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
+        elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
     b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
     x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
@@ -133,10 +135,10 @@ public class RobotContainer {
   private void armTest() {
     a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
     y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
+
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
-    }
+  }
 }
