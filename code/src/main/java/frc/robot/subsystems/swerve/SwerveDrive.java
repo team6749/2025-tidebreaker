@@ -9,13 +9,16 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,10 +47,14 @@ public class SwerveDrive extends SubsystemBase {
             backRight = new SwerveModuleSim();
 
         } else {
-           frontLeft = new SwerveModuleReal(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort, SwerveConstants.FLEncoderPort);
-           frontRight = new SwerveModuleReal(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort, SwerveConstants.FREncoderPort);
-           backLeft = new SwerveModuleReal(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort, SwerveConstants.BLEncoderPort);
-           backRight = new SwerveModuleReal(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort, SwerveConstants.BREncoderPort);
+            frontLeft = new SwerveModuleReal(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort,
+                    SwerveConstants.FLEncoderPort);
+            frontRight = new SwerveModuleReal(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort,
+                    SwerveConstants.FREncoderPort);
+            backLeft = new SwerveModuleReal(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort,
+                    SwerveConstants.BLEncoderPort);
+            backRight = new SwerveModuleReal(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort,
+                    SwerveConstants.BREncoderPort);
         }
 
         modules[0] = frontLeft;
@@ -137,8 +144,10 @@ public class SwerveDrive extends SubsystemBase {
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
                             .times(exponentialResponseCurve(deadZone(-controller.getRightX()))).in(RadiansPerSecond))));
 
+            Rotation2d robotRotation2d = localizationSubsystem.getRobotPose().getRotation();
             targetSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeeds,
-                    localizationSubsystem.getRobotPose().getRotation());
+                    DriverStation.getAlliance().get() == Alliance.Blue ? robotRotation2d
+                            : robotRotation2d.unaryMinus());
 
             // Desaturate the input
             SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(targetSpeeds);
@@ -154,13 +163,14 @@ public class SwerveDrive extends SubsystemBase {
 
     public Command testModuleSpeeds(SwerveModuleState target) {
         Command command = Commands.runEnd(() -> {
-            //targetSpeeds = new ChassisSpeeds(1,0,0);
-            //targetSpeeds = new ChassisSpeeds(3,0,0);
-            //targetSpeeds = new ChassisSpeeds(0,0.5,0);
-            //targetSpeeds = new ChassisSpeeds(0,0,1);
-            runModuleStates(new SwerveModuleState[]{target,target,target,target});
+            // targetSpeeds = new ChassisSpeeds(1,0,0);
+            // targetSpeeds = new ChassisSpeeds(3,0,0);
+            // targetSpeeds = new ChassisSpeeds(0,0.5,0);
+            // targetSpeeds = new ChassisSpeeds(0,0,1);
+            runModuleStates(new SwerveModuleState[] { target, target, target, target });
         }, () -> {
-            stop();}, this); 
+            stop();
+        }, this);
         return command;
     }
 }
