@@ -37,7 +37,7 @@ public class Localization extends SubsystemBase {
 
     Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
     Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
-    public static boolean APPLY_LIME = false; //For now, log only, don't actually apply to odometry
+    boolean applyLimePositioning = false; //For now, log only, don't actually apply to odometry
 
     @NotLogged
     SwerveDrive swerve;
@@ -111,7 +111,7 @@ public class Localization extends SubsystemBase {
     public void periodic() {
 
         // allow the smartdashboard to toggle vision updates
-        APPLY_LIME = limelightToggleChooser.getSelected();
+        applyLimePositioning = limelightToggleChooser.getSelected();
 
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
@@ -142,7 +142,7 @@ public class Localization extends SubsystemBase {
           doRejectUpdate = true;
         }
 
-        if(!doRejectUpdate && APPLY_LIME)
+        if(!doRejectUpdate && applyLimePositioning)
         {
           poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
           poseEstimator.addVisionMeasurement(
