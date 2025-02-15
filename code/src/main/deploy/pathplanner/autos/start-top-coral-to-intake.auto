@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "start_top_to_h"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "score_coral_ex"
+            "pathName": "test_1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "h_to_coral_bot"
+            "pathName": "test1_top_to_h"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "h_to_coral_top"
           }
         }
       ]

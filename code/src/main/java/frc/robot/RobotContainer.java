@@ -4,7 +4,13 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -13,12 +19,17 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ArmSample;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -28,15 +39,22 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   SwerveDrive swerveSubsystem;
+  Arm arm = new Arm();
+  //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
 
   XboxController controller = new XboxController(0);
+  XboxController controller2 = new XboxController(1);
+  // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller, 1);
-  JoystickButton b = new JoystickButton(controller, 2);
   JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton y = new JoystickButton(controller, 4);
-  JoystickButton rightBumper = new JoystickButton(controller, 6);
+  JoystickButton b = new JoystickButton(controller2, 2);
+  JoystickButton y = new JoystickButton(controller2, 4);
+  JoystickButton rightBumper = new JoystickButton(controller2, 5);
+  JoystickButton leftBumper = new JoystickButton(controller2, 6);
+  DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
+  DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -84,29 +102,34 @@ public class RobotContainer {
     SmartDashboard.putData("autoChooser", autoChooser);
 
     configureBindings();
-
-    // elevatorTest();
+    //elevatorTest();
+    //armTest();
   }
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    rightBumper.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.intake));
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
-    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
-    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
+    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
+    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
+    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
+    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
   }
 
   private void elevatorTest() {
     a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
         elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    // y.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.3)));
-    // a.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.2)));
+    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
     rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+  }
+
+  private void armTest() {
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
 
   public Command getAutonomousCommand() {
