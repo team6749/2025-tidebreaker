@@ -33,6 +33,8 @@ public class Localization extends SubsystemBase {
     SwerveDrive swerve;
 
     ADIS16470_IMU gyro = new ADIS16470_IMU();
+    public static final String LimeLightFront = "limelight-front";
+    public static final String LimeLightBack = "limelight-back";
 
     @NotLogged
     SwerveDriveOdometry odometry;
@@ -88,12 +90,26 @@ public class Localization extends SubsystemBase {
     }
 
     public void setVision() {
-        LimelightHelpers.SetRobotOrientation("limelight", poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        LimelightHelpers.SetRobotOrientation(LimeLightFront, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        applyVisionUpdates(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightFront));
+
+        LimelightHelpers.SetRobotOrientation(LimeLightBack, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        applyVisionUpdates(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightBack));
+
+    }
+
+
+    private void applyVisionUpdates(LimelightHelpers.PoseEstimate mt2) {
+        if(Math.abs(gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
         if(mt2.tagCount == 0)
         {
+            // We don't see any tags currently
           doRejectUpdate = true;
         }
+
         if(!doRejectUpdate)
         {
           poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
@@ -102,6 +118,8 @@ public class Localization extends SubsystemBase {
               mt2.timestampSeconds);
         }
     }
+
+
     @Override
     public void simulationPeriodic() {
         super.simulationPeriodic();
