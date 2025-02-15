@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ArmSample;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
@@ -24,6 +25,7 @@ public class RobotContainer {
 
   SwerveDrive swerveSubsystem;
   Arm arm = new Arm();
+  //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
 
   XboxController controller = new XboxController(0);

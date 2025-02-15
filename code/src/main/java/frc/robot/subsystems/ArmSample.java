@@ -1,3 +1,5 @@
+package frc.robot.subsystems;
+
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
@@ -94,7 +96,7 @@ public class ArmSample extends SubsystemBase {
         maxAngle.in(Radians),
         true,
         simStartAngle.in(Radians),
-        0.0 // Add noise with a std-dev of 1 tick
+        0.0,0 // Add noise with a std-dev of 1 tick
     );
   
     // Simulation Control
