@@ -45,15 +45,16 @@ public class RobotContainer {
   Elevator elevatorSubsystem;
 
   XboxController controller = new XboxController(0);
+  XboxController controller2 = new XboxController(1);
   // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton b = new JoystickButton(controller, 2);
-  JoystickButton y = new JoystickButton(controller, 4);
-  JoystickButton rightBumper = new JoystickButton(controller, 6);
-  JoystickButton leftBumper = new JoystickButton(controller, 5);
-  DoubleSupplier rightTrigger = () -> controller.getRawAxis(2);
-  DoubleSupplier leftTrigger =  () -> controller.getRawAxis(3);
+  JoystickButton b = new JoystickButton(controller2, 2);
+  JoystickButton y = new JoystickButton(controller2, 4);
+  JoystickButton rightBumper = new JoystickButton(controller2, 5);
+  JoystickButton leftBumper = new JoystickButton(controller2, 6);
+  DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
+  DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -108,10 +109,10 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(arm.runOpenLoopCommand(Volts.of(-1))); //find real values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1)));
-    leftBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
+    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-2))); //find real values
+    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(2)));
+    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
+    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
     b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
   }
