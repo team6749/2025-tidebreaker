@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -36,7 +37,7 @@ public class Localization extends SubsystemBase {
 
     Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
     Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
-    public static final boolean APPLY_LIME = false; //For now, log only, don't actually apply to odometry
+    public static boolean APPLY_LIME = false; //For now, log only, don't actually apply to odometry
 
     @NotLogged
     SwerveDrive swerve;
@@ -58,6 +59,8 @@ public class Localization extends SubsystemBase {
     ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
 
     Field2d dashboardField = new Field2d();
+
+    private final SendableChooser<Boolean> limelightToggleChooser = new SendableChooser<>();
 
     public Localization(SwerveDrive swerve) {
         this.swerve = swerve;
@@ -83,6 +86,10 @@ public class Localization extends SubsystemBase {
         });
 
         SmartDashboard.putData("Field", dashboardField);
+
+        limelightToggleChooser.setDefaultOption("Disabled", false);
+        limelightToggleChooser.addOption("Enabled", true);
+        SmartDashboard.putData("Limelight Toggle", limelightToggleChooser);
     }
 
 
@@ -102,6 +109,9 @@ public class Localization extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        // allow the smartdashboard to toggle vision updates
+        APPLY_LIME = limelightToggleChooser.getSelected();
 
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
