@@ -16,8 +16,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -32,6 +30,27 @@ import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
+/**
+ * The Localization subsystem tracks the robot's position on the field using odometry 
+ * and sensor data.
+ * 
+ * <p>This class maintains both {@link SwerveDriveOdometry} and 
+ * {@link SwerveDrivePoseEstimator} to estimate the robot’s pose using swerve 
+ * module states and gyro data. It supports simulation and integrates with 
+ * {@link PathPlannerLogging} for visualization.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Tracks robot pose using swerve odometry and pose estimation</li>
+ *   <li>Uses an ADIS16470 IMU for gyro-based heading estimation</li>
+ *   <li>Supports vision integration for future enhancements</li>
+ *   <li>Provides real-time pose updates to SmartDashboard</li>
+ *   <li>Simulates robot movement in a virtual field environment</li>
+ * </ul>
+ * 
+ * This subsystem ensures accurate positioning data for autonomous navigation 
+ * and field-oriented control.
+ */
 @Logged
 public class Localization extends SubsystemBase {
 
