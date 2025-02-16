@@ -10,18 +10,26 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants;
 
 /**
@@ -48,13 +56,22 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 @Logged
 public class Localization extends SubsystemBase {
 
+    Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
+    Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
+    boolean applyLimePositioning = false; //For now, log only, don't actually apply to odometry
+
     @NotLogged
     SwerveDrive swerve;
 
     ADIS16470_IMU gyro = new ADIS16470_IMU();
+    public static final String LimeLightFront = "limelight-front";
+    public static final String LimeLightBack = "limelight-back";
 
     @NotLogged
     SwerveDriveOdometry odometry;
+
+    Pose2d backLimelight = null;
+    Pose2d frontLimelight = null;
 
     @NotLogged
     SwerveDrivePoseEstimator poseEstimator;
@@ -63,6 +80,8 @@ public class Localization extends SubsystemBase {
     ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
 
     Field2d dashboardField = new Field2d();
+
+    private final SendableChooser<Boolean> limelightToggleChooser = new SendableChooser<>();
 
     public Localization(SwerveDrive swerve) {
         this.swerve = swerve;
@@ -88,7 +107,12 @@ public class Localization extends SubsystemBase {
         });
 
         SmartDashboard.putData("Field", dashboardField);
+
+        limelightToggleChooser.setDefaultOption("Disabled", false);
+        limelightToggleChooser.addOption("Enabled", true);
+        SmartDashboard.putData("Limelight Toggle", limelightToggleChooser);
     }
+
 
     /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
     private Rotation2d getGyroAngle() {
@@ -103,17 +127,52 @@ public class Localization extends SubsystemBase {
         poseEstimator.resetPose(newPose);
     }
 
+
     @Override
     public void periodic() {
+
+        // allow the smartdashboard to toggle vision updates
+        applyLimePositioning = limelightToggleChooser.getSelected();
 
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
 
-        // TODO add vision measurements
+        LimelightHelpers.SetRobotOrientation(LimeLightFront, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        PoseEstimate mt2Front = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightFront);
+        frontLimelightFailure.set(mt2Front == null);
+        frontLimelight = applyVisionUpdates(mt2Front);
+
+        LimelightHelpers.SetRobotOrientation(LimeLightBack, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        PoseEstimate mt2Back = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightBack);
+        backLimelightFailure.set(mt2Back == null);
+        backLimelight = applyVisionUpdates(mt2Back);
 
         // Update Dashboard (this is for elastic/driver)
         dashboardField.setRobotPose(getRobotPose());
     }
+
+
+    private Pose2d applyVisionUpdates(LimelightHelpers.PoseEstimate mt2) {
+        boolean doRejectUpdate = false;
+        if (mt2 == null) {
+            return null;
+        }
+        if(mt2.tagCount == 0 || Math.abs(gyro.getRate()) > 720) {
+             // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+            // OR We don't see any tags currently
+          doRejectUpdate = true;
+        }
+
+        if(!doRejectUpdate && applyLimePositioning)
+        {
+          poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+          poseEstimator.addVisionMeasurement(
+              mt2.pose,
+              mt2.timestampSeconds);
+        }
+        return mt2.pose;
+    }
+
 
     @Override
     public void simulationPeriodic() {
