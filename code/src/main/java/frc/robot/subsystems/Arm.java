@@ -47,6 +47,20 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+/**
+ * Controls a single-jointed arm using a TalonFX motor and duty cycle encoder for position feedback.
+ * Supports closed-loop (PID + feedforward with a trapezoidal profile) and open-loop control,
+ * along with simulation using SingleJointedArmSim and visualization via Mechanism2d.
+ *
+ * <p>Key methods include:
+ * <ul>
+ *   <li>{@code runClosedLoop(Angle)} - commands the arm to a target angle.</li>
+ *   <li>{@code goToPositionArm(Angle)} - returns a command to move the arm to a target position.</li>
+ *   <li>{@code runVolts(Voltage)} - sets the motor voltage directly.</li>
+ * </ul>
+ *
+ * <p>Requires constants defined in {@link frc.robot.Constants}.
+ */
 @Logged
 public class Arm extends SubsystemBase {
   Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
