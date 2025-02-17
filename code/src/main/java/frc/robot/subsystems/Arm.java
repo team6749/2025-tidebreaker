@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -70,15 +71,14 @@ public class Arm extends SubsystemBase {
   public static Angle angleOffset = Radians.of(0);
   PIDController armPID = new PIDController(15, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2);
-  TalonFX armMotor = new TalonFX(Constants.armMotorPort);// todo put in actual motor
+  TalonFX armMotor = new TalonFX(Constants.armMotorPort);
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
   public static Angle tolerance = Radians.of(0.04);
 
-  DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one on the arm but, for the sake of the
-                                                      // simulation, let's try it.
+  DutyCycleEncoder encoder = new DutyCycleEncoder(2); 
 
   Angle maxAngle = Degrees.of(90);
   Angle minAngle = Degrees.of(-90);
@@ -120,8 +120,8 @@ public class Arm extends SubsystemBase {
           3,
           new Color8Bit(Color.kYellow)));
 
-  TrapezoidProfile.State desiredState = new State(0, 0);
-  TrapezoidProfile.State currentState = new State(0, 0);
+  TrapezoidProfile.State endState = new State(0, 0);
+  TrapezoidProfile.State targetState = new State(0, 0);
 
   /** Creates a new Arm. */
   public Arm() {
@@ -148,13 +148,13 @@ public class Arm extends SubsystemBase {
         return;
       }
       var currentAngle = getPosition();
-      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
+      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), targetState, endState);
 
-      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), currentState.position));
-      Voltage feedForwardOutput = Volts.of(feedForward.calculate(currentState.position, currentState.velocity));
+      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), targetState.position));
+      Voltage feedForwardOutput = Volts.of(feedForward.calculate(targetState.position, targetState.velocity));
 
       setVolts(pidoutput.plus(feedForwardOutput));
-      currentState = nextState;
+      targetState = nextState;
     }
     armMech.setAngle(getPosition().in(Degrees));
 
@@ -162,7 +162,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void runClosedLoop(Angle desiredAngle) {
-    desiredState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
+    endState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
     closedLoop = true;
   }
 
@@ -179,6 +179,10 @@ public class Arm extends SubsystemBase {
     return Rotations.of(encoder.get()).plus(angleOffset);
   }
 
+  public double getPositionInRadians() {
+    return getPosition().in(Radians);
+  }
+
   public Boolean isAtTarget(Angle position) {
     return getPosition().isNear(position, tolerance);
   }
@@ -190,7 +194,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void resetProfileState() {
-    currentState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
+    targetState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
   }
 
   public Command goToPositionArm(Angle desiredAngle) {
@@ -200,7 +204,7 @@ public class Arm extends SubsystemBase {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
+      endState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
     });
   }
 

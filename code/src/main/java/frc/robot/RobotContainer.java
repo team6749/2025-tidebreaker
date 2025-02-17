@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.ArmSample;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -109,12 +108,12 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
-    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    // new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
+    // new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    // leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
+    // rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
+    // b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    // x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
   }
 
   private void elevatorTest() {
