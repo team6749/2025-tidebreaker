@@ -91,11 +91,11 @@ public class Elevator extends SubsystemBase {
       new TrapezoidProfile.Constraints(
           maxVelocity.in(MetersPerSecond),
           maxAcceleration.in(MetersPerSecondPerSecond)));
-  TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
-  TrapezoidProfile.State desiredState = new State(0, 0);
+  TrapezoidProfile.State targetState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+  TrapezoidProfile.State endState = new State(0, 0);
 
   PIDController elevatorPID = new PIDController(20, 0, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.3, 2);
 
   public Elevator() {
     stop();
@@ -111,6 +111,7 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("desired state pos", endState.position);
     if (isHomed == false) {
       setVolts(Volts.of(-0.1));
       if (getLimitSwitch()) {
@@ -126,11 +127,11 @@ public class Elevator extends SubsystemBase {
         resetProfileState();
         return;
       }
-      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
-      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), currentState.position));
-      Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
+      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), targetState, endState);
+      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), targetState.position));
+      Voltage feedForwardOutput = Volts.of(feedforward.calculate(nextState.velocity));
       setVolts(PIDOutput.plus(feedForwardOutput));
-      currentState = next;
+      targetState = nextState;
     }
     elevatorMech2d.setLength(getPosition().in(Meters)); 
     // This method will be called once per scheduler run
@@ -169,12 +170,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runClosedLoopSetGoal(Distance goal) {
-    desiredState = new TrapezoidProfile.State(goal.in(Meters), 0);
+    endState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
 
   public void resetProfileState() {
-    currentState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+    targetState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
   public Command runOpenLoopCommand(Voltage Volts) {
@@ -182,13 +183,15 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command goToPositionCommand(Distance position) {
+    SmartDashboard.putNumber("elevator target", position.in(Meters));
     return Commands.startRun(() -> {
+      SmartDashboard.putNumber("elevator thingayyyyyyyyy", position.in(Meters));
       resetProfileState();
     }, () -> {
       runClosedLoopSetGoal(position);
     }, this).until(() -> isAtTarget(position)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+      endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
   }
 

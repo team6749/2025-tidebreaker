@@ -116,7 +116,7 @@ public class Arm extends SubsystemBase {
   private final MechanismLigament2d armMech = armPivot.append(
       new MechanismLigament2d(
           "Arm",
-          0.5,
+          0.25,
           simStartAngle.in(Degrees),
           3,
           new Color8Bit(Color.kYellow)));
@@ -131,7 +131,7 @@ public class Arm extends SubsystemBase {
 
   public void simulationPeriodic() {
     simArm.update(Constants.simulationTimestep.in(Seconds));
-    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) / Constants.armGearRatio);
+    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Radians));
   }
 
   @Override
@@ -177,7 +177,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Angle getPosition() {
-    return Rotations.of(encoder.get()).plus(angleOffset);
+    return Radians.of(encoder.get()).plus(angleOffset);
   }
 
   public double getPositionInRadians() {
@@ -227,7 +227,7 @@ public class Arm extends SubsystemBase {
 
   public boolean inArmDangerZone() {
     inDangerZone = false;
-    if (Rotations.of(encoder.get()).in(Radians) < Constants.armDangerZone[0].in(Radians) || Rotations.of(encoder.get()).in(Radians) > Constants.armDangerZone[1].in(Radians)) {
+    if (Rotations.of(encoder.get()).in(Radians) < Constants.armDangerZone[0].in(Radians) & Rotations.of(encoder.get()).in(Radians) > Constants.armDangerZone[1].in(Radians)) {
       inDangerZone = true;
     }
     return inDangerZone;
