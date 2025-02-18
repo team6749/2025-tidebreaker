@@ -18,6 +18,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS5Controller;
@@ -133,5 +135,12 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public Command goToCoralLayer(Distance goalHeight, Angle goalAngle) {
+    return Commands.runEnd(() -> {
+      arm.goToPositionArm(arm.canExtend(goalAngle, elevatorSubsystem.inElevatorDangerZone()));
+      elevatorSubsystem.goToPositionCommand(elevatorSubsystem.canRaise(goalHeight, arm.inArmDangerZone()));
+    }, null, arm,elevatorSubsystem);
   }
 }

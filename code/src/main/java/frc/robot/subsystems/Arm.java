@@ -66,6 +66,7 @@ public class Arm extends SubsystemBase {
   boolean closedLoop = false;
   boolean encoderConnected = true;
   boolean motorInverted = true;
+  boolean inDangerZone = false;
 
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(0);
@@ -222,5 +223,28 @@ public class Arm extends SubsystemBase {
 
   public Command runOpenLoopCommand(Voltage Volts) {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  }
+
+  public boolean inArmDangerZone() {
+    inDangerZone = false;
+    if (Rotations.of(encoder.get()).in(Radians) < Constants.armDangerZone[0].in(Radians) || Rotations.of(encoder.get()).in(Radians) > Constants.armDangerZone[1].in(Radians)) {
+      inDangerZone = true;
+    }
+    return inDangerZone;
+  }
+
+  public Angle canExtend(Angle goalAngle,boolean elevatorInDangerZone) {
+    if(elevatorInDangerZone) {
+      if(goalAngle.in(Radians) < Constants.armDangerZone[0].in(Radians) & goalAngle.in(Radians) > Constants.armDangerZone[1].in(Radians)) {
+
+        if(goalAngle.in(Radians) >= Constants.avgOfArmDangerZone.in(Radians)) {
+          goalAngle = Radians.of(Constants.armDangerZone[0].in(Radians)); //these values are still bogus
+        } 
+        else if(goalAngle.in(Radians) < Constants.avgOfArmDangerZone.in(Radians)) {
+          goalAngle = Radians.of(Constants.armDangerZone[1].in(Radians));
+        }
+      }
+    }
+    return goalAngle;
   }
 }

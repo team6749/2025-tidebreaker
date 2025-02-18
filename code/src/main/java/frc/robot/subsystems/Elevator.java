@@ -47,6 +47,7 @@ public class Elevator extends SubsystemBase {
   boolean isHomed = false;
   boolean closedLoop = false;
   boolean motorInverted = true;
+  boolean inDangerZone = true;
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.65);
@@ -199,5 +200,22 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setVoltage(0.2);
     simElevator.setInputVoltage(0);
     closedLoop = false;
+  }
+
+  public boolean inElevatorDangerZone() {
+    inDangerZone = false;
+    if (getPosition().in(Meters) < Constants.elevatorDangerZone.in(Meters)) {
+      inDangerZone = true;
+    }
+    return inDangerZone;
+  }
+
+  public Distance canRaise(Distance goalHeight,boolean armInDangerZone) {
+    if(armInDangerZone) {
+      if(goalHeight.in(Meters) > Constants.elevatorDangerZone.in(Meters)) {
+        goalHeight = Meters.of(Constants.elevatorDangerZone.in(Meters)); //not sure if doing this is redundent, but it could help maintain units
+      }
+    }
+    return goalHeight;
   }
 }

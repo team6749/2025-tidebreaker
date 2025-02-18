@@ -6,7 +6,12 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 
+import java.security.PublicKey;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
@@ -20,6 +25,9 @@ public class Constants {
     public static final double deadZone = 0.06;
 
     public static final double armGearRatio = ((1.0 / 5.0) * (1.0 / 5.0) * (16.0 / 30.0)); // gearbox:1/5, gearbox2:1/5, chain:16/30 no clue about chain, double check that
+    public static final Distance elevatorDangerZone = Meters.of(1); //todo, find real values
+    public static final Angle[] armDangerZone = {Radians.of(1),Radians.of(0.5)}; //lower bound and upper bound
+    public static final Angle avgOfArmDangerZone = armDangerZone[0].plus(armDangerZone[1]).div(2);
     public class ElevatorSetPoints {
         public static Distance intake = Meters.of(0);
         public static Distance l1 = Meters.of(0.3);
