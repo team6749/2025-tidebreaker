@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.ArmSample;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -161,7 +160,7 @@ public class RobotContainer {
       elevatorCommands.positionLevel2(),
       armCommands.positionLevel2()
     );
-      command.setName("Score Level 2");
+      command.setName("Level 2");
       return command;
   }
 
@@ -170,7 +169,7 @@ public class RobotContainer {
       elevatorCommands.positionLevel3(),
       armCommands.positionLevel3()
      );
-      command.setName("Score Level 3");
+      command.setName("Level 3");
       return command;
   }
 
@@ -179,7 +178,7 @@ public class RobotContainer {
       elevatorCommands.positionLevel4(),
       armCommands.positionLevel4()
      );
-      command.setName("Score Level 4");
+      command.setName("Level 4");
       return command;
   }
 
@@ -192,4 +191,11 @@ public class RobotContainer {
       return command;
   }
 
+  public Command Score() {
+    Command command = Commands.sequence(
+      armCommands.score()
+    );
+      command.setName("Score");
+      return command;
+  }
 }

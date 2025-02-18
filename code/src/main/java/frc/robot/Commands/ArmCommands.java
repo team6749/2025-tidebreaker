@@ -21,31 +21,37 @@ public class ArmCommands {
 
     public Command intakePosition () {
         Command command = armSubsystem.goToPositionArm(Radians.of(- Math.PI /2));
-        command.setName("Elevator Intake Position");
+        command.setName("Arm Intake Position");
         return command;
     }
 
     public Command Home () {
         Command command = armSubsystem.goToPositionArm(Radians.of(- Math.PI /2));
-        command.setName("Elevator Idle Position");
+        command.setName("Arm Idle Position");
         return command;
     }
 
     public Command positionLevel2 () {
         Command command = armSubsystem.goToPositionArm(Radians.of(0.7));
-        command.setName("Elevator Score Level 2");
+        command.setName("Arm Score Level 2");
         return command;
     }
 
     public Command positionLevel3 () {
         Command command = armSubsystem.goToPositionArm(Radians.of(1));
-        command.setName("Elevator Score Level 3");
+        command.setName("Arm Score Level 3");
         return command;
     }
 
     public Command positionLevel4 () {
         Command command = armSubsystem.goToPositionArm(Radians.of(1.57));
-        command.setName("Elevator Score Level 4");
+        command.setName("Arm Score Level 4");
+        return command;
+    }
+
+    public Command score () {
+        Command command = armSubsystem.goToPositionArm(Radians.of(- Math.PI * 5 / 3));
+        command.setName("Arm Score Level 4");
         return command;
     }
 }
