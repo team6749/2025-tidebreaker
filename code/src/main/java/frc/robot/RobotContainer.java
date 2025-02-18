@@ -49,8 +49,8 @@ public class RobotContainer {
   // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
+  JoystickButton b = new JoystickButton(controller, 2);
+  JoystickButton y = new JoystickButton(controller, 4);
   JoystickButton rightBumper = new JoystickButton(controller2, 5);
   JoystickButton leftBumper = new JoystickButton(controller2, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
@@ -114,7 +114,8 @@ public class RobotContainer {
     leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
     rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
     b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-1)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
   }
 
   private void elevatorTest() {
