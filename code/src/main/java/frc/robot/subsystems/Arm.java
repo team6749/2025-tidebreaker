@@ -123,6 +123,11 @@ public class Arm extends SubsystemBase {
   TrapezoidProfile.State desiredState = new State(0, 0);
   TrapezoidProfile.State currentState = new State(0, 0);
 
+  SysIdRoutine routine = new SysIdRoutine(
+    new SysIdRoutine.Config(),
+    new SysIdRoutine.Mechanism(this::voltageDrive, this::logMotors, this)
+);
+
   /** Creates a new Arm. */
   public Arm() {
     SmartDashboard.putData("Arm Sim", mech2d);
@@ -218,5 +223,13 @@ public class Arm extends SubsystemBase {
 
   public Command runOpenLoopCommand(Voltage Volts) {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return routine.quasistatic(direction);
+  }
+  
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return routine.dynamic(direction);
   }
 }

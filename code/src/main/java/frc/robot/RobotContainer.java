@@ -127,8 +127,8 @@ public class RobotContainer {
   }
 
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
+    a.whileTrue(sysIdQuasistatic());
+    y.whileTrue(sysIdDynamic());
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
 
