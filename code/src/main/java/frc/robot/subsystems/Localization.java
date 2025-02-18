@@ -37,7 +37,7 @@ public class Localization extends SubsystemBase {
 
     Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
     Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
-    boolean applyLimePositioning = false; //For now, log only, don't actually apply to odometry
+    boolean applyLimePositioning = false; // For now, log only, don't actually apply to odometry
 
     @NotLogged
     SwerveDrive swerve;
@@ -73,7 +73,7 @@ public class Localization extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics, getGyroAngle(),
                 swerve.getModulePositions(), Pose2d.kZero);
 
-                // Logging callback for target robot pose
+        // Logging callback for target robot pose
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
             // Do whatever you want with the pose here
             dashboardField.getObject("target pose").setPose(pose);
@@ -92,7 +92,6 @@ public class Localization extends SubsystemBase {
         SmartDashboard.putData("Limelight Toggle", limelightToggleChooser);
     }
 
-
     /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
     private Rotation2d getGyroAngle() {
         return Rotation2d.fromDegrees(gyro.getAngle());
@@ -101,11 +100,11 @@ public class Localization extends SubsystemBase {
     public Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
+
     public void resetPose(Pose2d newPose) {
         odometry.resetPose(newPose);
         poseEstimator.resetPose(newPose);
     }
-
 
     @Override
     public void periodic() {
@@ -116,12 +115,14 @@ public class Localization extends SubsystemBase {
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
 
-        LimelightHelpers.SetRobotOrientation(LimeLightFront, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(LimeLightFront,
+                poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
         PoseEstimate mt2Front = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightFront);
         frontLimelightFailure.set(mt2Front == null);
         frontLimelight = applyVisionUpdates(mt2Front);
 
-        LimelightHelpers.SetRobotOrientation(LimeLightBack, poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(LimeLightBack,
+                poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
         PoseEstimate mt2Back = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLightBack);
         backLimelightFailure.set(mt2Back == null);
         backLimelight = applyVisionUpdates(mt2Back);
@@ -130,28 +131,26 @@ public class Localization extends SubsystemBase {
         dashboardField.setRobotPose(getRobotPose());
     }
 
-
     private Pose2d applyVisionUpdates(LimelightHelpers.PoseEstimate mt2) {
         boolean doRejectUpdate = false;
         if (mt2 == null) {
             return null;
         }
-        if(mt2.tagCount == 0 || Math.abs(gyro.getRate()) > 720) {
-             // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+        if (mt2.tagCount == 0 || Math.abs(gyro.getRate()) > 720) {
+            // if our angular velocity is greater than 720 degrees per second, ignore vision
+            // updates
             // OR We don't see any tags currently
-          doRejectUpdate = true;
+            doRejectUpdate = true;
         }
 
-        if(!doRejectUpdate && applyLimePositioning)
-        {
-          poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-          poseEstimator.addVisionMeasurement(
-              mt2.pose,
-              mt2.timestampSeconds);
+        if (!doRejectUpdate && applyLimePositioning) {
+            poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+            poseEstimator.addVisionMeasurement(
+                    mt2.pose,
+                    mt2.timestampSeconds);
         }
         return mt2.pose;
     }
-
 
     @Override
     public void simulationPeriodic() {

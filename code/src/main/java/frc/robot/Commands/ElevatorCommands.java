@@ -11,37 +11,37 @@ import frc.robot.subsystems.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ElevatorCommands {
-  Elevator elevatorSubsystem;
+    Elevator elevatorSubsystem;
 
-    public ElevatorCommands (Elevator elevator) {
+    public ElevatorCommands(Elevator elevator) {
         this.elevatorSubsystem = elevator;
     }
 
-    public Command intakePosition () {
+    public Command intakePosition() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.05));
         command.setName("Elevator Intake Position");
         return command;
     }
 
-    public Command Home () {
+    public Command Home() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.2));
         command.setName("Elevator Idle Position");
         return command;
     }
 
-    public Command positionLevel2 () {
+    public Command positionLevel2() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.3));
         command.setName("Elevator Score Level 2");
         return command;
     }
 
-    public Command positionLevel3 () {
+    public Command positionLevel3() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.4));
         command.setName("Elevator Score Level 3");
         return command;
     }
 
-    public Command positionLevel4 () {
+    public Command positionLevel4() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.63));
         command.setName("Elevator Score Level 4");
         return command;

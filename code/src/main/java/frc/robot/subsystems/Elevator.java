@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
   public static double gearboxRatio = 20;
   public static Mass carriageMass = Kilograms.of(4);
   public static Distance sprocketDiameter = Centimeters.of(6.5);
-  public BooleanSupplier limitSwitch; 
+  public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.015);
@@ -74,17 +74,16 @@ public class Elevator extends SubsystemBase {
       true,
       simStartHeight.in(Meters),
       0,
-      0
-      );
+      0);
 
-  private final Mechanism2d mech2d = new Mechanism2d(2, 
-  maxHeight.in(Meters));
-  private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", 1, 
-  minHeight.in(Meters));
+  private final Mechanism2d mech2d = new Mechanism2d(2,
+      maxHeight.in(Meters));
+  private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", 1,
+      minHeight.in(Meters));
   private final MechanismLigament2d elevatorMech2d = mech2dRoot.append(
-      new MechanismLigament2d("Elevator", 
-      simStartHeight.in(Meters), 
-      90));
+      new MechanismLigament2d("Elevator",
+          simStartHeight.in(Meters),
+          90));
 
   TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(
@@ -101,8 +100,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setInverted(motorInverted);
     if (Robot.isSimulation()) {
       limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
-    }
-    else {
+    } else {
       limitSwitch = () -> true;
     }
     SmartDashboard.putData("Elevator Sim", mech2d);
@@ -131,15 +129,15 @@ public class Elevator extends SubsystemBase {
       setVolts(PIDOutput.plus(feedForwardOutput));
       currentState = next;
     }
-    elevatorMech2d.setLength(getPosition().in(Meters)); 
+    elevatorMech2d.setLength(getPosition().in(Meters));
     // This method will be called once per scheduler run
   }
 
   @Override
   public void simulationPeriodic() {
-      simElevator.update(Constants.simulationTimestep.in(Seconds));
-      simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio * (motorInverted ? -1: 1));
-      simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio * (motorInverted ? -1:1));
+    simElevator.update(Constants.simulationTimestep.in(Seconds));
+    simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio * (motorInverted ? -1 : 1));
+    simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio * (motorInverted ? -1 : 1));
   }
 
   public boolean isAtTarget(Distance position) {

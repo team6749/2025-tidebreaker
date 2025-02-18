@@ -41,7 +41,7 @@ public class RobotContainer {
 
   SwerveDrive swerveSubsystem;
   Arm arm = new Arm();
-  //ArmSample armSample = new ArmSample();
+  // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem = new Elevator();
   ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
@@ -57,7 +57,7 @@ public class RobotContainer {
   JoystickButton rightBumper = new JoystickButton(controller2, 5);
   JoystickButton leftBumper = new JoystickButton(controller2, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
-  DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
+  DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -103,16 +103,18 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    //configureBindings();
-    //elevatorTest();
-    //armTest();
+    // configureBindings();
+    // elevatorTest();
+    // armTest();
     coralSubsystemTest();
   }
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
+    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); // find
+                                                                                                                      // real
+                                                                                                                      // values
     new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
     leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
     rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
@@ -132,7 +134,7 @@ public class RobotContainer {
   private void armTest() {
     a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
     y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); // find real values
   }
 
   private void coralSubsystemTest() {
@@ -148,54 +150,48 @@ public class RobotContainer {
 
   public Command Home() {
     Command command = Commands.sequence(
-      elevatorCommands.Home(),
-      armCommands.Home()
-    );
-      command.setName("Home");
-      return command;
+        elevatorCommands.Home(),
+        armCommands.Home());
+    command.setName("Home");
+    return command;
   }
 
   public Command moveToLevel2() {
     Command command = Commands.sequence(
-      elevatorCommands.positionLevel2(),
-      armCommands.positionLevel2()
-    );
-      command.setName("Level 2");
-      return command;
+        elevatorCommands.positionLevel2(),
+        armCommands.positionLevel2());
+    command.setName("Level 2");
+    return command;
   }
 
   public Command moveToLevel3() {
     Command command = Commands.sequence(
-      elevatorCommands.positionLevel3(),
-      armCommands.positionLevel3()
-     );
-      command.setName("Level 3");
-      return command;
+        elevatorCommands.positionLevel3(),
+        armCommands.positionLevel3());
+    command.setName("Level 3");
+    return command;
   }
 
   public Command moveToLevel4() {
     Command command = Commands.sequence(
-      elevatorCommands.positionLevel4(),
-      armCommands.positionLevel4()
-     );
-      command.setName("Level 4");
-      return command;
+        elevatorCommands.positionLevel4(),
+        armCommands.positionLevel4());
+    command.setName("Level 4");
+    return command;
   }
 
   public Command Intake() {
     Command command = Commands.sequence(
-      elevatorCommands.intakePosition(),
-      armCommands.intakePosition()
-    );
-      command.setName("intake Coral");
-      return command;
+        elevatorCommands.intakePosition(),
+        armCommands.intakePosition());
+    command.setName("intake Coral");
+    return command;
   }
 
   public Command Score() {
     Command command = Commands.sequence(
-      armCommands.score()
-    );
-      command.setName("Score");
-      return command;
+        armCommands.score());
+    command.setName("Score");
+    return command;
   }
 }
