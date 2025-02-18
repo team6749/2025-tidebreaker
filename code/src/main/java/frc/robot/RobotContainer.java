@@ -150,8 +150,8 @@ public class RobotContainer {
 
   public Command Home() {
     Command command = Commands.sequence(
-        elevatorCommands.Home(),
-        armCommands.Home());
+      armCommands.Home(),
+        elevatorCommands.Home());
     command.setName("Home");
     return command;
   }
