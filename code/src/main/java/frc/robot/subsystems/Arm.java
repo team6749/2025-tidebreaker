@@ -130,7 +130,7 @@ public class Arm extends SubsystemBase {
 
   public void simulationPeriodic() {
     simArm.update(Constants.simulationTimestep.in(Seconds));
-    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) / Constants.armGearRatio);
+    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations));
   }
 
   @Override
@@ -200,7 +200,7 @@ public class Arm extends SubsystemBase {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
+      desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
   }
 

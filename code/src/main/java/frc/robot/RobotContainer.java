@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Commands.ArmCommands;
+import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ArmSample;
 import frc.robot.subsystems.Localization;
@@ -42,15 +44,17 @@ public class RobotContainer {
   Arm arm = new Arm();
   //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
-  Elevator elevatorSubsystem;
+  Elevator elevatorSubsystem = new Elevator();
+  ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
+  ArmCommands armCommands = new ArmCommands(arm);
 
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
   // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
+  JoystickButton b = new JoystickButton(controller, 2);
+  JoystickButton y = new JoystickButton(controller, 4);
   JoystickButton rightBumper = new JoystickButton(controller2, 5);
   JoystickButton leftBumper = new JoystickButton(controller2, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
@@ -59,7 +63,6 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
-    elevatorSubsystem = new Elevator();
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
@@ -101,9 +104,10 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    configureBindings();
+    //configureBindings();
     //elevatorTest();
     //armTest();
+    coralSubsystemTest();
   }
 
   private void configureBindings() {
@@ -132,7 +136,60 @@ public class RobotContainer {
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
 
+  private void coralSubsystemTest() {
+    a.whileTrue(Home());
+    b.whileTrue(moveToLevel2());
+    x.whileTrue(moveToLevel3());
+    y.whileTrue(moveToLevel4());
+  }
+
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
+
+  public Command Home() {
+    Command command = Commands.sequence(
+      elevatorCommands.Home(),
+      armCommands.Home()
+    );
+      command.setName("Home");
+      return command;
+  }
+
+  public Command moveToLevel2() {
+    Command command = Commands.sequence(
+      elevatorCommands.positionLevel2(),
+      armCommands.positionLevel2()
+    );
+      command.setName("Score Level 2");
+      return command;
+  }
+
+  public Command moveToLevel3() {
+    Command command = Commands.sequence(
+      elevatorCommands.positionLevel3(),
+      armCommands.positionLevel3()
+     );
+      command.setName("Score Level 3");
+      return command;
+  }
+
+  public Command moveToLevel4() {
+    Command command = Commands.sequence(
+      elevatorCommands.positionLevel4(),
+      armCommands.positionLevel4()
+     );
+      command.setName("Score Level 4");
+      return command;
+  }
+
+  public Command Intake() {
+    Command command = Commands.sequence(
+      elevatorCommands.intakePosition(),
+      armCommands.intakePosition()
+    );
+      command.setName("intake Coral");
+      return command;
+  }
+
 }
