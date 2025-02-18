@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -40,10 +41,11 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   SwerveDrive swerveSubsystem;
-  Arm armSubsystem = new Arm();
+  // Arm armSubsystem = new Arm();
   //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
-  Elevator elevatorSubsystem;
+  // Elevator elevatorSubsystem;
+  CoralSubsystem coralSubsystem = new CoralSubsystem();
 
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
@@ -60,7 +62,6 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
-    elevatorSubsystem = new Elevator();
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
@@ -111,46 +112,38 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    leftBumper.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(0.7)));
-    rightBumper.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(-0.7)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1)));
-    x.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(1)));
+    // new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
+    // new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    // leftBumper.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(0.7)));
+    // rightBumper.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(-0.7)));
+    // b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1)));
+    // x.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(1)));
   }
 
   private void elevatorTest() {
-    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
-        elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    // a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
+    //     elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
+    // y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    // b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    // x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
+    // rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   private void armTest() {
-    a.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(2)));
-    y.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(-2))); //find real values
+    // a.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(2)));
+    // y.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(0.1)));
+    // x.whileTrue(armSubsystem.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
 
   private void coralSubsystemTest() {
-    a.whileTrue(goToCoralLayer(Meters.of(0.3), Radians.of(1.57)));
-    b.whileTrue(goToCoralLayer(Meters.of(0.4), Radians.of(1.8)));
-    y.whileTrue(goToCoralLayer(Meters.of(0.5), Radians.of(2.1)));
-    x.whileTrue(goToCoralLayer(Meters.of(0.63), Radians.of(2.6)));
+    a.whileTrue(coralSubsystem.goToCoralLayer(Meters.of(0.3), Radians.of(1.57)));
+    b.whileTrue(coralSubsystem.goToCoralLayer(Meters.of(0.4), Radians.of(1.8)));
+    y.whileTrue(coralSubsystem.goToCoralLayer(Meters.of(0.5), Radians.of(2.1)));
+    x.whileTrue(coralSubsystem.goToCoralLayer(Meters.of(0.63), Radians.of(2.6)));
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
 
-  public Command goToCoralLayer(Distance goalHeight, Angle goalAngle) {
-    return Commands.runEnd(() -> {
-      armSubsystem.goToPositionArm(armSubsystem.canExtend(goalAngle, elevatorSubsystem.inElevatorDangerZone()));
-      elevatorSubsystem.goToPositionCommand(elevatorSubsystem.canRaise(goalHeight, false));
-      SmartDashboard.putBoolean("arm in danger", armSubsystem.inArmDangerZone());
-      SmartDashboard.putNumber("coralLayer input", elevatorSubsystem.canRaise(goalHeight, false).in(Meters));
-    }, () -> {}, armSubsystem,elevatorSubsystem);
-  }
 }
