@@ -31,8 +31,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ArmSample;
 import frc.robot.subsystems.Localization;
+import frc.robot.subsystems.autoalignment.AutoAlignment;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Input;
 
 @Logged
 public class RobotContainer {
@@ -43,23 +45,17 @@ public class RobotContainer {
   //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
+  AutoAlignment autoAlignmentSubsystem;
+  Input inputSubsystem;
+  
 
-  XboxController controller = new XboxController(0);
-  XboxController controller2 = new XboxController(1);
-  // PS5Controller controller2 = new PS5Controller(1);
-  JoystickButton a = new JoystickButton(controller, 1);
-  JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
-  JoystickButton rightBumper = new JoystickButton(controller2, 5);
-  JoystickButton leftBumper = new JoystickButton(controller2, 6);
-  DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
-  DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
+    autoAlignmentSubsystem = new AutoAlignment(localizationSubsystem);
+    inputSubsystem = new Input();
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
@@ -107,29 +103,30 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
-
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
-    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(inputSubsystem, localizationSubsystem));
+    
+    new Trigger(() -> inputSubsystem.getLeftTrigger().getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
+    new Trigger(() -> inputSubsystem.getRightTrigger().getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    inputSubsystem.getLeftBumper().whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
+    inputSubsystem.getRightBumper().whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
+    inputSubsystem.getB().whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    inputSubsystem.getX().whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    inputSubsystem.getStart().onTrue(new AutoAlignment.AutoAlignCommand(autoAlignmentSubsystem, swerveSubsystem, inputSubsystem));
   }
 
   private void elevatorTest() {
-    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
+    inputSubsystem.getA().whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
         elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    inputSubsystem.getY().whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    inputSubsystem.getB().whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+    inputSubsystem.getX().whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
+    inputSubsystem.getRightBumper().whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
+    inputSubsystem.getA().whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
+    inputSubsystem.getY().whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
+    inputSubsystem.getX().whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
   }
 
   public Command getAutonomousCommand() {

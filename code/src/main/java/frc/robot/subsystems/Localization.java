@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.lang.reflect.Field;
+
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.epilogue.Logged;
@@ -128,6 +130,10 @@ public class Localization extends SubsystemBase {
 
         // Update Dashboard (this is for elastic/driver)
         dashboardField.setRobotPose(getRobotPose());
+    }
+
+    public Field2d getDashboardField() {
+        return dashboardField;
     }
 
 

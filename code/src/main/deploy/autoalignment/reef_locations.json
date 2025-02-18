@@ -1,0 +1,17 @@
+{
+    "reefLocationCalulations": {
+        "x": {
+            "reefWestPanelOffsetFromAllianceLineInches": 144.0,
+            "reefDiameterInches": 65.5,
+            "reefRadiusInches": 32.75,
+            "reefCenterXInchesFormula": "reefWestPanelOffsetFromAllianceLineInches + reefRadiusInches",
+            "locationInches": 176.75
+        },
+        "y": {
+            "distanceBetweenNorthAndSouthGuardRailsInches": 317.0,
+            "distanceHalfwayBetweenNorthAndSouthGuardRailsInches": 158.5,
+            "reefCenterYInchesFormula": "distanceHalfwayBetweenNorthAndSouthGuardRailsInches",
+            "locationInches": 158.5
+        }
+    }
+}
