@@ -125,6 +125,8 @@ public class Arm extends SubsystemBase {
 
   /** Creates a new Arm. */
   public Arm() {
+    encoder.setInverted(motorInverted);
+    armMotor.setInverted(motorInverted);
     SmartDashboard.putData("Arm Sim", mech2d);
   }
 
@@ -138,6 +140,7 @@ public class Arm extends SubsystemBase {
     simArm.getOutput();
     encoderConnected = encoder.isConnected();
     encoderDisconnectedAlert.set(encoderConnected == false);
+    SmartDashboard.putNumber("armRads", simArm.getAngleRads());
 
     if (closedLoop) {
       if (encoderConnected == false) {
