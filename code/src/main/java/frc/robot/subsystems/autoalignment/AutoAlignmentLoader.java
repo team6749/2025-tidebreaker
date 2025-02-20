@@ -3,6 +3,7 @@ package frc.robot.subsystems.autoalignment;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -15,8 +16,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.subsystems.autoalignment.Model.ReefLocation;
-import frc.robot.subsystems.autoalignment.Model.ReefOffset;
+import frc.robot.subsystems.autoalignment.AutoAlignmentModel.ReefLocation;
+import frc.robot.subsystems.autoalignment.AutoAlignmentModel.ReefOffset;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -26,7 +27,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 
 public class AutoAlignmentLoader {
     private Map<String, Pose2d> coralSproutPositions;
-    private ReefLocation reefLocation;
+    private ReefLocation reefLocationBlue;
+    private ReefLocation reefLocationRed;
     private Map<String, ReefOffset> reefOffsets = new LinkedHashMap<>(); // Stores recent 20 entries
     ShuffleboardTab tab = Shuffleboard.getTab("AutoAlignment");
     private GenericEntry xOffsetEntry, yOffsetEntry, outwardOffsetEntry;
@@ -34,7 +36,7 @@ public class AutoAlignmentLoader {
 
     public AutoAlignmentLoader() {
         loadReefConfigs();
-        generateCoralSproutPoses(Optional.empty(), Optional.empty(), Optional.empty());
+        generateCoralSproutPoses(0.0, 0.0, 0.0);
         setupShuffleboard();
     }
 
@@ -43,30 +45,42 @@ public class AutoAlignmentLoader {
         try {
             Map<String, Object> reefLocations = objectMapper.readValue(
                 new File(Filesystem.getDeployDirectory(), AutoAlignmentConstants.REEF_LOCATIONS_FILE),
-                new TypeReference<>() {} // Auto-detects type
+                new TypeReference<>() {}
             );
-    
-            // Access nested values
             @SuppressWarnings("unchecked")
             Map<String, Object> reefLocationCalculations = (Map<String, Object>) reefLocations.get("reefLocationCalulations");
-            @SuppressWarnings("unchecked")
-            Map<String, Object> xData = (Map<String, Object>) reefLocationCalculations.get("x");
-            @SuppressWarnings("unchecked")
-            Map<String, Object> yData = (Map<String, Object>) reefLocationCalculations.get("y");
     
-            // Retrieve values
-            double xLocationInches = ((Number) xData.get("locationInches")).doubleValue();
-            double yLocationInches = ((Number) yData.get("locationInches")).doubleValue();
-            reefLocation = new ReefLocation(xLocationInches, yLocationInches);
+            // Load blue reef data
+            @SuppressWarnings("unchecked")
+            Map<String, Object> blueData = (Map<String, Object>) reefLocationCalculations.get("blue");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> blueXData = (Map<String, Object>) blueData.get("x");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> blueYData = (Map<String, Object>) blueData.get("y");
+            double blueX = ((Number) blueXData.get("locationInches")).doubleValue();
+            double blueY = ((Number) blueYData.get("locationInches")).doubleValue();
+            reefLocationBlue = new ReefLocation(blueX, blueY);
     
-            // Load reef offsets JSON (keep only 20 most recent, sorted by timestamp)
+            // Load red reef data
+            @SuppressWarnings("unchecked")
+            Map<String, Object> redData = (Map<String, Object>) reefLocationCalculations.get("red");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> redXData = (Map<String, Object>) redData.get("x");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> redYData = (Map<String, Object>) redData.get("y");
+            double redX = ((Number) redXData.get("locationInches")).doubleValue();
+            double redY = ((Number) redYData.get("locationInches")).doubleValue();
+            reefLocationRed = new ReefLocation(redX, redY);
+    
+            // Optionally, set a default reef location
+            // reefLocation = reefLocationBlue;
+    
+            // Load reef offsets as before
             Map<String, ReefOffset> loadedOffsets = objectMapper.readValue(
                 new File(Filesystem.getDeployDirectory(), AutoAlignmentConstants.REEF_OFFSETS_FILE),
                 new TypeReference<>() {}
             );
-    
             reefOffsets = sortAndLimitOffsets(loadedOffsets);
-    
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -103,18 +117,36 @@ public class AutoAlignmentLoader {
     }
     
 
-    private void generateCoralSproutPoses(Optional<Double> optionalX, Optional<Double> optionalY, Optional<Double> optionalOutward) {
+    private void generateCoralSproutPoses(double xOffset, double yOffset, double outwardOffset) {
         ReefOffset reefOffset = getMostRecentReefOffset();
-
-        double xOffset = optionalX.orElse(reefOffset.reefXPositionOffsetInches());
-        double yOffset = optionalY.orElse(reefOffset.reefYPositionOffsetInches());
-        double outwardOffset = optionalOutward.orElse(reefOffset.outwardTargetPositionOffsetInches());
-
-        coralSproutPositions = calculateCoralSproutPoses(
-            reefLocation.reefXPositionInches() + xOffset,
-            reefLocation.reefYPositionInches() + yOffset,
-            outwardOffset
+        double finalXOffset = xOffset != 0.0 ? xOffset : reefOffset.reefXPositionOffsetInches();
+        double finalYOffset = yOffset != 0.0 ? yOffset : reefOffset.reefYPositionOffsetInches();
+        double finalOutwardOffset = outwardOffset != 0.0 ? outwardOffset : reefOffset.outwardTargetPositionOffsetInches();
+    
+        // Generate blue reef sprouts (12 positions)
+        Map<String, Pose2d> blueSprouts = calculateCoralSproutPoses(
+            reefLocationBlue.reefXPositionInches() + finalXOffset,
+            reefLocationBlue.reefYPositionInches() + finalYOffset,
+            finalOutwardOffset
         );
+    
+        // Generate red reef sprouts (12 positions)
+        Map<String, Pose2d> redSprouts = calculateCoralSproutPoses(
+            reefLocationRed.reefXPositionInches() + finalXOffset,
+            reefLocationRed.reefYPositionInches() + finalYOffset,
+            finalOutwardOffset
+        );
+    
+        // Prefix red reef keys with "R" to distinguish them
+        Map<String, Pose2d> modifiedRedSprouts = new LinkedHashMap<>();
+        for (Map.Entry<String, Pose2d> entry : redSprouts.entrySet()) {
+            modifiedRedSprouts.put("R" + entry.getKey(), entry.getValue());
+        }
+    
+        // Combine both sets into one map (total 24 positions)
+        coralSproutPositions = new LinkedHashMap<>();
+        coralSproutPositions.putAll(blueSprouts);
+        coralSproutPositions.putAll(modifiedRedSprouts);
     }
 
     public Map<String, Pose2d> calculateCoralSproutPoses(double xPositionInches, double yPositionInches, double additionalOffsetInches) {
@@ -215,18 +247,11 @@ public class AutoAlignmentLoader {
     
         tab.add("Apply Offsets", new InstantCommand(this::applyOffsets))
            .withWidget(BuiltInWidgets.kCommand);
-    
-        // Periodic check to update UI when a selection changes
-        new Thread(() -> {
-            while (true) {
-                updateOffsetEntries();
-                try {
-                    Thread.sleep(500); // Update UI every 500ms
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    }
+
+    // New public method to trigger UI updates
+    public void update() {
+        updateOffsetEntries();
     }
     
     private void updateOffsetEntries() {
@@ -239,7 +264,7 @@ public class AutoAlignmentLoader {
             yOffsetEntry.setDouble(selectedOffset.reefYPositionOffsetInches());
             outwardOffsetEntry.setDouble(selectedOffset.outwardTargetPositionOffsetInches());
 
-            generateCoralSproutPoses(Optional.of(selectedOffset.reefXPositionOffsetInches()), Optional.of(selectedOffset.reefYPositionOffsetInches()), Optional.of(selectedOffset.outwardTargetPositionOffsetInches()));
+            generateCoralSproutPoses(selectedOffset.reefXPositionOffsetInches(), selectedOffset.reefYPositionOffsetInches(), selectedOffset.outwardTargetPositionOffsetInches());
         }
     }
     
@@ -275,10 +300,10 @@ public class AutoAlignmentLoader {
         System.out.println("Applying Offsets: X=" + xOffset + " Y=" + yOffset + " Outward=" + outwardOffset);
     
         // pass in optional values
-        generateCoralSproutPoses(Optional.of(xOffset), Optional.of(yOffset), Optional.of(outwardOffset));
+        generateCoralSproutPoses(xOffset, yOffset, outwardOffset);
     }
     
     public Map<String, Pose2d> getCoralSproutPositions() {
-        return coralSproutPositions;
+        return Collections.unmodifiableMap(coralSproutPositions);
     }
 }

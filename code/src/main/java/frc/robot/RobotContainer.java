@@ -111,7 +111,9 @@ public class RobotContainer {
     inputSubsystem.getRightBumper().whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
     inputSubsystem.getB().whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
     inputSubsystem.getX().whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
-    inputSubsystem.getStart().onTrue(new AutoAlignment.AutoAlignCommand(autoAlignmentSubsystem, swerveSubsystem, inputSubsystem));
+    Trigger alignTrigger = new Trigger(() -> inputSubsystem.getStart().getAsBoolean() 
+                                      && !inputSubsystem.isUserControlActive());
+    alignTrigger.whileTrue(autoAlignmentSubsystem.autoAlignCommand(swerveSubsystem, inputSubsystem));
   }
 
   private void elevatorTest() {
