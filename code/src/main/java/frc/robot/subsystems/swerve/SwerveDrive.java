@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.enums.DriveOrientation;
+import frc.robot.subsystems.Input;
 import frc.robot.subsystems.Localization;
 
 @Logged
@@ -143,17 +144,17 @@ public class SwerveDrive extends SubsystemBase {
 
     // Simple robot relative drive with no field oriented control, response curves,
     // deadbands, or slew rates
-    public Command basicDriveCommand(XboxController controller, Localization localizationSubsystem) {
+    public Command basicDriveCommand(Input inputSubsystem, Localization localizationSubsystem) {
 
         Command command = Commands.runEnd(() -> {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
 
                     MetersPerSecond.of(SwerveConstants.driveLimiterY.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(deadZone(-controller.getLeftY()))).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(deadZone(-inputSubsystem.getLeftY()))).in(MetersPerSecond))),
                     MetersPerSecond.of(SwerveConstants.driveLimiterX.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(deadZone(-controller.getLeftX()))).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(deadZone(-inputSubsystem.getLeftX()))).in(MetersPerSecond))),
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
-                            .times(exponentialResponseCurve(deadZone(-controller.getRightX()))).in(RadiansPerSecond))));
+                            .times(exponentialResponseCurve(deadZone(-inputSubsystem.getRightX()))).in(RadiansPerSecond))));
 
             switch (orientationChooser.getSelected()) {
                 case FieldOriented:
