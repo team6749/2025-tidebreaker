@@ -135,4 +135,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
+
+  private void autoAlignTest() {
+    
+  }
 }
