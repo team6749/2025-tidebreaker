@@ -192,9 +192,9 @@ public class RobotContainer {
   }
 
   public Command Intake() {
-    Command command = Commands.parallel(
-        elevatorCommands.intakePosition(),
-        armCommands.intakePosition());
+    Command command = Commands.sequence(Commands.parallel(
+        elevatorCommands.Home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
     command.setName("intake Coral");
     return command;
   }
