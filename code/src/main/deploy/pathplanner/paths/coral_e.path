@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.456043466861679,
+        "y": 2.0084210440298524
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.5784718637144435,
+        "y": 1.7904502027595988
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.016624389033853,
+        "y": 2.782304356961474
+      },
+      "prevControl": {
+        "x": 5.1772901328867755,
+        "y": 2.5029385534233066
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "coral_e"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 119.98418526245462
+  },
+  "reversed": false,
+  "folder": "coral_paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 120.16690556652394
+  },
+  "useDefaultConstraints": true
+}
