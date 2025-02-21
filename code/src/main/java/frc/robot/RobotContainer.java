@@ -49,12 +49,7 @@ public class RobotContainer {
   // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
-  JoystickButton rightBumper = new JoystickButton(controller2, 5);
-  JoystickButton leftBumper = new JoystickButton(controller2, 6);
-  DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
-  DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
+
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
