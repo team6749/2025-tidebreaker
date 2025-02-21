@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ArmSample;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -43,6 +44,7 @@ public class RobotContainer {
   //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
+  ClimberSubsystem climberSubsystem;
 
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
@@ -55,6 +57,7 @@ public class RobotContainer {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
+    climberSubsystem = new ClimberSubsystem();
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
@@ -125,6 +128,10 @@ public class RobotContainer {
     a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
     y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
+  }
+
+  private void climberTest() {
+    a.whileTrue(climberSubsystem.climb());
   }
 
   public Command getAutonomousCommand() {
