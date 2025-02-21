@@ -4,14 +4,20 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SwerveDriveBrake;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class POICommands {
+SwerveDrive driveSubsystem;
+public POICommands(SwerveDrive swerveDrive) {
+        driveSubsystem = swerveDrive;
+}
 PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
 // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
 
@@ -19,14 +25,14 @@ PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Mat
 public Command pathToCoralA() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_a"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
         pathfindingCommand.setName("Coral A");
         return pathfindingCommand;
         }
 public Command pathToCoralB() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_b"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
                 pathfindingCommand.setName("Coral B");
         return pathfindingCommand;
         }
@@ -34,104 +40,118 @@ public Command pathToCoralB() throws FileVersionException, IOException, ParseExc
 public Command pathToCoralC() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_c"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
                 pathfindingCommand.setName("Coral C");
         return pathfindingCommand;
         }
 public Command pathToCoralD() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_d"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
                 pathfindingCommand.setName("Coral D");
         return pathfindingCommand;
         }
 public Command pathToCoralE() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_e"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral E");   
         return pathfindingCommand;
         }
 
 public Command pathToCoralF() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_f"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral F");
         return pathfindingCommand;
         }
 public Command pathToCoralG() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_g"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral G");
         return pathfindingCommand;
         }
 public Command pathToCoralH() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_h"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral H");
         return pathfindingCommand;
         }
 public Command pathToCoralI() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_i"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral I");
         return pathfindingCommand;
         }
 
 public Command pathToCoralJ() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_j"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral J");
         return pathfindingCommand;
         }
 public Command pathToCoralK() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_k"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral K");
         return pathfindingCommand;
         }
 public Command pathToCoralL() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("coral_l"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Coral L");
         return pathfindingCommand;
         }
 
 public Command pathToAlgaeAB() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_ab"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae AB");
         return pathfindingCommand;
         }
 public Command pathToAlgaeCD() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_cd"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae CD");
         return pathfindingCommand;
         }
 public Command pathToAlgaeEF() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_ef"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae EF");
         return pathfindingCommand;
         }
 
 public Command pathToAlgaeGH() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_gh"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae GH");
         return pathfindingCommand;
         }
 public Command pathToAlgaeIJ() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_ij"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae IJ");
         return pathfindingCommand;
         }
 
 public Command pathToAlgaeKL() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_kl"),
-                constraints);
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae KL");
         return pathfindingCommand;
         }
 }

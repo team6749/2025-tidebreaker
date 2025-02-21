@@ -47,7 +47,7 @@ public class RobotContainer {
   //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
-  POICommands poiCommands = new POICommands();
+  POICommands poiCommands; 
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
@@ -94,7 +94,7 @@ public class RobotContainer {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
-
+    poiCommands = new POICommands(swerveSubsystem);
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
