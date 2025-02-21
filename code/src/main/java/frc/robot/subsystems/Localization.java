@@ -159,8 +159,6 @@ public class Localization extends SubsystemBase {
                     MetersPerSecond.of(Math.hypot(xSpeedMetersPerSecond, ySpeedMetersPerSecond)),
                     DegreesPerSecond.of(gyro.getRate()), dist, ambiguity);
 
-            System.out.println(trust);
-
             poseEstimator.setVisionMeasurementStdDevs(trust);
             poseEstimator.addVisionMeasurement(
                     mt1.pose,
@@ -172,20 +170,20 @@ public class Localization extends SubsystemBase {
     // ambiguity is a limelight specific term, with values between 0 and 1, and 1 is
     // the "worst", anything greater than 0.7 is "bad"
     Matrix<N3, N1> calculateMeasurementTrust(LinearVelocity robotSpeedMetersPerSecond,
-            AngularVelocity robotAngleRadsPerSecond,
+            AngularVelocity robotAnglePerSecond,
             Distance tagDistance, double ambiguity) {
         final Matrix<N3, N1> rejectValue = VecBuilder.fill(9999999, 9999999, 9999999);
-        final Matrix<N3, N1> acceptValue = VecBuilder.fill(3, 3, 9999999);
-        final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 32);
+        final Matrix<N3, N1> acceptValue = VecBuilder.fill(8, 8, 128);
+        final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 24);
 
         var returnValue = idealValue;
 
         // Not Ideal but still accept Conditions
-        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(1))) {
+        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(0.3))) {
             // reject when moving quickly
             returnValue = acceptValue;
         }
-        if (robotAngleRadsPerSecond.in(DegreesPerSecond) > 10) {
+        if (robotAnglePerSecond.in(DegreesPerSecond) > 5) {
             // reject when rotating
             returnValue = acceptValue;
         }
@@ -202,7 +200,7 @@ public class Localization extends SubsystemBase {
             // reject when moving quickly
             returnValue = rejectValue;
         }
-        if (robotAngleRadsPerSecond.in(DegreesPerSecond) > 30) {
+        if (robotAnglePerSecond.in(DegreesPerSecond) > 30) {
             // reject when rotating
             returnValue = rejectValue;
         }
