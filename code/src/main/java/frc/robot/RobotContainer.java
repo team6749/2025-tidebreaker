@@ -160,7 +160,7 @@ public class RobotContainer {
   }
 
   public Command Home() {
-    Command command = Commands.sequence(
+    Command command = Commands.parallel(
       armCommands.Home(),
         elevatorCommands.Home());
     command.setName("Home");
@@ -168,7 +168,7 @@ public class RobotContainer {
   }
 
   public Command moveToLevel2() {
-    Command command = Commands.sequence(
+    Command command = Commands.parallel(
         elevatorCommands.positionLevel2(),
         armCommands.positionLevel2());
     command.setName("Level 2");
@@ -176,7 +176,7 @@ public class RobotContainer {
   }
 
   public Command moveToLevel3() {
-    Command command = Commands.sequence(
+    Command command = Commands.parallel(
         elevatorCommands.positionLevel3(),
         armCommands.positionLevel3());
     command.setName("Level 3");
@@ -184,7 +184,7 @@ public class RobotContainer {
   }
 
   public Command moveToLevel4() {
-    Command command = Commands.sequence(
+    Command command = Commands.parallel(
         elevatorCommands.positionLevel4(),
         armCommands.positionLevel4());
     command.setName("Level 4");
@@ -192,7 +192,7 @@ public class RobotContainer {
   }
 
   public Command Intake() {
-    Command command = Commands.sequence(
+    Command command = Commands.parallel(
         elevatorCommands.intakePosition(),
         armCommands.intakePosition());
     command.setName("intake Coral");
@@ -200,7 +200,7 @@ public class RobotContainer {
   }
 
   public Command score() {
-    Command command = Commands.sequence(
+    Command command = Commands.parallel(
         armCommands.score());
     command.setName("Score");
     return command;
