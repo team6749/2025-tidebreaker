@@ -5,7 +5,22 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Voltage;
 
-// Defines the standard IO for a swerve module.
+/**
+ * Interface defining the standard Input/Output operations for a swerve module.
+ * 
+ * <p>All swerve module implementations (real or simulated) must implement this 
+ * interface to ensure consistent behavior.
+ * 
+ * <p>Key functionalities:
+ * <ul>
+ *   <li>Controls module movement using open-loop and closed-loop control</li>
+ *   <li>Retrieves the module's current position and state</li>
+ *   <li>Handles motor stopping and brake mode activation</li>
+ *   <li>Runs periodic updates every robot loop</li>
+ * </ul>
+ * 
+ * This interface allows for modular and testable swerve implementations.
+ */
 @Logged
 public interface SwerveModuleBase {
     

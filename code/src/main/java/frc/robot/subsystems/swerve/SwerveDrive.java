@@ -11,7 +11,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -29,6 +28,25 @@ import frc.robot.Constants;
 import frc.robot.enums.DriveOrientation;
 import frc.robot.subsystems.Localization;
 
+/**
+ * The SwerveDrive subsystem controls the robot's swerve drive system, allowing
+ * for omni-directional movement.
+ * 
+ * <p>This class initializes and manages the four swerve modules, providing
+ * methods for setting module states, controlling chassis speeds, and handling 
+ * different drive orientations (field-oriented and robot-oriented).
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Configures and initializes swerve modules for real and simulated environments</li>
+ *   <li>Provides control methods for running chassis speeds and individual module states</li>
+ *   <li>Implements dead-zone filtering and exponential response curves for smoother driving</li>
+ *   <li>Integrates with localization for field-relative control</li>
+ *   <li>Offers test commands for verifying module movement</li>
+ * </ul>
+ * 
+ * This subsystem is designed to be used with WPILib's command-based structure.
+ */
 @Logged
 public class SwerveDrive extends SubsystemBase {
     private final SendableChooser<DriveOrientation> orientationChooser = new SendableChooser<>();
