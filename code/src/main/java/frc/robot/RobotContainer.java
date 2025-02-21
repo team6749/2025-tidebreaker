@@ -50,10 +50,10 @@ public class RobotContainer {
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
   // PS5Controller controller2 = new PS5Controller(1);
-  JoystickButton a = new JoystickButton(controller, 1);
-  JoystickButton x = new JoystickButton(controller, 3);
-  JoystickButton b = new JoystickButton(controller, 2);
-  JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton a = new JoystickButton(controller2, 1);
+  JoystickButton x = new JoystickButton(controller2, 3);
+  JoystickButton b = new JoystickButton(controller2, 2);
+  JoystickButton y = new JoystickButton(controller2, 4);
   JoystickButton rightBumper = new JoystickButton(controller2, 5);
   JoystickButton leftBumper = new JoystickButton(controller2, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
@@ -142,6 +142,8 @@ public class RobotContainer {
     b.whileTrue(moveToLevel2());
     x.whileTrue(moveToLevel3());
     y.whileTrue(moveToLevel4());
+    rightBumper.whileTrue(Intake());
+    leftBumper.whileTrue(score());
   }
 
   public Command getAutonomousCommand() {
@@ -188,7 +190,7 @@ public class RobotContainer {
     return command;
   }
 
-  public Command Score() {
+  public Command score() {
     Command command = Commands.sequence(
         armCommands.score());
     command.setName("Score");
