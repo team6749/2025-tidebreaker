@@ -9,13 +9,17 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+
+import org.json.simple.parser.ParseException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -43,6 +47,10 @@ public class RobotContainer {
   //ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
+  POICommands poiCommands; 
+
+  private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
+  private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
 
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
@@ -56,11 +64,37 @@ public class RobotContainer {
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
   DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
 
+  JoystickButton buttonCoralJ = new JoystickButton(bottomButtonBoard, 1);
+  JoystickButton buttonCoralI = new JoystickButton(bottomButtonBoard, 2);
+  JoystickButton buttonCoralH = new JoystickButton(bottomButtonBoard, 3);
+  JoystickButton buttonCoralG = new JoystickButton(bottomButtonBoard, 4);
+  JoystickButton buttonCoralF = new JoystickButton(bottomButtonBoard, 5);
+  JoystickButton bottomButton6 = new JoystickButton(bottomButtonBoard, 6);
+  JoystickButton bottomButton7 = new JoystickButton(bottomButtonBoard, 7);
+  JoystickButton buttonCoralE = new JoystickButton(bottomButtonBoard, 8);
+  JoystickButton buttonCoralD = new JoystickButton(bottomButtonBoard, 9);
+  JoystickButton buttonCoralC = new JoystickButton(bottomButtonBoard, 10);
+  JoystickButton buttonCoralB = new JoystickButton(bottomButtonBoard, 11);
+  JoystickButton buttonCoralA = new JoystickButton(bottomButtonBoard, 12);
+
+  JoystickButton topButton1 = new JoystickButton(topButtonBoard, 1);
+  JoystickButton topButton2 = new JoystickButton(topButtonBoard, 2);
+  JoystickButton topButton3 = new JoystickButton(topButtonBoard, 3);
+  JoystickButton topButton4 = new JoystickButton(topButtonBoard, 4);
+  JoystickButton topButton5 = new JoystickButton(topButtonBoard, 5);
+  JoystickButton topButton6 = new JoystickButton(topButtonBoard, 6);
+  JoystickButton topButton7 = new JoystickButton(topButtonBoard, 7);
+  JoystickButton topButton8 = new JoystickButton(topButtonBoard, 8);
+  JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 9);
+  JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 10);
+  JoystickButton buttonCoralL = new JoystickButton(topButtonBoard, 11);
+  JoystickButton buttonCoralK = new JoystickButton(topButtonBoard, 12);
+
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
-
+    poiCommands = new POICommands(swerveSubsystem);
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
@@ -101,9 +135,15 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    configureBindings();
+    //configureBindings();
     //elevatorTest();
     //armTest();
+    try {
+      autoAlignTest();
+    } catch (FileVersionException | IOException | ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   private void configureBindings() {
@@ -134,5 +174,22 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  private void autoAlignTest() throws FileVersionException, IOException, ParseException {
+    buttonCoralA.whileTrue(poiCommands.pathToCoralA());
+    buttonCoralB.whileTrue(poiCommands.pathToCoralB());
+    buttonCoralC.whileTrue(poiCommands.pathToCoralC());
+    buttonCoralD.whileTrue(poiCommands.pathToCoralD());
+    buttonCoralE.whileTrue(poiCommands.pathToCoralE());
+    buttonCoralF.whileTrue(poiCommands.pathToCoralF());
+    buttonCoralG.whileTrue(poiCommands.pathToCoralG());
+    buttonCoralH.whileTrue(poiCommands.pathToCoralH());
+    buttonCoralI.whileTrue(poiCommands.pathToCoralI());
+    buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
+    buttonCoralK.whileTrue(poiCommands.pathToCoralK());
+    buttonCoralL.whileTrue(poiCommands.pathToCoralL());
+    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
+    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 }
