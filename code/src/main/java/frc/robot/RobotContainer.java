@@ -48,7 +48,7 @@ public class RobotContainer {
   ArmCommands armCommands = new ArmCommands(arm);
 
   XboxController controller = new XboxController(0);
-  PS5Controller controller2 = new PS5Controller(1);
+  XboxController controller2 = new XboxController(2);
   // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller2, 1);
   JoystickButton x = new JoystickButton(controller2, 3);
@@ -59,33 +59,15 @@ public class RobotContainer {
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
   DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
 
-  private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
+
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
 
-  JoystickButton redOne = new JoystickButton(topButtonBoard, 1);
-  JoystickButton redTwo = new JoystickButton(topButtonBoard, 2);
-  JoystickButton redThree = new JoystickButton(topButtonBoard, 3);
-  JoystickButton redFour = new JoystickButton(topButtonBoard, 4);
-  JoystickButton redFive = new JoystickButton(topButtonBoard, 5);
-
-  JoystickButton yellowOne = new JoystickButton(topButtonBoard, 6);
-  JoystickButton yellowTwo = new JoystickButton(topButtonBoard, 7);
-  JoystickButton yellowThree = new JoystickButton(topButtonBoard, 8);
-  JoystickButton yellowFour = new JoystickButton(topButtonBoard, 9);
-  JoystickButton yellowFive = new JoystickButton(topButtonBoard, 10);
-
-  // Buttons For Bottom Button Board (blue and green)
-  JoystickButton blueOne = new JoystickButton(bottomButtonBoard, 1);
-  JoystickButton blueTwo = new JoystickButton(bottomButtonBoard, 2);
-  JoystickButton blueThree = new JoystickButton(bottomButtonBoard, 3);
-  JoystickButton blueFour = new JoystickButton(bottomButtonBoard, 4);
-  JoystickButton blueFive = new JoystickButton(bottomButtonBoard, 5);
-
-  JoystickButton greenOne = new JoystickButton(bottomButtonBoard, 6);
-  JoystickButton greenTwo = new JoystickButton(bottomButtonBoard, 7);
-  JoystickButton greenThree = new JoystickButton(bottomButtonBoard, 8);
-  JoystickButton greenFour = new JoystickButton(bottomButtonBoard, 9);
-  JoystickButton greenFive = new JoystickButton(bottomButtonBoard, 10);
+  JoystickButton buttonScore = new JoystickButton(topButtonBoard, 1);
+  JoystickButton buttonHome = new JoystickButton(topButtonBoard, 2);
+  JoystickButton buttonIntake = new JoystickButton(topButtonBoard, 3);
+  JoystickButton buttonL4 = new JoystickButton(topButtonBoard, 4);
+  JoystickButton buttonL3 = new JoystickButton(topButtonBoard, 5);
+  JoystickButton buttonL2 = new JoystickButton(topButtonBoard, 8);
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     localizationSubsystem = new Localization(swerveSubsystem);
@@ -165,12 +147,12 @@ public class RobotContainer {
   }
 
   private void coralSubsystemTest() {
-    a.whileTrue(Home());
-    b.whileTrue(moveToLevel2());
-    x.whileTrue(moveToLevel3());
-    y.whileTrue(moveToLevel4());
-    rightBumper.whileTrue(Intake());
-    leftBumper.whileTrue(score());
+    buttonHome.whileTrue(Home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(Intake());
+    buttonScore.whileTrue(score());
   }
 
   public Command getAutonomousCommand() {

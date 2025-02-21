@@ -50,7 +50,7 @@ public class ArmCommands {
     }
 
     public Command score() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI * 5 / 3));
+        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI  / 3));
         command.setName("Arm Score Level 4");
         return command;
     }
