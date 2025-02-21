@@ -44,7 +44,7 @@ public class Localization extends SubsystemBase {
 
     Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
     Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
-    boolean applyLimePositioning = false; // For now, log only, don't actually apply to odometry
+    boolean applyLimePositioning = true; // For now, log only, don't actually apply to odometry
 
     @NotLogged
     SwerveDrive swerve;
@@ -94,8 +94,8 @@ public class Localization extends SubsystemBase {
 
         SmartDashboard.putData("Field", dashboardField);
 
-        limelightToggleChooser.setDefaultOption("Disabled", false);
-        limelightToggleChooser.addOption("Enabled", true);
+        limelightToggleChooser.addOption("Disabled", false);
+        limelightToggleChooser.setDefaultOption("Enabled", true);
         SmartDashboard.putData("Limelight Toggle", limelightToggleChooser);
     }
 

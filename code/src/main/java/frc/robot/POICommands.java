@@ -18,7 +18,7 @@ SwerveDrive driveSubsystem;
 public POICommands(SwerveDrive swerveDrive) {
         driveSubsystem = swerveDrive;
 }
-PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+PathConstraints constraints = new PathConstraints(1.0, 1, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
 // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
 
 // Create the path using the waypoints created above
@@ -150,6 +150,21 @@ public Command pathToAlgaeIJ() throws FileVersionException, IOException, ParseEx
 public Command pathToAlgaeKL() throws FileVersionException, IOException, ParseException {
         Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                 PathPlannerPath.fromPathFile("algae_kl"),
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae KL");
+        return pathfindingCommand;
+        }
+public Command pathToRightIntake() throws FileVersionException, IOException, ParseException {
+        Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
+                PathPlannerPath.fromPathFile("intake_right"),
+                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("Algae IJ");
+        return pathfindingCommand;
+        }
+
+public Command pathToLeftIntake() throws FileVersionException, IOException, ParseException {
+        Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
+                PathPlannerPath.fromPathFile("Intake_left"),
                 constraints).finallyDo(() -> driveSubsystem.stop());
                 pathfindingCommand.setName("Algae KL");
         return pathfindingCommand;
