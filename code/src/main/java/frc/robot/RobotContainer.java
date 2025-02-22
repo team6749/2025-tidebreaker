@@ -113,9 +113,9 @@ public class RobotContainer {
     SmartDashboard.putData("autoChooser", autoChooser);
 
     // configureBindings();
-    // elevatorTest();
-    armTest();
-    coralSubsystemTest();
+    elevatorTest();
+    //armTest();
+    //coralSubsystemTest();
   }
 
   private void configureBindings() {
@@ -132,18 +132,20 @@ public class RobotContainer {
   }
 
   private void elevatorTest() {
-    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
-        elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
+    // a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
+    //     elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
+    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
+    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
+    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
     rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-1))); // find real values
+    a.whileTrue(arm.goToPositionArm(Radians.of(0)));
+    y.whileTrue(arm.goToPositionArm(Radians.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5))); // find real values
   }
 
   private void coralSubsystemTest() {

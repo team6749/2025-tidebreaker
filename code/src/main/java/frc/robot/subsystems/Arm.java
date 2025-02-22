@@ -68,7 +68,7 @@ public class Arm extends SubsystemBase {
 
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0:(- Math.PI / 2));
-  PIDController armPID = new PIDController(15, 0, 0);
+  PIDController armPID = new PIDController(0, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2);
   TalonFX armMotor = new TalonFX(Constants.armMotorPort);// todo put in actual motor
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
@@ -82,8 +82,8 @@ public class Arm extends SubsystemBase {
 
   Angle maxAngle = Degrees.of(90);
   Angle minAngle = Degrees.of(-90);
-  AngularVelocity maxVelocity = RadiansPerSecond.of(1);
-  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(1.5); // to do, find these values.
+  AngularVelocity maxVelocity = RadiansPerSecond.of(0.2);
+  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(0.3); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
           maxAcceleration.in(RadiansPerSecondPerSecond)));
