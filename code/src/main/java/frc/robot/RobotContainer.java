@@ -48,7 +48,7 @@ public class RobotContainer {
   ArmCommands armCommands = new ArmCommands(arm);
 
   XboxController controller = new XboxController(0);
-  XboxController controller2 = new XboxController(2);
+  XboxController controller2 = new XboxController(1);
   // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller2, 1);
   JoystickButton x = new JoystickButton(controller2, 3);
@@ -114,7 +114,7 @@ public class RobotContainer {
 
     // configureBindings();
     // elevatorTest();
-    // armTest();
+    armTest();
     coralSubsystemTest();
   }
 
@@ -141,9 +141,9 @@ public class RobotContainer {
   }
 
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
     y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); // find real values
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-1))); // find real values
   }
 
   private void coralSubsystemTest() {
