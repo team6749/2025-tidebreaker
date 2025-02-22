@@ -113,22 +113,20 @@ public class RobotContainer {
     SmartDashboard.putData("autoChooser", autoChooser);
 
     // configureBindings();
-    elevatorTest();
+    //elevatorTest();
     //armTest();
-    //coralSubsystemTest();
+    coralSubsystemTest();
   }
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); // find
-                                                                                                                      // real
-                                                                                                                      // values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
-    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    buttonHome.whileTrue(home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intake());
+    buttonScore.whileTrue(score());
   }
 
   private void elevatorTest() {
@@ -144,16 +142,16 @@ public class RobotContainer {
   private void armTest() {
     a.whileTrue(arm.goToPositionArm(Radians.of(0)));
     y.whileTrue(arm.goToPositionArm(Radians.of(1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5))); // find real values
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3))); // find real values
   }
 
   private void coralSubsystemTest() {
-    buttonHome.whileTrue(Home());
+    buttonHome.whileTrue(home());
     buttonL2.whileTrue(moveToLevel2());
     buttonL3.whileTrue(moveToLevel3());
     buttonL4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(Intake());
+    buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
   }
 
@@ -161,7 +159,7 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
-  public Command Home() {
+  public Command home() {
     Command command = Commands.parallel(
       armCommands.Home(),
         elevatorCommands.Home());
@@ -193,7 +191,7 @@ public class RobotContainer {
     return command;
   }
 
-  public Command Intake() {
+  public Command intake() {
     Command command = Commands.sequence(Commands.parallel(
         elevatorCommands.Home(),
         armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
@@ -207,4 +205,51 @@ public class RobotContainer {
     command.setName("Score");
     return command;
   }
+  public Command openHome() {
+    Command command = Commands.parallel(
+      armCommands.Home(),
+        elevatorCommands.Home());
+    command.setName("Home");
+    return command;
+  }
+
+  public Command openMoveToLevel2() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel2(),
+        armCommands.positionLevel2());
+    command.setName("Level 2");
+    return command;
+  }
+
+  public Command openMoveToLevel3() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel3(),
+        armCommands.positionLevel3());
+    command.setName("Level 3");
+    return command;
+  }
+
+  public Command openMoveToLevel4() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel4(),
+        armCommands.positionLevel4());
+    command.setName("Level 4");
+    return command;
+  }
+
+  public Command openIntake() {
+    Command command = Commands.sequence(Commands.parallel(
+        elevatorCommands.Home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+    command.setName("intake Coral");
+    return command;
+  }
+
+  public Command openScore() {
+    Command command = Commands.parallel(
+        armCommands.score());
+    command.setName("Score");
+    return command;
+  }
 }
+
