@@ -89,8 +89,8 @@ public class Elevator extends SubsystemBase {
       new TrapezoidProfile.Constraints(
           maxVelocity.in(MetersPerSecond),
           maxAcceleration.in(MetersPerSecondPerSecond)));
-  TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
-  TrapezoidProfile.State desiredState = new State(0, 0);
+  TrapezoidProfile.State targetState = new State(0, 0);
+  TrapezoidProfile.State endState = new State(0, 0);
 
   PIDController elevatorPID = new PIDController(20, 0, 0);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
@@ -123,11 +123,11 @@ public class Elevator extends SubsystemBase {
         resetProfileState();
         return;
       }
-      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
-      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), currentState.position));
+      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), targetState, endState);
+      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), targetState.position));
       Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
       setVolts(PIDOutput.plus(feedForwardOutput));
-      currentState = next;
+      targetState = next;
     }
     elevatorMech2d.setLength(getPosition().in(Meters));
     // This method will be called once per scheduler run
@@ -166,12 +166,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runClosedLoopSetGoal(Distance goal) {
-    desiredState = new TrapezoidProfile.State(goal.in(Meters), 0);
+    endState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
 
   public void resetProfileState() {
-    currentState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+    targetState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
   public Command runOpenLoopCommand(Voltage Volts) {
@@ -185,7 +185,7 @@ public class Elevator extends SubsystemBase {
       runClosedLoopSetGoal(position);
     }, this).until(() -> isAtTarget(position)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+      endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
   }
 
@@ -194,7 +194,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void stop() {
-    elevatorMotor.setVoltage(0.2);
+    elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
     closedLoop = false;
   }
