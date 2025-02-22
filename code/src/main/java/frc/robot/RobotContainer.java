@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
+import java.time.Year;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -145,6 +146,7 @@ public class RobotContainer {
     //coralSubsystemTest();
     configureBindings();
     //elevatorTest();
+    //configureBindings();
     //armTest();
     try {
       autoAlignTest();
