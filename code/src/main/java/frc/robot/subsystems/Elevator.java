@@ -9,7 +9,6 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 
 import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -46,7 +45,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class Elevator extends SubsystemBase {
   boolean isHomed = false;
   boolean closedLoop = false;
-  boolean motorInverted = true;
+  boolean motorInverted = false;
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.65);
@@ -55,11 +54,11 @@ public class Elevator extends SubsystemBase {
   public static Distance sprocketDiameter = Centimeters.of(0);
   public BooleanSupplier limitSwitch; 
   // Total Ratio for elevator motor in meters
-  public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
+  public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters)  * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.015);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.4);
-  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.2);
+  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.5);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
@@ -74,24 +73,23 @@ public class Elevator extends SubsystemBase {
       true,
       simStartHeight.in(Meters),
       0,
-      0
-      );
+      0);
 
-  private final Mechanism2d mech2d = new Mechanism2d(2, 
-  maxHeight.in(Meters));
-  private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", 1, 
-  minHeight.in(Meters));
+  private final Mechanism2d mech2d = new Mechanism2d(2,
+      maxHeight.in(Meters));
+  private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", 1,
+      minHeight.in(Meters));
   private final MechanismLigament2d elevatorMech2d = mech2dRoot.append(
-      new MechanismLigament2d("Elevator", 
-      simStartHeight.in(Meters), 
-      90));
+      new MechanismLigament2d("Elevator",
+          simStartHeight.in(Meters),
+          90));
 
   TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(
           maxVelocity.in(MetersPerSecond),
           maxAcceleration.in(MetersPerSecondPerSecond)));
-  TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
-  TrapezoidProfile.State desiredState = new State(0, 0);
+  TrapezoidProfile.State targetState = new State(0, 0);
+  TrapezoidProfile.State endState = new State(0, 0);
 
   PIDController elevatorPID = new PIDController(0, 0, 0);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
@@ -101,8 +99,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setInverted(motorInverted);
     if (Robot.isSimulation()) {
       limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
-    }
-    else {
+    } else {
       limitSwitch = () -> true;
     }
     SmartDashboard.putData("Elevator Sim", mech2d);
@@ -125,21 +122,21 @@ public class Elevator extends SubsystemBase {
         resetProfileState();
         return;
       }
-      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
-      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), currentState.position));
+      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), targetState, endState);
+      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), targetState.position));
       Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
       setVolts(PIDOutput.plus(feedForwardOutput));
-      currentState = next;
+      targetState = next;
     }
-    elevatorMech2d.setLength(getPosition().in(Meters)); 
+    elevatorMech2d.setLength(getPosition().in(Meters));
     // This method will be called once per scheduler run
   }
 
   @Override
   public void simulationPeriodic() {
-      simElevator.update(Constants.simulationTimestep.in(Seconds));
-      simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio * (motorInverted ? -1: 1));
-      simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio * (motorInverted ? -1:1));
+    simElevator.update(Constants.simulationTimestep.in(Seconds));
+    simMotor.setRawRotorPosition(simElevator.getPositionMeters() / outputRatio * (motorInverted ? -1 : 1));
+    simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio * (motorInverted ? -1 : 1));
   }
 
   public boolean isAtTarget(Distance position) {
@@ -168,12 +165,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runClosedLoopSetGoal(Distance goal) {
-    desiredState = new TrapezoidProfile.State(goal.in(Meters), 0);
+    endState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
 
   public void resetProfileState() {
-    currentState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+    targetState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
   public Command runOpenLoopCommand(Voltage Volts) {
@@ -187,7 +184,7 @@ public class Elevator extends SubsystemBase {
       runClosedLoopSetGoal(position);
     }, this).until(() -> isAtTarget(position)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+      endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
   }
 
@@ -196,7 +193,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void stop() {
-    elevatorMotor.setVoltage(0.2);
+    elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
     closedLoop = false;
   }
