@@ -142,8 +142,8 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    coralSubsystemTest();
-    //configureBindings();
+    //coralSubsystemTest();
+    configureBindings();
     //elevatorTest();
     //armTest();
     try {
