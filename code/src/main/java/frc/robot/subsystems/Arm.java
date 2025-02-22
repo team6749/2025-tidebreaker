@@ -69,7 +69,7 @@ public class Arm extends SubsystemBase {
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0:(- Math.PI / 2));
   PIDController armPID = new PIDController(0, 0, 0);
-  ArmFeedforward feedForward = new ArmFeedforward(0, 0, 0);
+  ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
   TalonFX armMotor = new TalonFX(Constants.armMotorID);// todo put in actual motor
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 

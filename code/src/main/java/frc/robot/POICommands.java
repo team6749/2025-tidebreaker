@@ -19,7 +19,7 @@ SwerveDrive driveSubsystem;
 public POICommands(SwerveDrive swerveDrive) {
         driveSubsystem = swerveDrive;
 }
-PathConstraints constraints = new PathConstraints(1.0, 1, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+PathConstraints constraints = new PathConstraints(1.5, 1, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
 // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
 
 // Create the path using the waypoints created above

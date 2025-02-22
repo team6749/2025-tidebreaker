@@ -45,7 +45,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
-  Arm arm = new Arm();
+  Arm arm;
   // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
@@ -96,6 +96,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
+    arm = new Arm();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
@@ -143,9 +144,9 @@ public class RobotContainer {
     SmartDashboard.putData("autoChooser", autoChooser);
 
     //coralSubsystemTest();
-    //configureBindings();
+    configureBindings();
     //elevatorTest();
-    armTest();
+    //armTest();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -157,14 +158,23 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    buttonHome.whileTrue(home());
-    buttonL2.whileTrue(moveToLevel2());
-    buttonL3.whileTrue(moveToLevel3());
-    buttonL4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intake());
-    buttonScore.whileTrue(score());
-    a.whileTrue(climberSubsystem.climbCommand());
-    b.whileTrue(climberSubsystem.unclimbCommand());
+    buttonL2.whileTrue(elevatorCommands.positionLevel2());
+    buttonL3.whileTrue(elevatorCommands.positionLevel3());
+    buttonL4.whileTrue(elevatorCommands.positionLevel4());
+    buttonIntake.whileTrue(elevatorCommands.intakePosition());
+    buttonHome.whileTrue(elevatorCommands.home());
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5),Radians.of(0)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
+    // buttonHome.whileTrue(home());
+    // buttonL2.whileTrue(moveToLevel2());
+    // buttonL3.whileTrue(moveToLevel3());
+    // buttonL4.whileTrue(moveToLevel4());
+    // buttonIntake.whileTrue(intake());
+    // buttonScore.whileTrue(score());
+    rightBumper.whileTrue(climberSubsystem.climbCommand());
+    leftBumper.whileTrue(climberSubsystem.unclimbCommand());
   }
 
   private void elevatorTest() {
@@ -178,9 +188,9 @@ public class RobotContainer {
   }
 
   private void armTest() {
-    a.whileTrue(arm.goToPositionArm(Radians.of(0)));
-    y.whileTrue(arm.goToPositionArm(Radians.of(1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5),Radians.of(0)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3))); // find real values
   }
 
@@ -192,7 +202,6 @@ public class RobotContainer {
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
   }
-
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
@@ -218,7 +227,7 @@ public class RobotContainer {
   public Command home() {
     Command command = Commands.parallel(
       armCommands.Home(),
-        elevatorCommands.Home());
+        elevatorCommands.home());
     command.setName("Home");
     return command;
   }
@@ -249,8 +258,8 @@ public class RobotContainer {
 
   public Command intake() {
     Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.Home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+        elevatorCommands.home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }
@@ -264,7 +273,7 @@ public class RobotContainer {
   public Command openHome() {
     Command command = Commands.parallel(
       armCommands.Home(),
-        elevatorCommands.Home());
+        elevatorCommands.home());
     command.setName("Home");
     return command;
   }
@@ -295,8 +304,8 @@ public class RobotContainer {
 
   public Command openIntake() {
     Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.Home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+        elevatorCommands.home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }
