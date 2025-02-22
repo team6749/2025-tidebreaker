@@ -67,10 +67,10 @@ public class Arm extends SubsystemBase {
   boolean motorInverted = true;
 
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Radians.of(0);
-  PIDController armPID = new PIDController(15, 0, 0);
-  ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2);
-  TalonFX armMotor = new TalonFX(Constants.armMotorPort);// todo put in actual motor
+  public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0:(- Math.PI / 2));
+  PIDController armPID = new PIDController(0, 0, 0);
+  ArmFeedforward feedForward = new ArmFeedforward(0, 0, 0);
+  TalonFX armMotor = new TalonFX(Constants.armMotorID);// todo put in actual motor
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
   public static Distance armLength = Meters.of(0.2);
@@ -82,8 +82,8 @@ public class Arm extends SubsystemBase {
 
   Angle maxAngle = Degrees.of(90);
   Angle minAngle = Degrees.of(-90);
-  AngularVelocity maxVelocity = RadiansPerSecond.of(1);
-  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(1.5); // to do, find these values.
+  AngularVelocity maxVelocity = RadiansPerSecond.of(0.2);
+  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(0.3); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
           maxAcceleration.in(RadiansPerSecondPerSecond)));
@@ -130,7 +130,7 @@ public class Arm extends SubsystemBase {
 
   public void simulationPeriodic() {
     simArm.update(Constants.simulationTimestep.in(Seconds));
-    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations) / Constants.armGearRatio);
+    encoderSim.set(Radians.of(simArm.getAngleRads()).in(Rotations));
   }
 
   @Override
@@ -200,7 +200,7 @@ public class Arm extends SubsystemBase {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Rotations), 0);
+      desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
   }
 
@@ -216,7 +216,7 @@ public class Arm extends SubsystemBase {
     closedLoop = false;
   }
 
-  public Command runOpenLoopCommand(Voltage Volts) {
-    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  public Command runOpenLoopCommand(Voltage Volts, Angle angle) {
+    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this).until(() -> isAtTarget(angle));
   }
 }
