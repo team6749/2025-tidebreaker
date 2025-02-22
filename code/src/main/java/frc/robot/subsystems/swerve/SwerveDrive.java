@@ -11,7 +11,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -108,10 +107,12 @@ public class SwerveDrive extends SubsystemBase {
         }
         return moduleStates;
     }
+
     public ChassisSpeeds getChassisSpeeds() {
         return SwerveConstants.kinematics.toChassisSpeeds(getModuleStates());
-    
+
     }
+
     /// Chassis Speeds can saturate the modules, this method desaturates the modules
     public void runChassisSpeeds(ChassisSpeeds speeds) {
         loggedTargetChassisSpeeds = speeds;

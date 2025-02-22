@@ -4,13 +4,10 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.json.simple.parser.ParseException;
@@ -24,14 +21,12 @@ import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.Arm;
@@ -51,14 +46,13 @@ public class RobotContainer {
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
   ArmCommands armCommands;
-  POICommands poiCommands; 
+  POICommands poiCommands;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
 
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
-  // PS5Controller controller2 = new PS5Controller(1);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton x = new JoystickButton(controller, 3);
   JoystickButton b = new JoystickButton(controller, 2);
@@ -143,10 +137,10 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    //coralSubsystemTest();
+    // coralSubsystemTest();
     configureBindings();
-    //elevatorTest();
-    //armTest();
+    // elevatorTest();
+    // armTest();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -163,7 +157,7 @@ public class RobotContainer {
     buttonL4.whileTrue(elevatorCommands.positionLevel4());
     buttonIntake.whileTrue(elevatorCommands.intakePosition());
     buttonHome.whileTrue(elevatorCommands.home());
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5),Radians.of(0)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
     y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
     b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
@@ -177,9 +171,8 @@ public class RobotContainer {
     leftBumper.whileTrue(climberSubsystem.unclimbCommand());
   }
 
+  @SuppressWarnings("unused")
   private void elevatorTest() {
-    // a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
-    //     elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
     y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
     b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
     x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
@@ -187,13 +180,15 @@ public class RobotContainer {
     rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
+  @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5),Radians.of(0)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
     y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
     b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3))); // find real values
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
 
+  @SuppressWarnings("unused")
   private void coralSubsystemTest() {
     buttonHome.whileTrue(home());
     buttonL2.whileTrue(moveToLevel2());
@@ -226,7 +221,7 @@ public class RobotContainer {
 
   public Command home() {
     Command command = Commands.parallel(
-      armCommands.Home(),
+        armCommands.Home(),
         elevatorCommands.home());
     command.setName("Home");
     return command;
@@ -270,9 +265,10 @@ public class RobotContainer {
     command.setName("Score");
     return command;
   }
+
   public Command openHome() {
     Command command = Commands.parallel(
-      armCommands.Home(),
+        armCommands.Home(),
         elevatorCommands.home());
     command.setName("Home");
     return command;

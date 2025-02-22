@@ -7,8 +7,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
@@ -23,27 +21,19 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -56,7 +46,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
 public class Arm extends SubsystemBase {
@@ -64,21 +53,19 @@ public class Arm extends SubsystemBase {
 
   boolean closedLoop = false;
   boolean encoderConnected = true;
-  boolean motorInverted = true;
-;
+  boolean motorInverted = true;;
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0:(- Math.PI / 2));
+  public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0 : (-Math.PI / 2));
   PIDController armPID = new PIDController(0, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
-  TalonFX armMotor = new TalonFX(Constants.armMotorID);// todo put in actual motor
+  TalonFX armMotor = new TalonFX(Constants.armMotorID);
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
   public static Angle tolerance = Radians.of(0.04);
 
-  DutyCycleEncoder encoder = new DutyCycleEncoder(2); // I don't think we have one on the arm but, for the sake of the
-                                                      // simulation, let's try it.
+  DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
   Angle maxAngle = Degrees.of(90);
   Angle minAngle = Degrees.of(-90);
@@ -205,7 +192,7 @@ public class Arm extends SubsystemBase {
   }
 
   private void setVolts(Voltage volts) {
-    armMotor.setVoltage(volts.in(Volts)); // porbably should do a seperate implementation here but this works for now
+    armMotor.setVoltage(volts.in(Volts));
     if (RobotBase.isSimulation()) {
       simArm.setInputVoltage(volts.in(Volts));
     }
