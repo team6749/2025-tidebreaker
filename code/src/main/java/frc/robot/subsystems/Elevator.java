@@ -50,9 +50,9 @@ public class Elevator extends SubsystemBase {
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.65);
-  public static double gearboxRatio = 20;
+  public static double gearboxRatio = 20 * (26/32);
   public static Mass carriageMass = Kilograms.of(4);
-  public static Distance sprocketDiameter = Centimeters.of(6.5);
+  public static Distance sprocketDiameter = Centimeters.of(0);
   public BooleanSupplier limitSwitch; 
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
@@ -93,7 +93,7 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State currentState = new State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   TrapezoidProfile.State desiredState = new State(0, 0);
 
-  PIDController elevatorPID = new PIDController(20, 0, 0);
+  PIDController elevatorPID = new PIDController(0, 0, 0);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
 
   public Elevator() {

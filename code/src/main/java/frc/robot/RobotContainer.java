@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.io.IOException;
+import java.time.Year;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -118,12 +120,9 @@ public class RobotContainer {
   }
 
   private void elevatorTest() {
-    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
-        elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
     b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
     x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    y.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   private void armTest() {
