@@ -146,7 +146,7 @@ public class RobotContainer {
     //coralSubsystemTest();
     configureBindings();
     //elevatorTest();
-    //configureBindings();
+
     //armTest();
     try {
       autoAlignTest();
