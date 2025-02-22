@@ -63,8 +63,8 @@ public class RobotContainer {
   JoystickButton x = new JoystickButton(controller, 3);
   JoystickButton b = new JoystickButton(controller, 2);
   JoystickButton y = new JoystickButton(controller, 4);
-  JoystickButton rightBumper = new JoystickButton(controller2, 5);
-  JoystickButton leftBumper = new JoystickButton(controller2, 6);
+  JoystickButton rightBumper = new JoystickButton(controller, 5);
+  JoystickButton leftBumper = new JoystickButton(controller, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
   DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
 
