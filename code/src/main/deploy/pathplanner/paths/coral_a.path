@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9713857439637987,
-        "y": 4.2063161234901765
+        "x": 2.9941952605614466,
+        "y": 4.203084999927817
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 4.184426289449521
       },
       "prevControl": {
-        "x": 2.215713379749369,
-        "y": 4.175371788146348
+        "x": 2.166072879883488,
+        "y": 4.194258348237921
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "coral_a"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
