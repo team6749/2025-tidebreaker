@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
-import java.time.Year;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -147,7 +146,6 @@ public class RobotContainer {
     //coralSubsystemTest();
     configureBindings();
     //elevatorTest();
-
     //armTest();
     try {
       autoAlignTest();
@@ -203,10 +201,6 @@ public class RobotContainer {
     buttonL4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
-  }
-
-  private void climberTest() {
-    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   public Command getAutonomousCommand() {
