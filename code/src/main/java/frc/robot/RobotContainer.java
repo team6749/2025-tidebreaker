@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -42,7 +43,7 @@ import frc.robot.subsystems.Elevator;
 @Logged
 public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
-
+  ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   Arm arm = new Arm();
   // ArmSample armSample = new ArmSample();
@@ -100,6 +101,7 @@ public class RobotContainer {
     poiCommands = new POICommands(swerveSubsystem);
     elevatorCommands = new ElevatorCommands(elevatorSubsystem);
     armCommands = new ArmCommands(arm);
+    climberSubsystem = new ClimberSubsystem();
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
@@ -187,6 +189,10 @@ public class RobotContainer {
     buttonL4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
+  }
+
+  private void climberTest() {
+    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   public Command getAutonomousCommand() {
