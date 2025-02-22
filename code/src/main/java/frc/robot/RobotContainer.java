@@ -193,6 +193,23 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
+  private void autoAlignTest() throws FileVersionException, IOException, ParseException {
+    buttonCoralA.whileTrue(poiCommands.pathToCoralA());
+    buttonCoralB.whileTrue(poiCommands.pathToCoralB());
+    buttonCoralC.whileTrue(poiCommands.pathToCoralC());
+    buttonCoralD.whileTrue(poiCommands.pathToCoralD());
+    buttonCoralE.whileTrue(poiCommands.pathToCoralE());
+    buttonCoralF.whileTrue(poiCommands.pathToCoralF());
+    buttonCoralG.whileTrue(poiCommands.pathToCoralG());
+    buttonCoralH.whileTrue(poiCommands.pathToCoralH());
+    buttonCoralI.whileTrue(poiCommands.pathToCoralI());
+    buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
+    buttonCoralK.whileTrue(poiCommands.pathToCoralK());
+    buttonCoralL.whileTrue(poiCommands.pathToCoralL());
+    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
+    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
+  }
+
   public Command home() {
     Command command = Commands.parallel(
       armCommands.Home(),
@@ -284,22 +301,5 @@ public class RobotContainer {
         armCommands.score());
     command.setName("Score");
     return command;
-  private void autoAlignTest() throws FileVersionException, IOException, ParseException {
-    buttonCoralA.whileTrue(poiCommands.pathToCoralA());
-    buttonCoralB.whileTrue(poiCommands.pathToCoralB());
-    buttonCoralC.whileTrue(poiCommands.pathToCoralC());
-    buttonCoralD.whileTrue(poiCommands.pathToCoralD());
-    buttonCoralE.whileTrue(poiCommands.pathToCoralE());
-    buttonCoralF.whileTrue(poiCommands.pathToCoralF());
-    buttonCoralG.whileTrue(poiCommands.pathToCoralG());
-    buttonCoralH.whileTrue(poiCommands.pathToCoralH());
-    buttonCoralI.whileTrue(poiCommands.pathToCoralI());
-    buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
-    buttonCoralK.whileTrue(poiCommands.pathToCoralK());
-    buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
-    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 }
-}
-
