@@ -46,11 +46,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class Elevator extends SubsystemBase {
   boolean isHomed = false;
   boolean closedLoop = false;
-  boolean motorInverted = true;
+  boolean motorInverted = false;
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.65);
-  public static double gearboxRatio = 20;
+  public static double gearboxRatio = (5 / 1) * (4 / 1) * (32 / 26); 
   public static Mass carriageMass = Kilograms.of(4);
   public static Distance sprocketDiameter = Centimeters.of(6.5);
   public BooleanSupplier limitSwitch;

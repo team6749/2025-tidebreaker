@@ -67,7 +67,7 @@ public class Arm extends SubsystemBase {
   boolean motorInverted = true;
 
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Radians.of(0);
+  public static Angle angleOffset = Radians.of(- Math.PI / 2);
   PIDController armPID = new PIDController(15, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2);
   TalonFX armMotor = new TalonFX(Constants.armMotorPort);// todo put in actual motor
