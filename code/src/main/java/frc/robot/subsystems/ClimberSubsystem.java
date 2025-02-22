@@ -32,7 +32,7 @@ public class ClimberSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public Command Climb() {
+  public Command climbCommand() {
     return Commands.runEnd(() -> {climberMotor.setVoltage(inputVoltage.in(Volts));}, () -> {stop();}, this);
     } 
   public void stop() {

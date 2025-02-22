@@ -131,7 +131,7 @@ public class RobotContainer {
   }
 
   private void climberTest() {
-    a.whileTrue(climberSubsystem.climb());
+    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   public Command getAutonomousCommand() {
