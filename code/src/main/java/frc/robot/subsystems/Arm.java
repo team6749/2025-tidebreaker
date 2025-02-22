@@ -65,7 +65,7 @@ public class Arm extends SubsystemBase {
   boolean closedLoop = false;
   boolean encoderConnected = true;
   boolean motorInverted = true;
-
+;
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0:(- Math.PI / 2));
   PIDController armPID = new PIDController(0, 0, 0);

@@ -59,10 +59,10 @@ public class RobotContainer {
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
   // PS5Controller controller2 = new PS5Controller(1);
-  JoystickButton a = new JoystickButton(controller2, 1);
-  JoystickButton x = new JoystickButton(controller2, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
+  JoystickButton a = new JoystickButton(controller, 1);
+  JoystickButton x = new JoystickButton(controller, 3);
+  JoystickButton b = new JoystickButton(controller, 2);
+  JoystickButton y = new JoystickButton(controller, 4);
   JoystickButton rightBumper = new JoystickButton(controller2, 5);
   JoystickButton leftBumper = new JoystickButton(controller2, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
@@ -143,9 +143,9 @@ public class RobotContainer {
     SmartDashboard.putData("autoChooser", autoChooser);
 
     //coralSubsystemTest();
-    configureBindings();
+    //configureBindings();
     //elevatorTest();
-    //armTest();
+    armTest();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -163,6 +163,8 @@ public class RobotContainer {
     buttonL4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
+    a.whileTrue(climberSubsystem.climbCommand());
+    b.whileTrue(climberSubsystem.unclimbCommand());
   }
 
   private void elevatorTest() {
@@ -191,9 +193,6 @@ public class RobotContainer {
     buttonScore.whileTrue(score());
   }
 
-  private void climberTest() {
-    a.whileTrue(climberSubsystem.climbCommand());
-  }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
