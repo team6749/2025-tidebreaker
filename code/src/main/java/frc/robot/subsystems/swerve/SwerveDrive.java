@@ -161,9 +161,9 @@ public class SwerveDrive extends SubsystemBase {
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
 
                     MetersPerSecond.of(SwerveConstants.driveLimiterY.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(-xinput)).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(xinput)).in(MetersPerSecond))),
                     MetersPerSecond.of(SwerveConstants.driveLimiterX.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(-yinput)).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(yinput)).in(MetersPerSecond))),
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
                             .times(exponentialResponseCurve(zinput)).in(RadiansPerSecond))));
 
