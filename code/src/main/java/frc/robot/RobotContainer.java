@@ -58,16 +58,14 @@ public class RobotContainer {
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
 
   XboxController controller = new XboxController(0);
-  XboxController controller2 = new XboxController(1);
-  // PS5Controller controller2 = new PS5Controller(1);
-  JoystickButton a = new JoystickButton(controller2, 1);
-  JoystickButton x = new JoystickButton(controller2, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
-  JoystickButton rightBumper = new JoystickButton(controller2, 5);
-  JoystickButton leftBumper = new JoystickButton(controller2, 6);
-  DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
-  DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
+  JoystickButton a = new JoystickButton(controller, 1);
+  JoystickButton x = new JoystickButton(controller, 3);
+  JoystickButton b = new JoystickButton(controller, 2);
+  JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton rightBumper = new JoystickButton(controller, 5);
+  JoystickButton leftBumper = new JoystickButton(controller, 6);
+  DoubleSupplier rightTrigger = () -> controller.getRawAxis(3);
+  DoubleSupplier leftTrigger = () -> controller.getRawAxis(2);
 
   JoystickButton buttonCoralJ = new JoystickButton(bottomButtonBoard, 1);
   JoystickButton buttonCoralI = new JoystickButton(bottomButtonBoard, 2);
@@ -165,6 +163,7 @@ public class RobotContainer {
     buttonL4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
+    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   private void elevatorTest() {
