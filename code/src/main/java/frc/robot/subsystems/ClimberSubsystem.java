@@ -13,11 +13,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-@Logged 
+@Logged
 public class ClimberSubsystem extends SubsystemBase {
   Timer timer = new Timer();
   TalonFX climberMotor = new TalonFX(Constants.climberMotorPort);
   Voltage inputVoltage = Volts.of(2);
+
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
     timer.start();
@@ -29,10 +30,15 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public Command climbCommand() {
-    return Commands.runEnd(() -> {climberMotor.setVoltage(inputVoltage.in(Volts));}, () -> {stop();}, this);
-    } 
+    return Commands.runEnd(() -> {
+      climberMotor.setVoltage(inputVoltage.in(Volts));
+    }, () -> {
+      stop(); 
+    },
+        this);
+  }
+
   public void stop() {
     climberMotor.setVoltage(0);
   }
-  }
-
+}
