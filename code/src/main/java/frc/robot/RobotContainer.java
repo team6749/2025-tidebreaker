@@ -19,6 +19,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -151,6 +152,31 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
+
+    // Add Rest Pose Command
+    SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
+      localizationSubsystem.resetPose(Pose2d.kZero);
+    }, localizationSubsystem));
+
+    try {
+      SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
+      SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
+      SmartDashboard.putData("Align/C", poiCommands.pathToCoralC());
+      SmartDashboard.putData("Align/D", poiCommands.pathToCoralD());
+      SmartDashboard.putData("Align/E", poiCommands.pathToCoralE());
+      SmartDashboard.putData("Align/F", poiCommands.pathToCoralF());
+      SmartDashboard.putData("Align/G", poiCommands.pathToCoralG());
+      SmartDashboard.putData("Align/H", poiCommands.pathToCoralH());
+      SmartDashboard.putData("Align/I", poiCommands.pathToCoralI());
+      SmartDashboard.putData("Align/J", poiCommands.pathToCoralJ());
+      SmartDashboard.putData("Align/K", poiCommands.pathToCoralK());
+      SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
+      SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
+      SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
+    } catch (FileVersionException | IOException | ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     buttonL2.whileTrue(elevatorCommands.positionLevel2());
     buttonL3.whileTrue(elevatorCommands.positionLevel3());
