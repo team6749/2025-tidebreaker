@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
+import java.time.Year;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -32,8 +33,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Commands.ArmCommands;
+import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.ArmSample;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
@@ -41,12 +44,14 @@ import frc.robot.subsystems.Elevator;
 @Logged
 public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
-
+  ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   Arm arm = new Arm();
-  //ArmSample armSample = new ArmSample();
+  // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
+  ElevatorCommands elevatorCommands;
+  ArmCommands armCommands;
   POICommands poiCommands; 
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
@@ -55,14 +60,14 @@ public class RobotContainer {
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
   // PS5Controller controller2 = new PS5Controller(1);
-  JoystickButton a = new JoystickButton(controller, 1);
-  JoystickButton x = new JoystickButton(controller, 3);
+  JoystickButton a = new JoystickButton(controller2, 1);
+  JoystickButton x = new JoystickButton(controller2, 3);
   JoystickButton b = new JoystickButton(controller2, 2);
   JoystickButton y = new JoystickButton(controller2, 4);
   JoystickButton rightBumper = new JoystickButton(controller2, 5);
   JoystickButton leftBumper = new JoystickButton(controller2, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
-  DoubleSupplier leftTrigger =  () -> controller2.getRawAxis(2);
+  DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
 
   JoystickButton buttonCoralJ = new JoystickButton(bottomButtonBoard, 1);
   JoystickButton buttonCoralI = new JoystickButton(bottomButtonBoard, 2);
@@ -77,14 +82,14 @@ public class RobotContainer {
   JoystickButton buttonCoralB = new JoystickButton(bottomButtonBoard, 11);
   JoystickButton buttonCoralA = new JoystickButton(bottomButtonBoard, 12);
 
-  JoystickButton topButton1 = new JoystickButton(topButtonBoard, 1);
-  JoystickButton topButton2 = new JoystickButton(topButtonBoard, 2);
-  JoystickButton topButton3 = new JoystickButton(topButtonBoard, 3);
-  JoystickButton topButton4 = new JoystickButton(topButtonBoard, 4);
-  JoystickButton topButton5 = new JoystickButton(topButtonBoard, 5);
-  JoystickButton topButton6 = new JoystickButton(topButtonBoard, 6);
-  JoystickButton topButton7 = new JoystickButton(topButtonBoard, 7);
-  JoystickButton topButton8 = new JoystickButton(topButtonBoard, 8);
+  JoystickButton buttonScore = new JoystickButton(topButtonBoard, 1);
+  JoystickButton buttonHome = new JoystickButton(topButtonBoard, 2);
+  JoystickButton buttonIntake = new JoystickButton(topButtonBoard, 3);
+  JoystickButton buttonL4 = new JoystickButton(topButtonBoard, 4);
+  JoystickButton buttonL3 = new JoystickButton(topButtonBoard, 5);
+  JoystickButton buttonTop6 = new JoystickButton(topButtonBoard, 6);
+  JoystickButton buttonTop7 = new JoystickButton(topButtonBoard, 7);
+  JoystickButton buttonL2 = new JoystickButton(topButtonBoard, 8);
   JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 9);
   JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 10);
   JoystickButton buttonCoralL = new JoystickButton(topButtonBoard, 11);
@@ -95,6 +100,9 @@ public class RobotContainer {
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
+    elevatorCommands = new ElevatorCommands(elevatorSubsystem);
+    armCommands = new ArmCommands(arm);
+    climberSubsystem = new ClimberSubsystem();
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
@@ -135,8 +143,10 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
+    //coralSubsystemTest();
     configureBindings();
     //elevatorTest();
+
     //armTest();
     try {
       autoAlignTest();
@@ -149,27 +159,38 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    new Trigger(() -> leftTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-1))); //find real values
-    new Trigger(() -> rightTrigger.getAsDouble() > 0.5).whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.7)));
-    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.7)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3)));
+    buttonHome.whileTrue(home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intake());
+    buttonScore.whileTrue(score());
   }
 
   private void elevatorTest() {
-    a.whileTrue(Commands.repeatingSequence(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3),
-        elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1)));
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
     b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
     x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    y.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(2)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(0.1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-2))); //find real values
+    a.whileTrue(arm.goToPositionArm(Radians.of(0)));
+    y.whileTrue(arm.goToPositionArm(Radians.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3))); // find real values
+  }
+
+  private void coralSubsystemTest() {
+    buttonHome.whileTrue(home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intake());
+    buttonScore.whileTrue(score());
+  }
+
+  private void climberTest() {
+    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   public Command getAutonomousCommand() {
@@ -191,5 +212,98 @@ public class RobotContainer {
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
     buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
+  }
+
+  public Command home() {
+    Command command = Commands.parallel(
+      armCommands.Home(),
+        elevatorCommands.Home());
+    command.setName("Home");
+    return command;
+  }
+
+  public Command moveToLevel2() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel2(),
+        armCommands.positionLevel2());
+    command.setName("Level 2");
+    return command;
+  }
+
+  public Command moveToLevel3() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel3(),
+        armCommands.positionLevel3());
+    command.setName("Level 3");
+    return command;
+  }
+
+  public Command moveToLevel4() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel4(),
+        armCommands.positionLevel4());
+    command.setName("Level 4");
+    return command;
+  }
+
+  public Command intake() {
+    Command command = Commands.sequence(Commands.parallel(
+        elevatorCommands.Home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+    command.setName("intake Coral");
+    return command;
+  }
+
+  public Command score() {
+    Command command = Commands.parallel(
+        armCommands.score());
+    command.setName("Score");
+    return command;
+  }
+  public Command openHome() {
+    Command command = Commands.parallel(
+      armCommands.Home(),
+        elevatorCommands.Home());
+    command.setName("Home");
+    return command;
+  }
+
+  public Command openMoveToLevel2() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel2(),
+        armCommands.positionLevel2());
+    command.setName("Level 2");
+    return command;
+  }
+
+  public Command openMoveToLevel3() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel3(),
+        armCommands.positionLevel3());
+    command.setName("Level 3");
+    return command;
+  }
+
+  public Command openMoveToLevel4() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel4(),
+        armCommands.positionLevel4());
+    command.setName("Level 4");
+    return command;
+  }
+
+  public Command openIntake() {
+    Command command = Commands.sequence(Commands.parallel(
+        elevatorCommands.Home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+    command.setName("intake Coral");
+    return command;
+  }
+
+  public Command openScore() {
+    Command command = Commands.parallel(
+        armCommands.score());
+    command.setName("Score");
+    return command;
   }
 }
