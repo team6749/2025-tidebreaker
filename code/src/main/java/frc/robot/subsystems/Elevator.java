@@ -91,7 +91,7 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State targetState = new State(0, 0);
   TrapezoidProfile.State endState = new State(0, 0);
 
-  PIDController elevatorPID = new PIDController(0, 0, 0);
+  PIDController elevatorPID = new PIDController(10, 0, 0);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
 
   public Elevator() {

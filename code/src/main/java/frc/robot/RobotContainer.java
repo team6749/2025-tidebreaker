@@ -259,50 +259,5 @@ public class RobotContainer {
     command.setName("Score");
     return command;
   }
-  public Command openHome() {
-    Command command = Commands.parallel(
-      armCommands.Home(),
-        elevatorCommands.Home());
-    command.setName("Home");
-    return command;
-  }
-
-  public Command openMoveToLevel2() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel2(),
-        armCommands.positionLevel2());
-    command.setName("Level 2");
-    return command;
-  }
-
-  public Command openMoveToLevel3() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel3(),
-        armCommands.positionLevel3());
-    command.setName("Level 3");
-    return command;
-  }
-
-  public Command openMoveToLevel4() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel4(),
-        armCommands.positionLevel4());
-    command.setName("Level 4");
-    return command;
-  }
-
-  public Command openIntake() {
-    Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.Home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
-    command.setName("intake Coral");
-    return command;
-  }
-
-  public Command openScore() {
-    Command command = Commands.parallel(
-        armCommands.score());
-    command.setName("Score");
-    return command;
-  }
+  
 }

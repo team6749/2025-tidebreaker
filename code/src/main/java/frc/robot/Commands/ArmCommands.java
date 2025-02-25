@@ -65,34 +65,5 @@ public class ArmCommands {
         return command;
     }
 
-    public Command HomeOpen() {
-        Command command = armSubsystem.runOpenLoopCommand(Volts.of(-1), Radians.of(-Math.PI / 2));
-        command.setName("Arm Idle Position");
-        return command;
-    }
-
-    public Command openPositionLevel2() {
-        Command command = armSubsystem.runOpenLoopCommand(Volts.of(1), Rotations.of(0.202));
-        command.setName("Arm Score Level 2");
-        return command;
-    }
-
-    public Command openPositionLevel3() {
-        Command command = armSubsystem.runOpenLoopCommand(Volts.of(1), Rotations.of(0.298));
-        command.setName("Arm Score Level 3");
-        return command;
-    }
-
-    public Command openPositionLevel4() {
-        Command command = armSubsystem.runOpenLoopCommand(Volts.of(1), Rotations.of(0.355));
-        command.setName("Arm Score Level 4");
-        return command;
-    }
-
-    public Command openScore() {
-        Command command = armSubsystem.runOpenLoopCommand(Volts.of(-1), Rotations.of(-0.2));
-        command.setName("Arm Score");
-        return command;
-    }
 }
 
