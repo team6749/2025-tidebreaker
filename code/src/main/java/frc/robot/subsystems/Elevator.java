@@ -49,9 +49,9 @@ public class Elevator extends SubsystemBase {
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.65);
   public static Distance simStartHeight = Meters.of(0.65);
-  public static double gearboxRatio = 20 * (26/32);
+  public static double gearboxRatio = Constants.elevatorGearRatio;
   public static Mass carriageMass = Kilograms.of(4);
-  public static Distance sprocketDiameter = Centimeters.of(0);
+  public static Distance sprocketDiameter = Centimeters.of(5.3);
   public BooleanSupplier limitSwitch; 
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters)  * Math.PI;
