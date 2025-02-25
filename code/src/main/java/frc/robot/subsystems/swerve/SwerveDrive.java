@@ -82,11 +82,8 @@ public class SwerveDrive extends SubsystemBase {
         }
     }
 
-    public double deadZone(double input) {
-        if (Math.abs(input) < Constants.deadZone) {
-            input = 0;
-        }
-        return input;
+    public double inputMagnitude(double x, double y) {
+        return Math.sqrt((x * x) + (y * y));
     };
 
     public double exponentialResponseCurve(double input) {
@@ -108,10 +105,12 @@ public class SwerveDrive extends SubsystemBase {
         }
         return moduleStates;
     }
+
     public ChassisSpeeds getChassisSpeeds() {
         return SwerveConstants.kinematics.toChassisSpeeds(getModuleStates());
-    
+
     }
+
     /// Chassis Speeds can saturate the modules, this method desaturates the modules
     public void runChassisSpeeds(ChassisSpeeds speeds) {
         loggedTargetChassisSpeeds = speeds;
@@ -146,14 +145,27 @@ public class SwerveDrive extends SubsystemBase {
     public Command basicDriveCommand(XboxController controller, Localization localizationSubsystem) {
 
         Command command = Commands.runEnd(() -> {
+
+            double xinput = -controller.getLeftY();
+            double yinput = -controller.getLeftX();
+            double zinput = -controller.getRightX();
+
+            if (inputMagnitude(xinput, yinput) < Constants.deadZone) {
+                xinput = 0;
+                yinput = 0;
+            }
+            if (inputMagnitude(zinput, 0) < Constants.deadZone) {
+                zinput = 0;
+            }
+
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
 
                     MetersPerSecond.of(SwerveConstants.driveLimiterY.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(deadZone(-controller.getLeftY()))).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(-xinput)).in(MetersPerSecond))),
                     MetersPerSecond.of(SwerveConstants.driveLimiterX.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(deadZone(-controller.getLeftX()))).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(-yinput)).in(MetersPerSecond))),
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
-                            .times(exponentialResponseCurve(deadZone(-controller.getRightX()))).in(RadiansPerSecond))));
+                            .times(exponentialResponseCurve(zinput)).in(RadiansPerSecond))));
 
             switch (orientationChooser.getSelected()) {
                 case FieldOriented:
