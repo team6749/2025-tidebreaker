@@ -8,16 +8,16 @@ import edu.wpi.first.units.measure.Voltage;
 // Defines the standard IO for a swerve module.
 @Logged
 public interface SwerveModuleBase {
-    
+
     // Run every robot loop
-    void periodic ();
+    void periodic();
 
     // Tells the module to run to this state
-    void runClosedLoop (SwerveModuleState state);
+    void runClosedLoop(SwerveModuleState state);
 
     // should apply open loop voltage to the motors.
     // Useful for running characterization
-    void runOpenLoop (Voltage drive, Voltage turn);
+    void runOpenLoop(Voltage drive, Voltage turn);
 
     // Returns the current position of the swerve module
     public SwerveModulePosition getPosition();
@@ -29,6 +29,6 @@ public interface SwerveModuleBase {
     void stop();
 
     // sets the brake mode on the module, this should not be called
-    void setBrakeMode (boolean brake);
+    void setBrakeMode(boolean brake);
 
 }

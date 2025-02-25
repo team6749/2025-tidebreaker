@@ -21,7 +21,8 @@ public class SwerveConstants {
     // Max linear velocity of the module (how fast it can spin)
     public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(4);
 
-    // This should be based on physical properties of the the max wheel speeds in a circle
+    // This should be based on physical properties of the the max wheel speeds in a
+    // circle
     public static final AngularVelocity maxAngularVelocity = DegreesPerSecond.of(90);
 
     public static final double angleReduction = (150.0 / 7.0);

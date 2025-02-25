@@ -4,14 +4,10 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
-import java.time.Year;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.json.simple.parser.ParseException;
@@ -23,16 +19,15 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.Arm;
@@ -46,26 +41,25 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
-  Arm arm = new Arm();
+  Arm arm;
   // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
   ArmCommands armCommands;
-  POICommands poiCommands; 
+  POICommands poiCommands;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
 
   XboxController controller = new XboxController(0);
   XboxController controller2 = new XboxController(1);
-  // PS5Controller controller2 = new PS5Controller(1);
-  JoystickButton a = new JoystickButton(controller2, 1);
-  JoystickButton x = new JoystickButton(controller2, 3);
-  JoystickButton b = new JoystickButton(controller2, 2);
-  JoystickButton y = new JoystickButton(controller2, 4);
-  JoystickButton rightBumper = new JoystickButton(controller2, 5);
-  JoystickButton leftBumper = new JoystickButton(controller2, 6);
+  JoystickButton a = new JoystickButton(controller, 1);
+  JoystickButton x = new JoystickButton(controller, 3);
+  JoystickButton b = new JoystickButton(controller, 2);
+  JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton rightBumper = new JoystickButton(controller, 5);
+  JoystickButton leftBumper = new JoystickButton(controller, 6);
   DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
   DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
 
@@ -97,6 +91,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
+    arm = new Arm();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
@@ -143,11 +138,10 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    //coralSubsystemTest();
+    // coralSubsystemTest();
     configureBindings();
-    //elevatorTest();
-
-    //armTest();
+    // elevatorTest();
+    // armTest();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -159,27 +153,68 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    buttonHome.whileTrue(home());
-    buttonL2.whileTrue(moveToLevel2());
-    buttonL3.whileTrue(moveToLevel3());
-    buttonL4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intake());
-    buttonScore.whileTrue(score());
+    // Add Rest Pose Command
+    SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
+      localizationSubsystem.resetPose(Pose2d.kZero);
+    }, localizationSubsystem));
+
+    try {
+      SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
+      SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
+      SmartDashboard.putData("Align/C", poiCommands.pathToCoralC());
+      SmartDashboard.putData("Align/D", poiCommands.pathToCoralD());
+      SmartDashboard.putData("Align/E", poiCommands.pathToCoralE());
+      SmartDashboard.putData("Align/F", poiCommands.pathToCoralF());
+      SmartDashboard.putData("Align/G", poiCommands.pathToCoralG());
+      SmartDashboard.putData("Align/H", poiCommands.pathToCoralH());
+      SmartDashboard.putData("Align/I", poiCommands.pathToCoralI());
+      SmartDashboard.putData("Align/J", poiCommands.pathToCoralJ());
+      SmartDashboard.putData("Align/K", poiCommands.pathToCoralK());
+      SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
+      SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
+      SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
+    } catch (FileVersionException | IOException | ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    buttonL2.whileTrue(elevatorCommands.positionLevel2());
+    buttonL3.whileTrue(elevatorCommands.positionLevel3());
+    buttonL4.whileTrue(elevatorCommands.positionLevel4());
+    buttonIntake.whileTrue(elevatorCommands.intakePosition());
+    buttonHome.whileTrue(elevatorCommands.home());
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
+    // buttonHome.whileTrue(home());
+    // buttonL2.whileTrue(moveToLevel2());
+    // buttonL3.whileTrue(moveToLevel3());
+    // buttonL4.whileTrue(moveToLevel4());
+    // buttonIntake.whileTrue(intake());
+    // buttonScore.whileTrue(score());
+    rightBumper.whileTrue(climberSubsystem.climbCommand());
+    leftBumper.whileTrue(climberSubsystem.unclimbCommand());
   }
 
+  @SuppressWarnings("unused")
   private void elevatorTest() {
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-    x.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.5)));
-    y.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
+    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
+    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
+    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
+    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
+  @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.goToPositionArm(Radians.of(0)));
-    y.whileTrue(arm.goToPositionArm(Radians.of(1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3))); // find real values
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
+    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
+    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
 
+  @SuppressWarnings("unused")
   private void coralSubsystemTest() {
     buttonHome.whileTrue(home());
     buttonL2.whileTrue(moveToLevel2());
@@ -187,10 +222,6 @@ public class RobotContainer {
     buttonL4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
-  }
-
-  private void climberTest() {
-    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   public Command getAutonomousCommand() {
@@ -216,8 +247,8 @@ public class RobotContainer {
 
   public Command home() {
     Command command = Commands.parallel(
-      armCommands.Home(),
-        elevatorCommands.Home());
+        armCommands.Home(),
+        elevatorCommands.home());
     command.setName("Home");
     return command;
   }
@@ -248,8 +279,8 @@ public class RobotContainer {
 
   public Command intake() {
     Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.Home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+        elevatorCommands.home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }
@@ -260,10 +291,11 @@ public class RobotContainer {
     command.setName("Score");
     return command;
   }
+
   public Command openHome() {
     Command command = Commands.parallel(
-      armCommands.Home(),
-        elevatorCommands.Home());
+        armCommands.Home(),
+        elevatorCommands.home());
     command.setName("Home");
     return command;
   }
@@ -294,8 +326,8 @@ public class RobotContainer {
 
   public Command openIntake() {
     Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.Home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.Home());
+        elevatorCommands.home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }

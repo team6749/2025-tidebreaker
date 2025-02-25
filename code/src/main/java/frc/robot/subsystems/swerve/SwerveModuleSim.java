@@ -50,7 +50,7 @@ public class SwerveModuleSim implements SwerveModuleBase {
     @Override
     public void runClosedLoop(SwerveModuleState targetState) {
         SwerveModuleState currentState = getState();
-        
+
         targetState.optimize(currentState.angle);
         targetState.cosineScale(currentState.angle);
 
