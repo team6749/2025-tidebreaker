@@ -21,7 +21,6 @@ public class Constants {
     public static final double deadZone = 0.06;
 
     public static final double armGearRatio = ((1.0 / 5.0) * (1.0 / 5.0) * (16.0 / 30.0)); // gearbox:1/5, gearbox2:1/5, chain:16/30 no clue about chain, double check that
-    public static final double elevatorGearRatio = 0.2 * 0.25 * 0.8125; //(4/1) * (5/1) * (26/32)
 
     public static final int kTopButtonBoardPort = 2;
     public static final int kBottomButtonBoardPort = 3;
