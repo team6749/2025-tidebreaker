@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
-
 /** Add your docs here. */
 public class Constants {
 
@@ -20,10 +19,13 @@ public class Constants {
     public static final int climberMotorPort = 20;
     public static final double deadZone = 0.06;
 
-    public static final double armGearRatio = ((1.0 / 5.0) * (1.0 / 5.0) * (16.0 / 30.0)); // gearbox:1/5, gearbox2:1/5, chain:16/30 no clue about chain, double check that
+    public static final double armGearRatio = ((1.0 / 5.0) * (1.0 / 5.0) * (16.0 / 30.0)); // gearbox:1/5, gearbox2:1/5,
+                                                                                           // chain:16/30 no clue about
+                                                                                           // chain, double check that
 
     public static final int kTopButtonBoardPort = 2;
     public static final int kBottomButtonBoardPort = 3;
+
     public class ElevatorSetPoints {
         public static Distance intake = Meters.of(0);
         public static Distance l1 = Meters.of(0.3);

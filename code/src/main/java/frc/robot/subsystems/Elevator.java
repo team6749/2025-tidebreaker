@@ -55,7 +55,7 @@ public class Elevator extends SubsystemBase {
   public static Distance sprocketDiameter = Centimeters.of(5.3);
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
-  public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters)  * Math.PI;
+  public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.015);
   public static TalonFX elevatorMotor = new TalonFX(18);
   public static LinearVelocity maxVelocity = MetersPerSecond.of(0.2);
@@ -95,6 +95,7 @@ public class Elevator extends SubsystemBase {
   PIDController elevatorPID = new PIDController(10, 0, 0);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
 
+  @SuppressWarnings("removal")
   public Elevator() {
     stop();
     elevatorMotor.setInverted(motorInverted);

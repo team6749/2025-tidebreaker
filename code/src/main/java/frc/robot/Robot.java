@@ -4,12 +4,6 @@
 
 package frc.robot;
 
-import java.io.IOException;
-
-import org.json.simple.parser.ParseException;
-
-import com.pathplanner.lib.util.FileVersionException;
-
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
@@ -34,6 +28,7 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  @SuppressWarnings("unused")
   public Robot() {
     // !!! IMPORTANT !!!!
     // ensure that all real robots have a usb drive for log data. Otherwise it will

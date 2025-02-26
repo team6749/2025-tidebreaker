@@ -4,17 +4,12 @@
 
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.Inch;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-
-import javax.sound.sampled.Line;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -24,22 +19,13 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import pabeles.concurrency.IntOperatorTask.Min;
 
 @Logged
 public class SwerveModuleReal implements SwerveModuleBase {
@@ -50,7 +36,7 @@ public class SwerveModuleReal implements SwerveModuleBase {
   private Angle angle = Radians.zero();
   private Distance position = Meters.zero();
   public PIDController drivePID = new PIDController(1.8, 0, 0);
-  public PIDController anglePID = new PIDController(3.7,0, 0);
+  public PIDController anglePID = new PIDController(3.7, 0, 0);
   public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(1, 2);
 
   /** Creates a new SwerveModule. */
@@ -62,15 +48,12 @@ public class SwerveModuleReal implements SwerveModuleBase {
     encoder = new CANcoder(encoderPort);
     angleMotor.setNeutralMode(NeutralModeValue.Brake);
   }
-  // hello, i dont do code for a reason -Austin
 
   @Override
   public void periodic() {
     velocity = MetersPerSecond.of(driveMotor.getVelocity().getValue().in(RotationsPerSecond)
         / SwerveConstants.driveReduction * SwerveConstants.wheelCircumference.in(Meters));
-    angle = Rotations.of(encoder.getAbsolutePosition().getValueAsDouble());// This is in radians
-    // angle = Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble() *
-    // 360);
+    angle = Rotations.of(encoder.getAbsolutePosition().getValueAsDouble());
     position = Meters.of(driveMotor.getPosition().getValue().in(Rotations) / SwerveConstants.driveReduction
         * SwerveConstants.wheelCircumference.in(Meters));
     // This method will be called once per scheduler run
@@ -97,7 +80,7 @@ public class SwerveModuleReal implements SwerveModuleBase {
 
     Voltage angleOutput = Volts
         .of(anglePID.calculate(MathUtil.angleModulus(currentState.angle.getRadians()),
-          desiredState.angle.getRadians()));
+            desiredState.angle.getRadians()));
     driveMotor.setVoltage((driveFeedForward.calculate(desiredState.speedMetersPerSecond) + driveOutput.in(Volts)));
     angleMotor.setVoltage(-angleOutput.in(Volts));
   }

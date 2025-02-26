@@ -4,15 +4,12 @@
 
 package frc.robot.Commands;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ArmCommands {
@@ -53,11 +50,10 @@ public class ArmCommands {
     }
 
     public Command score() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI  / 3));
+        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 3));
         command.setName("Arm Score Level 4");
         return command;
     }
-
 
     public Command intakePositionOpen() {
         Command command = armSubsystem.runOpenLoopCommand(Volts.of(-1), Radians.of(-Math.PI / 2));
@@ -66,4 +62,3 @@ public class ArmCommands {
     }
 
 }
-
