@@ -3,11 +3,11 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,6 +22,7 @@ public class ClimberSubsystem extends SubsystemBase {
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
     timer.start();
+    climberMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   @Override
@@ -33,9 +34,16 @@ public class ClimberSubsystem extends SubsystemBase {
     return Commands.runEnd(() -> {
       climberMotor.setVoltage(inputVoltage.in(Volts));
     }, () -> {
-      stop(); 
-    },
-        this);
+      stop();
+    }, this);
+  }
+
+  public Command unclimbCommand() {
+    return Commands.runEnd(() -> {
+      climberMotor.setVoltage(-inputVoltage.in(Volts));
+    }, () -> {
+      stop();
+    }, this);
   }
 
   public void stop() {
