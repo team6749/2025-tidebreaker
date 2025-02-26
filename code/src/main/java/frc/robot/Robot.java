@@ -15,8 +15,10 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
@@ -35,7 +37,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     // !!! IMPORTANT !!!!
     // ensure that all real robots have a usb drive for log data. Otherwise it will
-    // be written to the roborio's SD card/internal storage, which has limited write endurance
+    // be written to the roborio's SD card/internal storage, which has limited write
+    // endurance
     DataLogManager.start();
     Epilogue.configure(config -> {
       if (isSimulation() || true) {
@@ -44,12 +47,12 @@ public class Robot extends TimedRobot {
         config.errorHandler = ErrorHandler.crashOnError();
         // Data passed into network tables is logged by the DataLogManager
         config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
-      }
-      else{
+      } else {
         config.errorHandler = ErrorHandler.printErrorMessages();
         // On the real robot only log to disk, to avoid too much network bandwidth
         // Dashboard values are sent separately
-        config.backend = new FileBackend(DataLogManager.getLog());}
+        config.backend = new FileBackend(DataLogManager.getLog());
+      }
     });
     Epilogue.bind(this);
 
@@ -76,7 +79,7 @@ public class Robot extends TimedRobot {
                   "Command finished", command.getName(), EventImportance.kNormal);
               DataLogManager.log("Command finished: " + command.getName());
             });
-
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     // Initialize Robot
     m_robotContainer = new RobotContainer();
   }
