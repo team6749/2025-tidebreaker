@@ -164,6 +164,7 @@ public class RobotContainer {
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
     a.whileTrue(climberSubsystem.climbCommand());
+    b.whileTrue(climberSubsystem.unclimbCommand());
   }
 
   private void elevatorTest() {
