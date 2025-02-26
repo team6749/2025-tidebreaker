@@ -53,15 +53,14 @@ public class RobotContainer {
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
 
   XboxController controller = new XboxController(0);
-  XboxController controller2 = new XboxController(1);
   JoystickButton a = new JoystickButton(controller, 1);
   JoystickButton x = new JoystickButton(controller, 3);
   JoystickButton b = new JoystickButton(controller, 2);
   JoystickButton y = new JoystickButton(controller, 4);
   JoystickButton rightBumper = new JoystickButton(controller, 5);
   JoystickButton leftBumper = new JoystickButton(controller, 6);
-  DoubleSupplier rightTrigger = () -> controller2.getRawAxis(3);
-  DoubleSupplier leftTrigger = () -> controller2.getRawAxis(2);
+  DoubleSupplier rightTrigger = () -> controller.getRawAxis(3);
+  DoubleSupplier leftTrigger = () -> controller.getRawAxis(2);
 
   JoystickButton buttonCoralJ = new JoystickButton(bottomButtonBoard, 1);
   JoystickButton buttonCoralI = new JoystickButton(bottomButtonBoard, 2);
@@ -178,23 +177,15 @@ public class RobotContainer {
       e.printStackTrace();
     }
 
-    buttonL2.whileTrue(elevatorCommands.positionLevel2());
-    buttonL3.whileTrue(elevatorCommands.positionLevel3());
-    buttonL4.whileTrue(elevatorCommands.positionLevel4());
-    buttonIntake.whileTrue(elevatorCommands.intakePosition());
-    buttonHome.whileTrue(elevatorCommands.home());
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
-    // buttonHome.whileTrue(home());
-    // buttonL2.whileTrue(moveToLevel2());
-    // buttonL3.whileTrue(moveToLevel3());
-    // buttonL4.whileTrue(moveToLevel4());
-    // buttonIntake.whileTrue(intake());
-    // buttonScore.whileTrue(score());
     rightBumper.whileTrue(climberSubsystem.climbCommand());
     leftBumper.whileTrue(climberSubsystem.unclimbCommand());
+    buttonHome.whileTrue(home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intake());
+    buttonScore.whileTrue(score());
+    a.whileTrue(climberSubsystem.climbCommand());
   }
 
   @SuppressWarnings("unused")
@@ -291,51 +282,5 @@ public class RobotContainer {
     command.setName("Score");
     return command;
   }
-
-  public Command openHome() {
-    Command command = Commands.parallel(
-        armCommands.Home(),
-        elevatorCommands.home());
-    command.setName("Home");
-    return command;
-  }
-
-  public Command openMoveToLevel2() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel2(),
-        armCommands.positionLevel2());
-    command.setName("Level 2");
-    return command;
-  }
-
-  public Command openMoveToLevel3() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel3(),
-        armCommands.positionLevel3());
-    command.setName("Level 3");
-    return command;
-  }
-
-  public Command openMoveToLevel4() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel4(),
-        armCommands.positionLevel4());
-    command.setName("Level 4");
-    return command;
-  }
-
-  public Command openIntake() {
-    Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
-    command.setName("intake Coral");
-    return command;
-  }
-
-  public Command openScore() {
-    Command command = Commands.parallel(
-        armCommands.score());
-    command.setName("Score");
-    return command;
-  }
+  
 }

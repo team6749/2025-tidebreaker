@@ -9,8 +9,10 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
@@ -72,7 +74,7 @@ public class Robot extends TimedRobot {
                   "Command finished", command.getName(), EventImportance.kNormal);
               DataLogManager.log("Command finished: " + command.getName());
             });
-
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     // Initialize Robot
     m_robotContainer = new RobotContainer();
   }
