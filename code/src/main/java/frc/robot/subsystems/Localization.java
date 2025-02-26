@@ -208,7 +208,6 @@ public class Localization extends SubsystemBase {
             // reject far away tags
             returnValue = rejectValue;
         }
-        System.out.println(returnValue);
         // Speed range: 0 - 3 m/s
         // Rotation Range: 0 - 60 deg/s
         // Distance: 0 - 3 m
