@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
                   "Command finished", command.getName(), EventImportance.kNormal);
               DataLogManager.log("Command finished: " + command.getName());
             });
-    WebServer.start(5000, Filesystem.getDeployDirectory().getPath());
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     // Initialize Robot
     m_robotContainer = new RobotContainer();
   }
