@@ -43,22 +43,14 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
 
     public SwerveDrive() {
-        if (RobotBase.isSimulation()) {
-            frontLeft = new SwerveModuleSim();
-            frontRight = new SwerveModuleSim();
-            backLeft = new SwerveModuleSim();
-            backRight = new SwerveModuleSim();
-
-        } else {
-            frontLeft = new SwerveModuleReal(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort,
+            frontLeft = new SwerveModule(SwerveConstants.FLDriveMotorPort, SwerveConstants.FLAngleMotorPort,
                     SwerveConstants.FLEncoderPort);
-            frontRight = new SwerveModuleReal(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort,
+            frontRight = new SwerveModule(SwerveConstants.FRDriveMotorPort, SwerveConstants.FRAngleMotorPort,
                     SwerveConstants.FREncoderPort);
-            backLeft = new SwerveModuleReal(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort,
+            backLeft = new SwerveModule(SwerveConstants.BLDriveMotorPort, SwerveConstants.BLAngleMotorPort,
                     SwerveConstants.BLEncoderPort);
-            backRight = new SwerveModuleReal(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort,
+            backRight = new SwerveModule(SwerveConstants.BRDriveMotorPort, SwerveConstants.BRAngleMotorPort,
                     SwerveConstants.BREncoderPort);
-        }
 
         modules[0] = frontLeft;
         modules[1] = frontRight;
