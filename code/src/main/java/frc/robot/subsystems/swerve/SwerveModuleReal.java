@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
@@ -11,6 +12,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -47,6 +49,11 @@ public class SwerveModuleReal implements SwerveModuleBase {
     anglePID.enableContinuousInput(-Math.PI, Math.PI);
     encoder = new CANcoder(encoderPort);
     angleMotor.setNeutralMode(NeutralModeValue.Brake);
+
+    var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(60))
+        .withStatorCurrentLimitEnable(true);
+    angleMotor.getConfigurator().apply(angleMotorCurrentLimits);
+
   }
 
   @Override
