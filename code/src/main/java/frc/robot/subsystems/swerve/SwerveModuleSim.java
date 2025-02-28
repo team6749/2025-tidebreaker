@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
@@ -87,6 +88,7 @@ public class SwerveModuleSim implements SwerveModuleBase {
                         * SwerveConstants.wheelCircumference.in(Meters),
                 Rotation2d.fromRadians(turnSim.getAngularPositionRad()));
     }
+
 
     @Override
     public SwerveModuleState getState() {
