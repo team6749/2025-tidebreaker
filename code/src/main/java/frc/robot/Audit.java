@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Audit {
 
-    public String branch;
-    public String head;
-    public String machine;
-    public String status;
-    public boolean isCleanDeploy;
+    private String branch;
+    private String head;
+    private String machine;
+    private String status;
+    private boolean isCleanDeploy;
 
     Audit() {
         // Get Audit data
