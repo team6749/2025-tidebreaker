@@ -29,6 +29,29 @@ deploy {
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
                 }
 
+                File fullPath = new File('src/main/deploy/audit')
+                    if (!fullPath.exists())
+                        fullPath.mkdirs()
+
+                new File('src/main/deploy/audit/machine.txt').text = providers.exec {
+                    commandLine("hostname")
+                }.standardOutput.asText.get()
+
+                // Nothing is printed when there are no local changes
+                new File('src/main/deploy/audit/status.txt').text = providers.exec {
+                    commandLine("git", "status", "--short")
+                }.standardOutput.asText.get()
+
+                 // Note: Nothing is output in a detached head
+                new File('src/main/deploy/audit/branch.txt').text = providers.exec {
+                    commandLine("git", "branch", "--show-current")
+                }.standardOutput.asText.get()
+
+                // Note: Nothing is output in a detached head
+                new File('src/main/deploy/audit/HEAD.txt').text = providers.exec {
+                    commandLine("git", "rev-parse", "HEAD")
+                }.standardOutput.asText.get()
+
                 // Static files artifact
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
