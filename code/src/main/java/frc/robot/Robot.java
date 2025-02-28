@@ -84,7 +84,9 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     // Initialize Robot
     m_robotContainer = new RobotContainer();
-
+    
+    // Outputting the audit data is intentionally done last to be confident that the robot
+    // did not crash during the initial start-up, and can be confident the deploy succeeded
     audit.updateSmartDashboard();
     audit.printDeployInformation();
   }
