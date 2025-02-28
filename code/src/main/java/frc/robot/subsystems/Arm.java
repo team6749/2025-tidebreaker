@@ -29,11 +29,15 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -45,6 +49,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
 @Logged
@@ -109,6 +114,39 @@ public class Arm extends SubsystemBase {
 
   TrapezoidProfile.State desiredState = new State(0, 0);
   TrapezoidProfile.State currentState = new State(0, 0);
+
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle m_angle = Radians.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
+
+  // Create a new SysId routine for characterizing the shooter.
+  private final SysIdRoutine m_sysIdRoutine =
+      new SysIdRoutine(
+          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+          new SysIdRoutine.Config(),
+          new SysIdRoutine.Mechanism(
+              // Tell SysId how to plumb the driving voltage to the motor(s).
+              voltage -> {
+              setVolts(voltage);
+              },
+              // Tell SysId how to record a frame of data for each motor on the mechanism being
+              // characterized.
+              log -> {
+                // Record a frame for the shooter motor.
+                log.motor("arm")
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
+                            armMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                    .angularPosition(m_angle.mut_replace(getPosition().in(Rotations), Rotations))
+                    .angularVelocity(
+                        m_velocity.mut_replace(getVelocity().in(RotationsPerSecond), RotationsPerSecond));
+              },
+              // Tell SysId to make generated commands require this subsystem, suffix test state in
+              // WPILog with this subsystem's name ("shooter")
+              this));
 
   /** Creates a new Arm. */
   public Arm() {
@@ -205,5 +243,13 @@ public class Arm extends SubsystemBase {
 
   public Command runOpenLoopCommand(Voltage Volts, Angle angle) {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this).until(() -> isAtTarget(angle));
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
   }
 }

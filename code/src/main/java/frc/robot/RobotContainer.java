@@ -233,10 +233,10 @@ public class RobotContainer {
     y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
   private void sysIDArm() {
-    a.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    b.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    x.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    y.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    a.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   public Command getAutonomousCommand() {
