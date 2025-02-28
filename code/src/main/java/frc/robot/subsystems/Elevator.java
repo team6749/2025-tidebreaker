@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
@@ -32,8 +33,12 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -41,6 +46,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 @Logged
 public class Elevator extends SubsystemBase {
@@ -106,6 +112,47 @@ public class Elevator extends SubsystemBase {
     }
     SmartDashboard.putData("Elevator Sim", mech2d);
   }
+
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+    // Mutable holder for unit-safe linear distance values, persisted to avoid
+    // reallocation.
+    private final MutDistance m_distance = Meters.mutable(0);
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid
+    // reallocation.
+    private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+
+    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                    // Tell SysId how to plumb the driving voltage to the motors.
+                    voltage -> {
+                        runOpenLoopCommand(voltage);
+                    },
+                    // Tell SysId how to record a frame of data for each motor on the mechanism
+                    // being
+                    // characterized.
+                    log -> {
+                        // Record a frame for the left motors. Since these share an encoder, we consider
+                        // the entire group to be one motor.
+                        log.motor("front-left")
+                                .voltage(
+                                        m_appliedVoltage.mut_replace(
+                                                elevatorMotor.get()
+                                                        * RobotController.getBatteryVoltage(),
+                                                Volts))
+                                .linearPosition(m_distance.mut_replace(getPosition().in(Meters), Meters))
+                                .linearVelocity(
+                                        m_velocity.mut_replace(getVelocity().in(MetersPerSecond),
+                                                MetersPerSecond));
+                        // Record a frame for the right motors. Since these share an encoder, we
+                        // consider
+                        // the entire group to be one motor.
+                    },
+                    (Subsystem) // Tell SysId to make generated commands require this subsystem, suffix test
+                                // state in
+                    // WPILog with this subsystem's name ("drive")
+                    this));
 
   @Override
   public void periodic() {
@@ -198,5 +245,13 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
     closedLoop = false;
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
   }
 }
