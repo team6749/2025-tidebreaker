@@ -142,7 +142,9 @@ public class RobotContainer {
     //configureBindings();
     // elevatorTest();
     // armTest();
-    sysID();
+    //sysIDSwerve();
+    sysIDElevator();
+    // sysIDArm();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -218,7 +220,19 @@ public class RobotContainer {
     buttonScore.whileTrue(score());
   }
 
-  private void sysID() {
+  private void sysIDSwerve() {
+    a.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    x.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    y.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+  private void sysIDElevator() {
+    a.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+  private void sysIDArm() {
     a.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     x.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
