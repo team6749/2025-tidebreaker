@@ -14,7 +14,6 @@ public class Audit {
     public String head;
     public String machine;
     public String status;
-
     public boolean isCleanDeploy;
 
     Audit() {
@@ -25,7 +24,7 @@ public class Audit {
             head = Files.readString(deploy.toPath().resolve("audit/HEAD.txt")).trim();
             machine = Files.readString(deploy.toPath().resolve("audit/machine.txt")).trim();
             status = Files.readString(deploy.toPath().resolve("audit/status.txt")).trim();
-            isCleanDeploy = branch == "main" && status == "";
+            isCleanDeploy = branch.equals("main") && status.equals("");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,7 +32,7 @@ public class Audit {
 
     public void printDeployInformation() {
         System.out
-                .println("\n----- Deploy Information: -----\n" + branch + " " + machine + " " + head + "\n" + status);
+                .println("\n----- Deploy Information -----\n" + branch + " " + machine + " " + head + "\n" + status);
     }
 
     public void updateSmartDashboard() {
