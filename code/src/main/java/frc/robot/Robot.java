@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import java.io.IOException;
-import java.nio.file.Files;
-
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
@@ -14,12 +11,10 @@ import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
