@@ -138,13 +138,15 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
+    
+
     // coralSubsystemTest();
     //configureBindings();
-    // elevatorTest();
-    // armTest();
-    //sysIDSwerve();
-    sysIDElevator();
-    // sysIDArm();
+    //elevatorTest();
+    //armTest();
+    sysIDSwerve();
+    //sysIDElevator();
+     //sysIDArm();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -200,14 +202,15 @@ public class RobotContainer {
     x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
     a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
     rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    leftBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
   }
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
+    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
+    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1)));
+    // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
+    // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
 
   @SuppressWarnings("unused")
