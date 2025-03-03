@@ -144,8 +144,8 @@ public class RobotContainer {
     //configureBindings();
     //elevatorTest();
     //armTest();
-    sysIDSwerve();
-    //sysIDElevator();
+    //sysIDSwerve();
+    sysIDElevator();
      //sysIDArm();
     try {
       autoAlignTest();

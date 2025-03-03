@@ -127,7 +127,7 @@ public class Elevator extends SubsystemBase {
             new SysIdRoutine.Mechanism(
                     // Tell SysId how to plumb the driving voltage to the motors.
                     voltage -> {
-                        runOpenLoopCommand(voltage);
+                        runVolts(voltage);
                     },
                     // Tell SysId how to record a frame of data for each motor on the mechanism
                     // being
