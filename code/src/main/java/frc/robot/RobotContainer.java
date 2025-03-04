@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
+import frc.robot.Commands.POICommands;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
