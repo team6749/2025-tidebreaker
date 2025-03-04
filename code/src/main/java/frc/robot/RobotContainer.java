@@ -145,8 +145,8 @@ public class RobotContainer {
     //elevatorTest();
     //armTest();
     //sysIDSwerve();
-    //sysIDElevator();
-    sysIDArm();
+    sysIDElevator();
+    //sysIDArm();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -232,14 +232,14 @@ public class RobotContainer {
   private void sysIDElevator() {
     a.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    //x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    //y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
   private void sysIDArm() {
     a.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    //x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    //y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   public Command getAutonomousCommand() {
