@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
@@ -15,6 +16,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -151,6 +153,10 @@ public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
   public Arm() {
     SmartDashboard.putData("Arm Sim", mech2d);
+
+    var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(60))
+        .withStatorCurrentLimitEnable(true);
+    armMotor.getConfigurator().apply(angleMotorCurrentLimits);
   }
 
   public void simulationPeriodic() {

@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -20,6 +20,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -105,6 +106,10 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
     stop();
     elevatorMotor.setInverted(motorInverted);
+    var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(80))
+        .withStatorCurrentLimitEnable(true);
+    elevatorMotor.getConfigurator().apply(angleMotorCurrentLimits);
+
     if (Robot.isSimulation()) {
       limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
     } else {
