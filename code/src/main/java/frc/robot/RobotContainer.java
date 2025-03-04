@@ -145,8 +145,8 @@ public class RobotContainer {
     //elevatorTest();
     //armTest();
     //sysIDSwerve();
-    sysIDElevator();
-     //sysIDArm();
+    //sysIDElevator();
+    sysIDArm();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {

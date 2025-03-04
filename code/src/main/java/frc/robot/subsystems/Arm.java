@@ -246,10 +246,10 @@ public class Arm extends SubsystemBase {
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
-  }
+    return m_sysIdRoutine.quasistatic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2 : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
+  };
 
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
+    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2 : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
   }
 }

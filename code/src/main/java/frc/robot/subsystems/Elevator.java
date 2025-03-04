@@ -248,10 +248,10 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
+    return m_sysIdRoutine.quasistatic(direction).until(() -> direction ==  SysIdRoutine.Direction.kForward? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02 : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
   }
 
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
+    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02 : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
   }
 }
