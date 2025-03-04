@@ -16,6 +16,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -34,6 +36,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
@@ -62,6 +65,10 @@ public class Arm extends SubsystemBase {
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
   TalonFX armMotor = new TalonFX(Constants.armMotorID);
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);
+
+  public BooleanSupplier limitSwitchValue;
+  public DigitalInput topLimitSwitch = new DigitalInput(7);
+  public DigitalInput bottomLimitSwitch = new DigitalInput(6);
 
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
@@ -119,6 +126,7 @@ public class Arm extends SubsystemBase {
     var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(60))
         .withStatorCurrentLimitEnable(true);
     armMotor.getConfigurator().apply(angleMotorCurrentLimits);
+    limitSwitchValue = () -> topLimitSwitch.get() || bottomLimitSwitch.get();
   }
 
   public void simulationPeriodic() {
@@ -191,7 +199,7 @@ public class Arm extends SubsystemBase {
       resetProfileState();
     }, () -> {
       runClosedLoop(desiredAngle);
-    }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
+    }, this).until(() -> isAtTarget(desiredAngle) || getLimitSwitch()).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
       desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
@@ -211,5 +219,9 @@ public class Arm extends SubsystemBase {
 
   public Command runOpenLoopCommand(Voltage Volts, Angle angle) {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this).until(() -> isAtTarget(angle));
+  }
+
+  public boolean getLimitSwitch() {
+    return limitSwitchValue.getAsBoolean();
   }
 }

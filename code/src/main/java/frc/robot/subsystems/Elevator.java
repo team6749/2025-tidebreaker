@@ -34,6 +34,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -54,7 +55,9 @@ public class Elevator extends SubsystemBase {
   public static double gearboxRatio = (4.0 / 1.0) * (5.0 / 1.0);
   public static Mass carriageMass = Kilograms.of(4);
   public static Distance sprocketDiameter = Centimeters.of(5.3);
-  public BooleanSupplier limitSwitch;
+  public BooleanSupplier limitSwitchValue;
+  public DigitalInput topLimitSwitch = new DigitalInput(9);
+  public DigitalInput bottomLimitSwitch = new DigitalInput(8);
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.015);
@@ -105,9 +108,9 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.getConfigurator().apply(angleMotorCurrentLimits);
 
     if (Robot.isSimulation()) {
-      limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
+      limitSwitchValue = () -> getPosition().isNear(maxHeight, Meters.of(0.01));
     } else {
-      limitSwitch = () -> true;
+      limitSwitchValue = () -> (topLimitSwitch.get() || bottomLimitSwitch.get()); 
     }
     SmartDashboard.putData("Elevator Sim", mech2d);
   }
@@ -189,14 +192,14 @@ public class Elevator extends SubsystemBase {
       resetProfileState();
     }, () -> {
       runClosedLoopSetGoal(position);
-    }, this).until(() -> isAtTarget(position)).handleInterrupt(() -> {
+    }, this).until(() -> isAtTarget(position) || getLimitSwitch()).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
       endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
   }
 
   public boolean getLimitSwitch() {
-    return limitSwitch.getAsBoolean();
+    return limitSwitchValue.getAsBoolean();
   }
 
   public void stop() {
