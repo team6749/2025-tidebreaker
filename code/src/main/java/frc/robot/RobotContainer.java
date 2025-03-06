@@ -143,9 +143,9 @@ public class RobotContainer {
     // coralSubsystemTest();
     //configureBindings();
     //elevatorTest();
-    //armTest();
+    armTest();
     //sysIDSwerve();
-    sysIDElevator();
+    //sysIDElevator();
     //sysIDArm();
     try {
       autoAlignTest();
@@ -197,14 +197,14 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void elevatorTest() {
-    a.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.3)));
+    a.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.7)));
+    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.7)));
   }
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(0.1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(1)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.3), Radians.of(-1.2)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3), Radians.of(1)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
