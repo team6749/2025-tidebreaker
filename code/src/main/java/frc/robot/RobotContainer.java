@@ -197,18 +197,14 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void elevatorTest() {
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
-    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
-    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
-    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
-    leftBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    a.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.3)));
   }
 
   @SuppressWarnings("unused")
   private void armTest() {
-    leftBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
-    rightBumper.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1)));
+    a.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(0.1)));
+    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(1)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
