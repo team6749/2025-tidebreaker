@@ -63,7 +63,7 @@ public class Arm extends SubsystemBase {
   boolean motorInverted = true;;
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.45); //0.2 the encoder value - 0.25 for standard position.
-  PIDController armPID = new PIDController(0, 0, 0);
+  PIDController armPID = new PIDController(1, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
   TalonFX armMotor = new TalonFX(Constants.armMotorID);
   DCMotor m_armGearbox = DCMotor.getFalcon500(1);

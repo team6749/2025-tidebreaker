@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -140,11 +141,11 @@ public class RobotContainer {
 
     
 
-    // coralSubsystemTest();
+    coralSubsystemTest();
     //configureBindings();
     //elevatorTest();
-    armTest();
-    //sysIDSwerve();
+    //armTest();
+    sysIDSwerve();
     //sysIDElevator();
     //sysIDArm();
     try {
@@ -197,14 +198,12 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void elevatorTest() {
-    a.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.7)));
-    b.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(0.7)));
+    a.whileTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.33)));
   }
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.3), Radians.of(-1.2)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(0.3), Radians.of(1)));
+    a.whileTrue(arm.goToPositionArm(Radians.of(0)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }

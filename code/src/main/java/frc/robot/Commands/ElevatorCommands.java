@@ -18,7 +18,7 @@ public class ElevatorCommands {
     }
 
     public Command intakePosition() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.05));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.01));
         command.setName("Elevator Intake Position");
         return command;
     }

@@ -32,19 +32,20 @@ public class ArmCommands {
     }
 
     public Command positionLevel2() {
-        Command command = armSubsystem.goToPositionArm(Rotations.of(0.202));
+        Command command = armSubsystem.goToPositionArm(Radians.of(-0.23)); //random values
         command.setName("Arm Score Level 2");
         return command;
     }
 
     public Command positionLevel3() {
-        Command command = armSubsystem.goToPositionArm(Rotations.of(0.298));
+        System.out.println("running 3");
+        Command command = armSubsystem.goToPositionArm(Radians.of(0.4));
         command.setName("Arm Score Level 3");
         return command;
     }
 
     public Command positionLevel4() {
-        Command command = armSubsystem.goToPositionArm(Rotations.of(0.355));
+        Command command = armSubsystem.goToPositionArm(Radians.of(0.7));
         command.setName("Arm Score Level 4");
         return command;
     }
