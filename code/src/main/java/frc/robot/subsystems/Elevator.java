@@ -55,8 +55,8 @@ public class Elevator extends SubsystemBase {
   boolean closedLoop = false;
   boolean motorInverted = false;
   public static Distance minHeight = Meters.of(0);
-  public static Distance maxHeight = Meters.of(0.65);
-  public static Distance simStartHeight = Meters.of(0.65);
+  public static Distance maxHeight = Meters.of(0.665);
+  public static Distance simStartHeight = Meters.of(0.665);
   public static double gearboxRatio = (4.0 / 1.0) * (5.0 / 1.0);
   public static Mass carriageMass = Kilograms.of(4);
   public static Distance sprocketDiameter = Centimeters.of(5.3);
