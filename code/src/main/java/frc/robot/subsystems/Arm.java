@@ -62,7 +62,7 @@ public class Arm extends SubsystemBase {
   boolean encoderConnected = true;
   boolean motorInverted = true;;
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.955);
+  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.45); //0.2 the encoder value - 0.25 for standard position.
   PIDController armPID = new PIDController(0, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
   TalonFX armMotor = new TalonFX(Constants.armMotorID);
@@ -207,7 +207,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Angle getPosition() {
-    return Rotations.of(encoder.get()).plus(angleOffset);
+    return Rotations.of(encoder.get()).plus(angleOffset).times(1.06); // 1.06 is the ratio of loss that the encoder reports. 
   }
 
   public Boolean isAtTarget(Angle position) {
