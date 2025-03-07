@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.015);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.2);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.3);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.5);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
@@ -100,7 +100,7 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State endState = new State(0, 0);
 
   PIDController elevatorPID = new PIDController(10, 0, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 3);
 
   @SuppressWarnings("removal")
   public Elevator() {
