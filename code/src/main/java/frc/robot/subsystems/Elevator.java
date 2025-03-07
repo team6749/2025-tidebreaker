@@ -63,9 +63,9 @@ public class Elevator extends SubsystemBase {
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
-  public static Distance toleranceOnReachedGoal = Meters.of(0.015);
+  public static Distance toleranceOnReachedGoal = Meters.of(0.005);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.3);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.4);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.5);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();

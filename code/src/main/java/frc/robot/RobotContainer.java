@@ -141,11 +141,11 @@ public class RobotContainer {
 
     
 
-    //coralSubsystemTest();
-    configureBindings();
+    coralSubsystemTest();
+    //configureBindings();
     //elevatorTest();
     //armTest();
-    sysIDSwerve();
+    //sysIDSwerve();
     //sysIDElevator();
     //sysIDArm();
     try {

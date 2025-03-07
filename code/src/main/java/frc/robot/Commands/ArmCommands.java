@@ -20,13 +20,13 @@ public class ArmCommands {
     }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 2));
+        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 2 + 0.03));
         command.setName("Arm Intake Position");
         return command;
     }
 
     public Command Home() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 2));
+        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 2 + 0.03));
         command.setName("Arm Idle Position");
         return command;
     }
@@ -53,12 +53,6 @@ public class ArmCommands {
     public Command score() {
         Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 3));
         command.setName("Arm Score Level 4");
-        return command;
-    }
-
-    public Command intakePositionOpen() {
-        Command command = armSubsystem.runOpenLoopCommand(Volts.of(-1), Radians.of(-Math.PI / 2));
-        command.setName("Arm Intake Position");
         return command;
     }
 
