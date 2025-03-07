@@ -24,13 +24,13 @@ public class ElevatorCommands {
     }
 
     public Command home() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.1));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.15));
         command.setName("Elevator Idle Position");
         return command;
     }
 
     public Command positionLevel2() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.103));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.15));
         command.setName("Elevator Score Level 2");
         return command;
     }

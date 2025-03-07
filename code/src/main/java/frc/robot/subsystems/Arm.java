@@ -152,6 +152,7 @@ public class Arm extends SubsystemBase {
 
   /** Creates a new Arm. */
   public Arm() {
+    stop();
     SmartDashboard.putData("Arm Sim", mech2d);
 
     var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(60))

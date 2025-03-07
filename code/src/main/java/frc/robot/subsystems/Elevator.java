@@ -66,7 +66,7 @@ public class Elevator extends SubsystemBase {
   public static Distance toleranceOnReachedGoal = Meters.of(0.005);
   public static TalonFX elevatorMotor = new TalonFX(18);
   public static LinearVelocity maxVelocity = MetersPerSecond.of(0.4);
-  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.5);
+  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.7);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
@@ -99,7 +99,7 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State targetState = new State(0, 0);
   TrapezoidProfile.State endState = new State(0, 0);
 
-  PIDController elevatorPID = new PIDController(10, 0, 0);
+  PIDController elevatorPID = new PIDController(10, 1, 0);
   ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 3);
 
   @SuppressWarnings("removal")
