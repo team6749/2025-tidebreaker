@@ -143,8 +143,7 @@ public class Elevator extends SubsystemBase {
                         log.motor("front-left")
                                 .voltage(
                                         m_appliedVoltage.mut_replace(
-                                                elevatorMotor.get()
-                                                        * RobotController.getBatteryVoltage(),
+                                                elevatorMotor.getMotorVoltage().getValueAsDouble(),
                                                 Volts))
                                 .linearPosition(m_distance.mut_replace(getPosition().in(Meters), Meters))
                                 .linearVelocity(

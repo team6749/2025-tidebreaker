@@ -141,7 +141,7 @@ public class Arm extends SubsystemBase {
                 log.motor("arm")
                     .voltage(
                         m_appliedVoltage.mut_replace(
-                            armMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                            armMotor.getMotorVoltage().getValueAsDouble(), Volts))
                     .angularPosition(m_angle.mut_replace(getPosition().in(Rotations), Rotations))
                     .angularVelocity(
                         m_velocity.mut_replace(getVelocity().in(RotationsPerSecond), RotationsPerSecond));
