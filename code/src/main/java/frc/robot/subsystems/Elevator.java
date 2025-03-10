@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Meters.of(0.005);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.4);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.5);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.7);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
@@ -100,7 +100,7 @@ public class Elevator extends SubsystemBase {
   TrapezoidProfile.State endState = new State(0, 0);
 
   PIDController elevatorPID = new PIDController(10, 1, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 3);
+  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 4);
 
   @SuppressWarnings("removal")
   public Elevator() {
@@ -161,7 +161,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     if (isHomed == false) {
-      setVolts(Volts.of(-0.1));
+      setVolts(Volts.of(-0.5));
       if (getLimitSwitch()) {
         isHomed = true;
         elevatorMotor.setPosition(minHeight.in(Meters) / outputRatio);
@@ -256,6 +256,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02 : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
+    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02 : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
   }
 }
