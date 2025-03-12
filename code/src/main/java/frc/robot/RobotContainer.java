@@ -142,10 +142,10 @@ public class RobotContainer {
     
 
     coralSubsystemTest();
-    //configureBindings();
+    configureBindings();
     //elevatorTest();
     //armTest();
-    //sysIDSwerve();
+    sysIDSwerve();
     //sysIDElevator();
     //sysIDArm();
     try {
@@ -184,16 +184,8 @@ public class RobotContainer {
       e.printStackTrace();
     }
 
-    rightBumper.whileTrue(climberSubsystem.climbCommand());
-    leftBumper.whileTrue(climberSubsystem.unclimbCommand());
-    buttonHome.whileTrue(home());
-    buttonL2.whileTrue(moveToLevel2());
-    buttonL3.whileTrue(moveToLevel3());
-    buttonL4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intake());
-    buttonScore.whileTrue(score());
-    a.whileTrue(climberSubsystem.climbCommand());
-    b.whileTrue(climberSubsystem.unclimbCommand());
+    // a.whileTrue(climberSubsystem.climbCommand());
+    // b.whileTrue(climberSubsystem.unclimbCommand());
   }
 
   @SuppressWarnings("unused")
@@ -210,12 +202,12 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void coralSubsystemTest() {
-    buttonHome.whileTrue(home());
-    buttonL2.whileTrue(moveToLevel2());
-    buttonL3.whileTrue(moveToLevel3());
-    buttonL4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intake());
-    buttonScore.whileTrue(score());
+    // buttonHome.whileTrue(home());
+    // buttonL2.whileTrue(moveToLevel2());
+    // buttonL3.whileTrue(moveToLevel3());
+    // buttonL4.whileTrue(moveToLevel4());
+    // buttonIntake.whileTrue(intake());
+    // buttonScore.whileTrue(score());
   }
 
   private void sysIDSwerve() {
@@ -258,51 +250,51 @@ public class RobotContainer {
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
-  public Command home() {
-    Command command = Commands.parallel(
-        armCommands.Home(),
-        elevatorCommands.home());
-    command.setName("Home");
-    return command;
-  }
+  // public Command home() {
+  //   Command command = Commands.parallel(
+  //       armCommands.Home(),
+  //       elevatorCommands.home());
+  //   command.setName("Home");
+  //   return command;
+  // }
 
-  public Command moveToLevel2() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel2(),
-        armCommands.positionLevel2());
-    command.setName("Level 2");
-    return command;
-  }
+  // public Command moveToLevel2() {
+  //   Command command = Commands.parallel(
+  //       elevatorCommands.positionLevel2(),
+  //       armCommands.positionLevel2());
+  //   command.setName("Level 2");
+  //   return command;
+  // }
 
-  public Command moveToLevel3() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel3(),
-        armCommands.positionLevel3());
-    command.setName("Level 3");
-    return command;
-  }
+  // public Command moveToLevel3() {
+  //   Command command = Commands.parallel(
+  //       elevatorCommands.positionLevel3(),
+  //       armCommands.positionLevel3());
+  //   command.setName("Level 3");
+  //   return command;
+  // }
 
-  public Command moveToLevel4() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel4(),
-        armCommands.positionLevel4());
-    command.setName("Level 4");
-    return command;
-  }
+  // public Command moveToLevel4() {
+  //   Command command = Commands.parallel(
+  //       elevatorCommands.positionLevel4(),
+  //       armCommands.positionLevel4());
+  //   command.setName("Level 4");
+  //   return command;
+  // }
 
-  public Command intake() {
-    Command command = Commands.sequence(Commands.parallel(
-        elevatorCommands.home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
-    command.setName("intake Coral");
-    return command;
-  }
+  // public Command intake() {
+  //   Command command = Commands.sequence(Commands.parallel(
+  //       elevatorCommands.home(),
+  //       armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
+  //   command.setName("intake Coral");
+  //   return command;
+  // }
 
-  public Command score() {
-    Command command = Commands.parallel(
-        armCommands.score());
-    command.setName("Score");
-    return command;
-  }
+  // public Command score() {
+  //   Command command = Commands.parallel(
+  //       armCommands.score());
+  //   command.setName("Score");
+  //   return command;
+  // }
   
 }
