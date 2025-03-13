@@ -57,7 +57,7 @@ public class Arm extends SubsystemBase {
   boolean encoderConnected = true;
   boolean motorInverted = true;;
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0 : (-Math.PI / 2));
+  public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0 : -0.22);
   PIDController armPID = new PIDController(0, 0, 0);
   ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
   TalonFX armMotor = new TalonFX(Constants.armMotorID);
@@ -115,6 +115,7 @@ public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
   public Arm() {
     SmartDashboard.putData("Arm Sim", mech2d);
+
 
     var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(60))
         .withStatorCurrentLimitEnable(true);
