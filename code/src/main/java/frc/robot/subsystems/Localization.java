@@ -70,6 +70,7 @@ public class Localization extends SubsystemBase {
     private final SendableChooser<Boolean> limelightToggleChooser = new SendableChooser<>();
 
     public Localization(SwerveDrive swerve) {
+        gyro.calibrate();
         this.swerve = swerve;
 
         odometry = new SwerveDriveOdometry(
