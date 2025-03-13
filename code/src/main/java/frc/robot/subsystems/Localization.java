@@ -27,6 +27,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -70,7 +71,12 @@ public class Localization extends SubsystemBase {
     private final SendableChooser<Boolean> limelightToggleChooser = new SendableChooser<>();
 
     public Localization(SwerveDrive swerve) {
-        gyro.calibrate();
+
+        if (RobotBase.isReal()) {
+            gyro.calibrate();
+        }
+
+
         this.swerve = swerve;
 
         odometry = new SwerveDriveOdometry(
