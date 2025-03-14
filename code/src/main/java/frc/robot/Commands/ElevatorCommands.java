@@ -18,19 +18,19 @@ public class ElevatorCommands {
     }
 
     public Command intakePosition() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.05));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.005));
         command.setName("Elevator Intake Position");
         return command;
     }
 
     public Command home() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.103));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.24));
         command.setName("Elevator Idle Position");
         return command;
     }
 
     public Command positionLevel2() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.103));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.15));
         command.setName("Elevator Score Level 2");
         return command;
     }
@@ -42,7 +42,7 @@ public class ElevatorCommands {
     }
 
     public Command positionLevel4() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.67));
+        Command command = elevatorSubsystem.goToPositionCommand(Elevator.maxHeight);
         command.setName("Elevator Score Level 4");
         return command;
     }

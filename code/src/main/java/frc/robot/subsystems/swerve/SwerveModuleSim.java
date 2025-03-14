@@ -88,6 +88,7 @@ public class SwerveModuleSim implements SwerveModuleBase {
                 Rotation2d.fromRadians(turnSim.getAngularPositionRad()));
     }
 
+
     @Override
     public SwerveModuleState getState() {
         return new SwerveModuleState(
