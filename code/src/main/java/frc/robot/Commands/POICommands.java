@@ -1,4 +1,6 @@
-package frc.robot;
+package frc.robot.Commands;
+
+import frc.robot.Commands.POICommands;
 
 import java.io.IOException;
 
@@ -12,6 +14,9 @@ import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+
 public class POICommands {
         SwerveDrive driveSubsystem;
 
@@ -19,7 +24,7 @@ public class POICommands {
                 driveSubsystem = swerveDrive;
         }
 
-        PathConstraints constraints = new PathConstraints(1.5, 1, 2 * Math.PI, 4 * Math.PI); // The constraints for this
+        PathConstraints constraints = new PathConstraints(3, 2, Degrees.of(360).in(Radians), Degrees.of(720).in(Radians));  // The constraints for this
                                                                                              // path.
         // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
         // You can also use unlimited constraints, only limited by motor torque and

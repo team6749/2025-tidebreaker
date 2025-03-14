@@ -169,7 +169,7 @@ public class SwerveDrive extends SubsystemBase {
     };
 
     public double exponentialResponseCurve(double input) {
-        return Math.pow(input, 3);
+        return Math.pow(input, 5);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -228,26 +228,26 @@ public class SwerveDrive extends SubsystemBase {
 
         Command command = Commands.runEnd(() -> {
 
-            double xinput = -controller.getLeftY();
-            double yinput = -controller.getLeftX();
-            double zinput = -controller.getRightX();
+            double xInput = -controller.getLeftY();
+            double yInput = -controller.getLeftX();
+            double zInput = -controller.getRightX();
 
-            if (inputMagnitude(xinput, yinput) < Constants.deadZone) {
-                xinput = 0;
-                yinput = 0;
+            if (inputMagnitude(xInput, yInput) < Constants.deadZone) {
+                xInput = 0;
+                yInput = 0;
             }
-            if (inputMagnitude(zinput, 0) < Constants.deadZone) {
-                zinput = 0;
+            if (inputMagnitude(zInput, 0) < Constants.deadZone) {
+                zInput = 0;
             }
 
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
 
                     MetersPerSecond.of(SwerveConstants.driveLimiterY.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(xinput)).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(xInput)).in(MetersPerSecond))),
                     MetersPerSecond.of(SwerveConstants.driveLimiterX.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(yinput)).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(yInput)).in(MetersPerSecond))),
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
-                            .times(exponentialResponseCurve(zinput)).in(RadiansPerSecond))));
+                            .times(exponentialResponseCurve(zInput)).in(RadiansPerSecond))));
 
             switch (orientationChooser.getSelected()) {
                 case FieldOriented:
