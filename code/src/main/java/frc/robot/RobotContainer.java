@@ -170,6 +170,14 @@ public class RobotContainer {
     }, localizationSubsystem));
 
     try {
+      SmartDashboard.putData("Command/Home", home());
+      SmartDashboard.putData("Command/Score", score());
+      SmartDashboard.putData("Command/Intake", intake());
+      SmartDashboard.putData("Command/L2", moveToLevel2());
+      SmartDashboard.putData("Command/L3", moveToLevel3());
+      SmartDashboard.putData("Command/L4", moveToLevel4());
+
+
       SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
       SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
       SmartDashboard.putData("Align/C", poiCommands.pathToCoralC());

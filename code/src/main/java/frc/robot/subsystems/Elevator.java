@@ -95,7 +95,7 @@ public class Elevator extends SubsystemBase {
           maxAcceleration.in(MetersPerSecondPerSecond)));
 
   private TrapezoidProfile.State targetState = new State(0, 0);
-  private TrapezoidProfile.State endState = new State(0, 0);
+  private TrapezoidProfile.State setpointState = new State(0, 0);
 
   private boolean isHomed = false;
   private boolean closedLoop = false;
@@ -177,11 +177,11 @@ public class Elevator extends SubsystemBase {
         resetProfileState();
         return;
       }
-      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), targetState, endState);
-      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), targetState.position));
+      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), setpointState, targetState);
+      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), setpointState.position));
       Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
       setVolts(PIDOutput.plus(feedForwardOutput));
-      targetState = next;
+      setpointState = next;
     }
     elevatorMech2d.setLength(getPosition().in(Meters));
     // This method will be called once per scheduler run
@@ -220,12 +220,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runClosedLoopSetGoal(Distance goal) {
-    endState = new TrapezoidProfile.State(goal.in(Meters), 0);
+    targetState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
 
   public void resetProfileState() {
-    targetState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+    setpointState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
   public Command runOpenLoopCommand(Voltage Volts) {
@@ -263,7 +263,7 @@ public class Elevator extends SubsystemBase {
       runClosedLoopSetGoal(targetHeight);
     }, this).until(() -> isAtTarget(targetHeight)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
-      endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+      targetState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
   }
 

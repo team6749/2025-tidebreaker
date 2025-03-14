@@ -116,8 +116,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
           3,
           new Color8Bit(Color.kYellow)));
 
-  TrapezoidProfile.State desiredState = new State(0, 0);
-  TrapezoidProfile.State currentState = new State(0, 0);
+  TrapezoidProfile.State targetState = new State(0, 0);
+  TrapezoidProfile.State setpointState = new State(0, 0);
 
     // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
@@ -182,13 +182,13 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
         return;
       }
       var currentAngle = getPosition();
-      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
+      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), setpointState, targetState);
 
-      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), currentState.position));
-      Voltage feedForwardOutput = Volts.of(feedForward.calculate(currentState.position, currentState.velocity));
+      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), setpointState.position));
+      Voltage feedForwardOutput = Volts.of(feedForward.calculate(setpointState.position, setpointState.velocity));
 
       setVolts(pidoutput.plus(feedForwardOutput));
-      currentState = nextState;
+      setpointState = nextState;
     }
     armMech.setAngle(getPosition().in(Degrees));
 
@@ -196,7 +196,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   }
 
   public void runClosedLoop(Angle desiredAngle) {
-    desiredState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
+    targetState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
     closedLoop = true;
   }
 
@@ -224,7 +224,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   }
 
   public void resetProfileState() {
-    currentState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
+    setpointState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
   }
 
    public Command goToPositionCommand(Angle desiredAngle) {
@@ -257,7 +257,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
+      targetState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
   }
 
