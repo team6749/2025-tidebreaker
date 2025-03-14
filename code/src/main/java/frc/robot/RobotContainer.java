@@ -304,6 +304,7 @@ public class RobotContainer {
   private Command score() {
     Command command = Commands.parallel(
         armCommands.score());
+        elevatorCommands.home();
     command.setName("Score");
     return command;
   }
