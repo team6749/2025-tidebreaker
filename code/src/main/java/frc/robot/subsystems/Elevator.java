@@ -220,7 +220,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runClosedLoopSetGoal(Distance goal) {
-    SmartDashboard.putNumber("Targetgoal", goal.in(Meters));
     targetState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
