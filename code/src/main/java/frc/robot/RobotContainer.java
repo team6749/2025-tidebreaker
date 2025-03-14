@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
 import java.util.function.DoubleSupplier;
@@ -14,6 +13,7 @@ import java.util.function.DoubleSupplier;
 import org.json.simple.parser.ParseException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -43,7 +43,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
-  Arm arm;
+  ConstrainedArmSubsystem arm;
   // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
@@ -92,13 +92,21 @@ public class RobotContainer {
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
-    arm = new Arm();
+    arm = new ConstrainedArmSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
     elevatorCommands = new ElevatorCommands(elevatorSubsystem);
     armCommands = new ArmCommands(arm);
     climberSubsystem = new ClimberSubsystem();
+
+    NamedCommands.registerCommand("home", home());
+    NamedCommands.registerCommand("intake", intake());
+    NamedCommands.registerCommand("score", score());
+    NamedCommands.registerCommand("l2", moveToLevel2());
+    NamedCommands.registerCommand("l3", moveToLevel3());
+    NamedCommands.registerCommand("l4", moveToLevel4());
+
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
@@ -139,19 +147,16 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    
-
     coralSubsystemTest();
     configureBindings();
-    //elevatorTest();
-    //armTest();
+    // elevatorTest();
+    // armTest();
     sysIDSwerve();
-    //sysIDElevator();
-    //sysIDArm();
+    // sysIDElevator();
+    // sysIDArm();
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -180,12 +185,8 @@ public class RobotContainer {
       SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
       SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
     } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
-    // a.whileTrue(climberSubsystem.climbCommand());
-    // b.whileTrue(climberSubsystem.unclimbCommand());
   }
 
   @SuppressWarnings("unused")
@@ -195,7 +196,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.goToPositionArm(Radians.of(0)));
+    a.whileTrue(arm.goToPositionCommand(Radians.of(0)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
@@ -216,17 +217,19 @@ public class RobotContainer {
     x.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
     y.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
+
   private void sysIDElevator() {
     a.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    //x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    //y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
+
   private void sysIDArm() {
     a.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    //x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    //y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   public Command getAutonomousCommand() {
@@ -250,51 +253,51 @@ public class RobotContainer {
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
-  // public Command home() {
-  //   Command command = Commands.parallel(
-  //       armCommands.Home(),
-  //       elevatorCommands.home());
-  //   command.setName("Home");
-  //   return command;
-  // }
+  private Command home() {
+    Command command = Commands.parallel(
+        armCommands.Home(),
+        elevatorCommands.home());
+    command.setName("Home");
+    return command;
+  }
 
-  // public Command moveToLevel2() {
-  //   Command command = Commands.parallel(
-  //       elevatorCommands.positionLevel2(),
-  //       armCommands.positionLevel2());
-  //   command.setName("Level 2");
-  //   return command;
-  // }
+  private Command moveToLevel2() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel2(),
+        armCommands.positionLevel2());
+    command.setName("Level 2");
+    return command;
+  }
 
-  // public Command moveToLevel3() {
-  //   Command command = Commands.parallel(
-  //       elevatorCommands.positionLevel3(),
-  //       armCommands.positionLevel3());
-  //   command.setName("Level 3");
-  //   return command;
-  // }
+  private Command moveToLevel3() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel3(),
+        armCommands.positionLevel3());
+    command.setName("Level 3");
+    return command;
+  }
 
-  // public Command moveToLevel4() {
-  //   Command command = Commands.parallel(
-  //       elevatorCommands.positionLevel4(),
-  //       armCommands.positionLevel4());
-  //   command.setName("Level 4");
-  //   return command;
-  // }
+  private Command moveToLevel4() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel4(),
+        armCommands.positionLevel4());
+    command.setName("Level 4");
+    return command;
+  }
 
-  // public Command intake() {
-  //   Command command = Commands.sequence(Commands.parallel(
-  //       elevatorCommands.home(),
-  //       armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
-  //   command.setName("intake Coral");
-  //   return command;
-  // }
+  private Command intake() {
+    Command command = Commands.sequence(Commands.parallel(
+        elevatorCommands.home(),
+        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
+    command.setName("intake Coral");
+    return command;
+  }
 
-  // public Command score() {
-  //   Command command = Commands.parallel(
-  //       armCommands.score());
-  //   command.setName("Score");
-  //   return command;
-  // }
-  
+  private Command score() {
+    Command command = Commands.parallel(
+        armCommands.score());
+    command.setName("Score");
+    return command;
+  }
+
 }

@@ -4,54 +4,51 @@
 
 package frc.robot.Commands;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ConstrainedArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ArmCommands {
-    Arm armSubsystem;
+    ConstrainedArmSubsystem armSubsystem;
 
-    public ArmCommands(Arm arm) {
+    public ArmCommands(ConstrainedArmSubsystem arm) {
         this.armSubsystem = arm;
     }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 2 + 0.03));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-89));
         command.setName("Arm Intake Position");
         return command;
     }
 
     public Command Home() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 2 + 0.03));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-89));
         command.setName("Arm Idle Position");
         return command;
     }
 
     public Command positionLevel2() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-0.23)); //random values
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-13)); //random values
         command.setName("Arm Score Level 2");
         return command;
     }
 
     public Command positionLevel3() {
-        System.out.println("running 3");
-        Command command = armSubsystem.goToPositionArm(Radians.of(0.4));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(23));
         command.setName("Arm Score Level 3");
         return command;
     }
 
     public Command positionLevel4() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(0.7));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(40));
         command.setName("Arm Score Level 4");
         return command;
     }
 
     public Command score() {
-        Command command = armSubsystem.goToPositionArm(Radians.of(-Math.PI / 3));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-90));
         command.setName("Arm Score Level 4");
         return command;
     }

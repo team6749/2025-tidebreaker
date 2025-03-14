@@ -42,7 +42,7 @@ public class ElevatorCommands {
     }
 
     public Command positionLevel4() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.63)); // As a result of the tuning and the fact that the elvator is askew, the previous value would grind the elevator bearings against the top.
+        Command command = elevatorSubsystem.goToPositionCommand(Elevator.maxHeight);
         command.setName("Elevator Score Level 4");
         return command;
     }

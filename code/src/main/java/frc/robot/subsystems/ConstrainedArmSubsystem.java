@@ -39,7 +39,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -53,29 +52,32 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 @Logged
-public class Arm extends SubsystemBase {
-  Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
+public class ConstrainedArmSubsystem extends SubsystemBase {
+  private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
-  boolean closedLoop = false;
-  boolean encoderConnected = true;
-  boolean motorInverted = true;;
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.45); //0.2 the encoder value - 0.25 for standard position.
-  PIDController armPID = new PIDController(3, 0, 0);
-  ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2.5);
-  TalonFX armMotor = new TalonFX(Constants.armMotorID);
-  DCMotor m_armGearbox = DCMotor.getFalcon500(1);
-
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
-  public static Angle tolerance = Radians.of(0.05);
+  public static Angle tolerance = Degrees.of(3);
+  public static Angle maxAngle = Degrees.of(90);
+  public static Angle minAngle = Degrees.of(-90);
+
+  private PIDController armPID = new PIDController(0, 0, 0);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2.5);
+  private TalonFX armMotor = new TalonFX(Constants.armMotorID);
+  private DCMotor m_armGearbox = DCMotor.getFalcon500(1);
+
+  private boolean closedLoop = false;
+  private boolean encoderConnected = true;
+  private boolean motorInverted = true;
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
-  Angle maxAngle = Degrees.of(90);
-  Angle minAngle = Degrees.of(-90);
+
   AngularVelocity maxVelocity = RadiansPerSecond.of(0.6);
   AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(0.5); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
@@ -151,7 +153,7 @@ public class Arm extends SubsystemBase {
               this));
 
   /** Creates a new Arm. */
-  public Arm() {
+  public ConstrainedArmSubsystem() {
     stop();
     SmartDashboard.putData("Arm Sim", mech2d);
 
@@ -208,7 +210,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Angle getPosition() {
-    return Rotations.of(encoder.get()).plus(angleOffset).times(1.06); // 1.06 is the ratio of loss that the encoder reports. 
+    return Rotations.of(encoder.get()).plus(angleOffset);
   }
 
   public Boolean isAtTarget(Angle position) {
@@ -225,7 +227,30 @@ public class Arm extends SubsystemBase {
     currentState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
   }
 
-  public Command goToPositionArm(Angle desiredAngle) {
+   public Command goToPositionCommand(Angle desiredAngle) {
+    if(desiredAngle.gt(maxAngle)) {
+      Exception exception =  new Exception("WARNING: Arm instructed to go more than max angle. " + desiredAngle.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if(Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(maxAngle);
+    }
+    if(desiredAngle.lt(minAngle)) {
+      Exception exception =  new Exception("WARNING: Arm instructed to go less than min angle. " + desiredAngle.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if(Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(minAngle);
+    }
+    return goToPositionCommandPrivate(desiredAngle);
+  }
+
+
+  private Command goToPositionCommandPrivate(Angle desiredAngle) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {

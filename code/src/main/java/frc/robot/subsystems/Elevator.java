@@ -39,7 +39,6 @@ import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -51,9 +50,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 
 @Logged
 public class Elevator extends SubsystemBase {
-  boolean isHomed = false;
-  boolean closedLoop = false;
-  boolean motorInverted = false;
+
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.665);
   public static Distance simStartHeight = Meters.of(0.665);
@@ -63,7 +60,7 @@ public class Elevator extends SubsystemBase {
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
-  public static Distance toleranceOnReachedGoal = Meters.of(0.005);
+  public static Distance toleranceOnReachedGoal = Centimeters.of(1);
   public static TalonFX elevatorMotor = new TalonFX(18);
   public static LinearVelocity maxVelocity = MetersPerSecond.of(0.5);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.7);
@@ -92,15 +89,20 @@ public class Elevator extends SubsystemBase {
           simStartHeight.in(Meters),
           90));
 
-  TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
+  private TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(
           maxVelocity.in(MetersPerSecond),
           maxAcceleration.in(MetersPerSecondPerSecond)));
-  TrapezoidProfile.State targetState = new State(0, 0);
-  TrapezoidProfile.State endState = new State(0, 0);
 
-  PIDController elevatorPID = new PIDController(10, 1, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 4);
+  private TrapezoidProfile.State targetState = new State(0, 0);
+  private TrapezoidProfile.State endState = new State(0, 0);
+
+  private boolean isHomed = false;
+  private boolean closedLoop = false;
+  private boolean motorInverted = false;
+
+  private PIDController elevatorPID = new PIDController(0, 0, 0);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 4);
 
   @SuppressWarnings("removal")
   public Elevator() {
@@ -119,49 +121,49 @@ public class Elevator extends SubsystemBase {
   }
 
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
-    // Mutable holder for unit-safe linear distance values, persisted to avoid
-    // reallocation.
-    private final MutDistance m_distance = Meters.mutable(0);
-    // Mutable holder for unit-safe linear velocity values, persisted to avoid
-    // reallocation.
-    private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid
+  // reallocation.
+  private final MutDistance m_distance = Meters.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid
+  // reallocation.
+  private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
-    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-            new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism(
-                    // Tell SysId how to plumb the driving voltage to the motors.
-                    voltage -> {
-                        runVolts(voltage);
-                    },
-                    // Tell SysId how to record a frame of data for each motor on the mechanism
-                    // being
-                    // characterized.
-                    log -> {
-                        // Record a frame for the left motors. Since these share an encoder, we consider
-                        // the entire group to be one motor.
-                        log.motor("front-left")
-                                .voltage(
-                                        m_appliedVoltage.mut_replace(
-                                                elevatorMotor.getMotorVoltage().getValueAsDouble(),
-                                                Volts))
-                                .linearPosition(m_distance.mut_replace(getPosition().in(Meters), Meters))
-                                .linearVelocity(
-                                        m_velocity.mut_replace(getVelocity().in(MetersPerSecond),
-                                                MetersPerSecond));
-                        // Record a frame for the right motors. Since these share an encoder, we
-                        // consider
-                        // the entire group to be one motor.
-                    },
-                    (Subsystem) // Tell SysId to make generated commands require this subsystem, suffix test
-                                // state in
-                    // WPILog with this subsystem's name ("drive")
-                    this));
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motors.
+          voltage -> {
+            runVolts(voltage);
+          },
+          // Tell SysId how to record a frame of data for each motor on the mechanism
+          // being
+          // characterized.
+          log -> {
+            // Record a frame for the left motors. Since these share an encoder, we consider
+            // the entire group to be one motor.
+            log.motor("front-left")
+                .voltage(
+                    m_appliedVoltage.mut_replace(
+                        elevatorMotor.getMotorVoltage().getValueAsDouble(),
+                        Volts))
+                .linearPosition(m_distance.mut_replace(getPosition().in(Meters), Meters))
+                .linearVelocity(
+                    m_velocity.mut_replace(getVelocity().in(MetersPerSecond),
+                        MetersPerSecond));
+            // Record a frame for the right motors. Since these share an encoder, we
+            // consider
+            // the entire group to be one motor.
+          },
+          (Subsystem) // Tell SysId to make generated commands require this subsystem, suffix test
+                      // state in
+          // WPILog with this subsystem's name ("drive")
+          this));
 
   @Override
   public void periodic() {
     if (isHomed == false) {
-      setVolts(Volts.of(-0.5));
+      setVolts(Volts.of(-0.1));
       if (getLimitSwitch()) {
         isHomed = true;
         elevatorMotor.setPosition(minHeight.in(Meters) / outputRatio);
@@ -230,12 +232,36 @@ public class Elevator extends SubsystemBase {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
   }
 
-  public Command goToPositionCommand(Distance position) {
+  public Command goToPositionCommand(Distance targetHeight) {
+    if (targetHeight.gt(maxHeight)) {
+      Exception exception = new Exception(
+          "WARNING: Elevator instructed to go higher than max height. " + targetHeight.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if (Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(maxHeight);
+    }
+    if (targetHeight.lt(minHeight)) {
+      Exception exception = new Exception(
+          "WARNING: Elevator instructed to go lower than min height. " + targetHeight.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if (Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(minHeight);
+    }
+    return goToPositionCommandPrivate(targetHeight);
+  }
+
+  private Command goToPositionCommandPrivate(Distance targetHeight) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
-      runClosedLoopSetGoal(position);
-    }, this).until(() -> isAtTarget(position)).handleInterrupt(() -> {
+      runClosedLoopSetGoal(targetHeight);
+    }, this).until(() -> isAtTarget(targetHeight)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
       endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
@@ -256,6 +282,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02 : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
+    return m_sysIdRoutine.dynamic(direction).until(
+        () -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02
+            : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
   }
 }

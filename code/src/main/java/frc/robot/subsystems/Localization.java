@@ -41,20 +41,20 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
 public class Localization extends SubsystemBase {
-
     Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
     Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
+
+    public static final String LimeLightFront = "limelight-front";
+    public static final String LimeLightBack = "limelight-back";
+    
     boolean applyLimePositioning = true; // For now, log only, don't actually apply to odometry
 
     @NotLogged
     SwerveDrive swerve;
-
-    ADIS16470_IMU gyro = new ADIS16470_IMU();
-    public static final String LimeLightFront = "limelight-front";
-    public static final String LimeLightBack = "limelight-back";
-
     @NotLogged
     SwerveDriveOdometry odometry;
+
+    ADIS16470_IMU gyro = new ADIS16470_IMU();
 
     Pose2d backLimelight = null;
     Pose2d frontLimelight = null;
