@@ -59,7 +59,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.45); //0.2 the encoder value - 0.25 for standard position.
+  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.39); //-0.14 the encoder value - 0.25 for standard position.
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
   public static Angle tolerance = Degrees.of(3);
