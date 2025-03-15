@@ -4,8 +4,10 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
 import java.util.function.DoubleSupplier;
@@ -151,7 +153,7 @@ public class RobotContainer {
     coralSubsystemTest();
     configureBindings();
     // elevatorTest();
-    // armTest();
+    //armTest();
     sysIDSwerve();
     // sysIDElevator();
     // sysIDArm();
@@ -178,6 +180,26 @@ public class RobotContainer {
       SmartDashboard.putData("Command/L3", moveToLevel3());
       SmartDashboard.putData("Command/L4", moveToLevel4());
 
+      SmartDashboard.putData("ElevatorID/Volts0", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.22)));
+      SmartDashboard.putData("ElevatorID/Volts1", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.24)));
+      SmartDashboard.putData("ElevatorID/Volts2", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.26)));
+      SmartDashboard.putData("ElevatorID/Volts3", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.28)));
+      SmartDashboard.putData("ElevatorID/Volts4", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.30)));
+
+      SmartDashboard.putData("ElevatorSetpoints/0.0", elevatorSubsystem.goToPositionCommand(Meters.of(0.0)));
+      SmartDashboard.putData("ElevatorSetpoints/0.2", elevatorSubsystem.goToPositionCommand(Meters.of(0.2)));
+      SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
+      SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
+
+      SmartDashboard.putData("arm/Volts0", arm.runOpenLoopCommand(Volts.of(0.1)));
+      SmartDashboard.putData("arm/Volts1", arm.runOpenLoopCommand(Volts.of(0.15)));
+      SmartDashboard.putData("arm/Volts2", arm.runOpenLoopCommand(Volts.of(0.2)));
+      SmartDashboard.putData("arm/Volts3", arm.runOpenLoopCommand(Volts.of(0.25)));
+      SmartDashboard.putData("arm/Volts4", arm.runOpenLoopCommand(Volts.of(0.3)));
+
+      SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
+      SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
+      SmartDashboard.putData("ArmSetpoints/45", arm.goToPositionCommand(Degrees.of(45)));
 
       SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
       SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
