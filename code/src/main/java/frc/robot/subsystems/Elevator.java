@@ -182,7 +182,6 @@ public class Elevator extends SubsystemBase {
       setpointState = next;
     }
     elevatorMech2d.setLength(getPosition().in(Meters));
-    // This method will be called once per scheduler run
   }
 
   @Override
