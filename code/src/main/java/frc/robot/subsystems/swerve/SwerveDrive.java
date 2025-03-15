@@ -169,7 +169,7 @@ public class SwerveDrive extends SubsystemBase {
     };
 
     public double exponentialResponseCurve(double input) {
-        return Math.pow(input, 5);
+        return Math.pow(input, 3);
     }
 
     public SwerveModulePosition[] getModulePositions() {
