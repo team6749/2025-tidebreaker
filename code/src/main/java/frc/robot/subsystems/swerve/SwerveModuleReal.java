@@ -28,9 +28,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 @Logged
 public class SwerveModuleReal implements SwerveModuleBase {
+  private Alert encoderDisconnectedAlert;
+
   public TalonFX driveMotor;
   public TalonFX angleMotor;
   public CANcoder encoder;
@@ -43,6 +47,7 @@ public class SwerveModuleReal implements SwerveModuleBase {
 
   /** Creates a new SwerveModule. */
   public SwerveModuleReal(int driveMotorPort, int angleMotorPort, int encoderPort) {
+    encoderDisconnectedAlert = new Alert("Swerve module encoder " + encoderPort + " disconnected", AlertType.kError);
 
     driveMotor = new TalonFX(driveMotorPort);
     angleMotor = new TalonFX(angleMotorPort);
@@ -64,6 +69,7 @@ public class SwerveModuleReal implements SwerveModuleBase {
     position = Meters.of(driveMotor.getPosition().getValue().in(Rotations) / SwerveConstants.driveReduction
         * SwerveConstants.wheelCircumference.in(Meters));
     // This method will be called once per scheduler run
+    encoderDisconnectedAlert.set(encoder.isConnected() == false);
   }
 
 

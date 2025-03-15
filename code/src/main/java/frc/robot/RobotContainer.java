@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.ArmCommands;
@@ -190,6 +192,16 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
+      SmartDashboard.putData("arm/Volts0", arm.runOpenLoopCommand(Volts.of(0.1)));
+      SmartDashboard.putData("arm/Volts1", arm.runOpenLoopCommand(Volts.of(0.15)));
+      SmartDashboard.putData("arm/Volts2", arm.runOpenLoopCommand(Volts.of(0.2)));
+      SmartDashboard.putData("arm/Volts3", arm.runOpenLoopCommand(Volts.of(0.25)));
+      SmartDashboard.putData("arm/Volts4", arm.runOpenLoopCommand(Volts.of(0.3)));
+
+      SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
+      SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
+      SmartDashboard.putData("ArmSetpoints/45", arm.goToPositionCommand(Degrees.of(45)));
+
       SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
       SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
       SmartDashboard.putData("Align/C", poiCommands.pathToCoralC());
@@ -223,12 +235,12 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void coralSubsystemTest() {
-    // buttonHome.whileTrue(home());
-    // buttonL2.whileTrue(moveToLevel2());
-    // buttonL3.whileTrue(moveToLevel3());
-    // buttonL4.whileTrue(moveToLevel4());
-    // buttonIntake.whileTrue(intake());
-    // buttonScore.whileTrue(score());
+    buttonHome.whileTrue(home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intake());
+    buttonScore.whileTrue(score());
   }
 
   private void sysIDSwerve() {
@@ -308,7 +320,14 @@ public class RobotContainer {
   private Command intake() {
     Command command = Commands.sequence(Commands.parallel(
         elevatorCommands.home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
+        armCommands.intakePosition()),
+        elevatorCommands.intakePosition(),
+        // Run open loop to push into the game piece for a few tenths
+        Commands.race(
+            elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.75)),
+            new WaitCommand(0.3)),
+        // Return to closed loop control after 0.3 seconds
+        elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }
@@ -316,7 +335,7 @@ public class RobotContainer {
   private Command score() {
     Command command = Commands.parallel(
         armCommands.score());
-        elevatorCommands.home();
+    elevatorCommands.home();
     command.setName("Score");
     return command;
   }
