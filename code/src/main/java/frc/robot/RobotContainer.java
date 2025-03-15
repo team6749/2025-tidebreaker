@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.ArmCommands;
@@ -153,7 +154,7 @@ public class RobotContainer {
     coralSubsystemTest();
     configureBindings();
     // elevatorTest();
-    //armTest();
+    // armTest();
     sysIDSwerve();
     // sysIDElevator();
     // sysIDArm();
@@ -234,12 +235,12 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void coralSubsystemTest() {
-    // buttonHome.whileTrue(home());
-    // buttonL2.whileTrue(moveToLevel2());
-    // buttonL3.whileTrue(moveToLevel3());
-    // buttonL4.whileTrue(moveToLevel4());
-    // buttonIntake.whileTrue(intake());
-    // buttonScore.whileTrue(score());
+    buttonHome.whileTrue(home());
+    buttonL2.whileTrue(moveToLevel2());
+    buttonL3.whileTrue(moveToLevel3());
+    buttonL4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intake());
+    buttonScore.whileTrue(score());
   }
 
   private void sysIDSwerve() {
@@ -319,7 +320,14 @@ public class RobotContainer {
   private Command intake() {
     Command command = Commands.sequence(Commands.parallel(
         elevatorCommands.home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
+        armCommands.intakePosition()),
+        elevatorCommands.intakePosition(),
+        // Run open loop to push into the game piece for a few tenths
+        Commands.race(
+            elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.75)),
+            new WaitCommand(0.3)),
+        // Return to closed loop control after 0.3 seconds
+        elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }
@@ -327,7 +335,7 @@ public class RobotContainer {
   private Command score() {
     Command command = Commands.parallel(
         armCommands.score());
-        elevatorCommands.home();
+    elevatorCommands.home();
     command.setName("Score");
     return command;
   }
