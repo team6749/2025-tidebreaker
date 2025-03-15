@@ -97,6 +97,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    m_robotContainer.intakeDropper.disabledInit();
   }
 
   @Override
