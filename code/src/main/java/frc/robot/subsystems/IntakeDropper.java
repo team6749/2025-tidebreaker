@@ -4,15 +4,35 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@Logged
 public class IntakeDropper extends SubsystemBase {
   
+    Servo servo = new Servo(0);
+    public static final double HOLD = 1;
+    public static final double DROP = 0;
+
   /** Creates a new IntakeDropper. */
-  public IntakeDropper() {}
+  public IntakeDropper() {
+    servo.set(HOLD);
+  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+
   }
+    // This method will be called once per scheduler run
+    
+    public Command drop() {
+      return Commands.run(() ->servo.set(DROP), this);
+    }
+
+    public Command hold() {
+      return Commands.run(() -> servo.set(HOLD), this);
+    }
 }

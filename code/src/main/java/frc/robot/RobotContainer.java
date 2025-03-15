@@ -39,6 +39,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.IntakeDropper;
 
 @Logged
 public class RobotContainer {
@@ -52,6 +53,7 @@ public class RobotContainer {
   ElevatorCommands elevatorCommands;
   ArmCommands armCommands;
   POICommands poiCommands;
+  IntakeDropper intakeDropper;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
@@ -61,6 +63,7 @@ public class RobotContainer {
   JoystickButton x = new JoystickButton(controller, 3);
   JoystickButton b = new JoystickButton(controller, 2);
   JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton startButton = new JoystickButton(controller, 8);
   JoystickButton rightBumper = new JoystickButton(controller, 5);
   JoystickButton leftBumper = new JoystickButton(controller, 6);
   DoubleSupplier rightTrigger = () -> controller.getRawAxis(3);
@@ -101,6 +104,7 @@ public class RobotContainer {
     elevatorCommands = new ElevatorCommands(elevatorSubsystem);
     armCommands = new ArmCommands(arm);
     climberSubsystem = new ClimberSubsystem();
+    intakeDropper = new IntakeDropper();
 
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intake());
@@ -156,6 +160,7 @@ public class RobotContainer {
     sysIDSwerve();
     // sysIDElevator();
     // sysIDArm();
+    
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -165,6 +170,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
+
+    startButton.debounce(3).whileTrue(intakeDropper.drop());
 
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
@@ -204,6 +211,11 @@ public class RobotContainer {
       SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
       SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
       SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
+
+      SmartDashboard.putData("Intake/Drop", intakeDropper.drop());
+      SmartDashboard.putData("Intake/Hold", intakeDropper.hold());
+
+
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
     }
