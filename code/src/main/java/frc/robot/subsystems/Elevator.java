@@ -60,10 +60,10 @@ public class Elevator extends SubsystemBase {
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
-  public static Distance toleranceOnReachedGoal = Centimeters.of(1);
+  public static Distance toleranceOnReachedGoal = Centimeters.of(2);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.4);
-  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.4);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.7);
+  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
@@ -101,8 +101,8 @@ public class Elevator extends SubsystemBase {
   private boolean closedLoop = false;
   private boolean motorInverted = false;
 
-  private PIDController elevatorPID = new PIDController(5, 0, 0);
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 6);
+  private PIDController elevatorPID = new PIDController(20, 0, 0);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.20, 13);
 
   @SuppressWarnings("removal")
   public Elevator() {
@@ -142,7 +142,7 @@ public class Elevator extends SubsystemBase {
           log -> {
             // Record a frame for the left motors. Since these share an encoder, we consider
             // the entire group to be one motor.
-            log.motor("front-left")
+            log.motor("elevator")
                 .voltage(
                     m_appliedVoltage.mut_replace(
                         elevatorMotor.getMotorVoltage().getValueAsDouble(),
@@ -156,8 +156,6 @@ public class Elevator extends SubsystemBase {
             // the entire group to be one motor.
           },
           (Subsystem) // Tell SysId to make generated commands require this subsystem, suffix test
-                      // state in
-          // WPILog with this subsystem's name ("drive")
           this));
 
   @Override
@@ -184,7 +182,6 @@ public class Elevator extends SubsystemBase {
       setpointState = next;
     }
     elevatorMech2d.setLength(getPosition().in(Meters));
-    // This method will be called once per scheduler run
   }
 
   @Override
@@ -219,7 +216,7 @@ public class Elevator extends SubsystemBase {
     setVolts(voltInput);
   }
 
-  public void runClosedLoopSetGoal(Distance goal) {
+  private void runClosedLoopSetGoal(Distance goal) {
     targetState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
