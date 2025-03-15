@@ -62,7 +62,7 @@ public class Elevator extends SubsystemBase {
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Centimeters.of(2);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.7);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.9);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
