@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.651379074327336,
-        "y": 6.301607843908196
+        "x": 5.606919116266824,
+        "y": 6.342011692721942
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.022848360655738,
-        "y": 5.277715163934426
+        "x": 5.130737704918032,
+        "y": 5.481506147540983
       },
       "prevControl": {
-        "x": 5.185051464680966,
-        "y": 5.56226742163265
+        "x": 5.264965897780322,
+        "y": 5.69241558839398
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -121.65127288671255
+    "rotation": -120.79030868800552
   },
   "reversed": false,
   "folder": "coral_paths",
