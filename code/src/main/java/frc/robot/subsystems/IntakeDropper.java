@@ -17,6 +17,10 @@ public class IntakeDropper extends SubsystemBase {
     public static final double HOLD = 1;
     public static final double DROP = 0;
 
+    public void disabledInit () {
+      servo.set(HOLD);
+    }
+
   /** Creates a new IntakeDropper. */
   public IntakeDropper() {
     servo.set(HOLD);
