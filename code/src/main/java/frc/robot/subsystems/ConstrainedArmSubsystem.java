@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
@@ -59,15 +61,15 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.39); //-0.14 the encoder value - 0.25 for standard position.
+  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.394); //-0.144 the encoder value - 0.25 for standard position.
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
-  public static Angle tolerance = Degrees.of(3);
+  public static Angle tolerance = Degrees.of(2.5);
   public static Angle maxAngle = Degrees.of(90);
   public static Angle minAngle = Degrees.of(-90);
 
-  private PIDController armPID = new PIDController(0, 0, 0);
-  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 2.5);
+  private PIDController armPID = new PIDController(2, 0, 0);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.2, 0.82);
   private TalonFX armMotor = new TalonFX(Constants.armMotorID);
   private DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
@@ -78,8 +80,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
 
-  AngularVelocity maxVelocity = RadiansPerSecond.of(0.6);
-  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(0.5); // to do, find these values.
+  AngularVelocity maxVelocity = DegreesPerSecond.of(75);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(90); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
           maxAcceleration.in(RadiansPerSecondPerSecond)));
@@ -273,8 +275,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     closedLoop = false;
   }
 
-  public Command runOpenLoopCommand(Voltage Volts, Angle angle) {
-    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this).until(() -> isAtTarget(angle));
+  public Command runOpenLoopCommand(Voltage Volts) {
+    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
