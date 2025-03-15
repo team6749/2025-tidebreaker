@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
@@ -33,6 +34,9 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -42,25 +46,24 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 @Logged
 public class Elevator extends SubsystemBase {
-  boolean isHomed = false;
-  boolean closedLoop = false;
-  boolean motorInverted = false;
+
   public static Distance minHeight = Meters.of(0);
-  public static Distance maxHeight = Meters.of(0.65);
-  public static Distance simStartHeight = Meters.of(0.65);
+  public static Distance maxHeight = Meters.of(0.665);
+  public static Distance simStartHeight = Meters.of(0.665);
   public static double gearboxRatio = (4.0 / 1.0) * (5.0 / 1.0);
   public static Mass carriageMass = Kilograms.of(4);
   public static Distance sprocketDiameter = Centimeters.of(5.3);
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
-  public static Distance toleranceOnReachedGoal = Meters.of(0.015);
+  public static Distance toleranceOnReachedGoal = Centimeters.of(2);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.2);
-  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(0.5);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.7);
+  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
@@ -86,15 +89,20 @@ public class Elevator extends SubsystemBase {
           simStartHeight.in(Meters),
           90));
 
-  TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
+  private TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(
           maxVelocity.in(MetersPerSecond),
           maxAcceleration.in(MetersPerSecondPerSecond)));
-  TrapezoidProfile.State targetState = new State(0, 0);
-  TrapezoidProfile.State endState = new State(0, 0);
 
-  PIDController elevatorPID = new PIDController(10, 0, 0);
-  ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.1, 2);
+  private TrapezoidProfile.State targetState = new State(0, 0);
+  private TrapezoidProfile.State setpointState = new State(0, 0);
+
+  private boolean isHomed = false;
+  private boolean closedLoop = false;
+  private boolean motorInverted = false;
+
+  private PIDController elevatorPID = new PIDController(20, 0, 0);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.20, 13);
 
   @SuppressWarnings("removal")
   public Elevator() {
@@ -111,6 +119,44 @@ public class Elevator extends SubsystemBase {
     }
     SmartDashboard.putData("Elevator Sim", mech2d);
   }
+
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid
+  // reallocation.
+  private final MutDistance m_distance = Meters.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid
+  // reallocation.
+  private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motors.
+          voltage -> {
+            runVolts(voltage);
+          },
+          // Tell SysId how to record a frame of data for each motor on the mechanism
+          // being
+          // characterized.
+          log -> {
+            // Record a frame for the left motors. Since these share an encoder, we consider
+            // the entire group to be one motor.
+            log.motor("elevator")
+                .voltage(
+                    m_appliedVoltage.mut_replace(
+                        elevatorMotor.getMotorVoltage().getValueAsDouble(),
+                        Volts))
+                .linearPosition(m_distance.mut_replace(getPosition().in(Meters), Meters))
+                .linearVelocity(
+                    m_velocity.mut_replace(getVelocity().in(MetersPerSecond),
+                        MetersPerSecond));
+            // Record a frame for the right motors. Since these share an encoder, we
+            // consider
+            // the entire group to be one motor.
+          },
+          (Subsystem) // Tell SysId to make generated commands require this subsystem, suffix test
+          this));
 
   @Override
   public void periodic() {
@@ -129,14 +175,13 @@ public class Elevator extends SubsystemBase {
         resetProfileState();
         return;
       }
-      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), targetState, endState);
-      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), targetState.position));
+      var next = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), setpointState, targetState);
+      Voltage PIDOutput = Volts.of(elevatorPID.calculate(getPosition().in(Meters), setpointState.position));
       Voltage feedForwardOutput = Volts.of(feedforward.calculate(next.velocity));
       setVolts(PIDOutput.plus(feedForwardOutput));
-      targetState = next;
+      setpointState = next;
     }
     elevatorMech2d.setLength(getPosition().in(Meters));
-    // This method will be called once per scheduler run
   }
 
   @Override
@@ -171,27 +216,51 @@ public class Elevator extends SubsystemBase {
     setVolts(voltInput);
   }
 
-  public void runClosedLoopSetGoal(Distance goal) {
-    endState = new TrapezoidProfile.State(goal.in(Meters), 0);
+  private void runClosedLoopSetGoal(Distance goal) {
+    targetState = new TrapezoidProfile.State(goal.in(Meters), 0);
     closedLoop = true;
   }
 
   public void resetProfileState() {
-    targetState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
+    setpointState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
   public Command runOpenLoopCommand(Voltage Volts) {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
   }
 
-  public Command goToPositionCommand(Distance position) {
+  public Command goToPositionCommand(Distance targetHeight) {
+    if (targetHeight.gt(maxHeight)) {
+      Exception exception = new Exception(
+          "WARNING: Elevator instructed to go higher than max height. " + targetHeight.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if (Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(maxHeight);
+    }
+    if (targetHeight.lt(minHeight)) {
+      Exception exception = new Exception(
+          "WARNING: Elevator instructed to go lower than min height. " + targetHeight.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if (Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(minHeight);
+    }
+    return goToPositionCommandPrivate(targetHeight);
+  }
+
+  private Command goToPositionCommandPrivate(Distance targetHeight) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
-      runClosedLoopSetGoal(position);
-    }, this).until(() -> isAtTarget(position)).handleInterrupt(() -> {
+      runClosedLoopSetGoal(targetHeight);
+    }, this).until(() -> isAtTarget(targetHeight)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
-      endState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+      targetState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
   }
 
@@ -203,5 +272,15 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
     closedLoop = false;
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction).until(
+        () -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Meters) > maxHeight.in(Meters) - 0.02
+            : getPosition().in(Meters) < minHeight.in(Meters) + 0.02);
   }
 }

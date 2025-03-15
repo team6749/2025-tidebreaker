@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -14,8 +16,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -23,7 +30,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.enums.DriveOrientation;
 import frc.robot.subsystems.Localization;
@@ -35,6 +44,80 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModuleBase frontRight;
     SwerveModuleBase backLeft;
     SwerveModuleBase backRight;
+
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+    // Mutable holder for unit-safe linear distance values, persisted to avoid
+    // reallocation.
+    private final MutDistance m_distance = Meters.mutable(0);
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid
+    // reallocation.
+    private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
+
+    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                    // Tell SysId how to plumb the driving voltage to the motors.
+                    voltage -> {
+                        setModuleOpenLoop(voltage);
+                    },
+                    // Tell SysId how to record a frame of data for each motor on the mechanism
+                    // being
+                    // characterized.
+                    log -> {
+                        // Record a frame for the left motors. Since these share an encoder, we consider
+                        // the entire group to be one motor.
+                        log.motor("front-left")
+                                .voltage(
+                                        m_appliedVoltage.mut_replace(
+                                                frontLeft.getState().speedMetersPerSecond
+                                                        * RobotController.getBatteryVoltage(),
+                                                Volts))
+                                .linearPosition(m_distance.mut_replace(frontLeft.getPosition().distanceMeters, Meters))
+                                .linearVelocity(
+                                        m_velocity.mut_replace(frontLeft.getState().speedMetersPerSecond,
+                                                MetersPerSecond));
+                        // Record a frame for the right motors. Since these share an encoder, we
+                        // consider
+                        // the entire group to be one motor.
+                        log.motor("front-right")
+                                .voltage(
+                                        m_appliedVoltage.mut_replace(
+                                                frontRight.getState().speedMetersPerSecond
+                                                        * RobotController.getBatteryVoltage(),
+                                                Volts))
+                                .linearPosition(m_distance.mut_replace(frontRight.getPosition().distanceMeters, Meters))
+                                .linearVelocity(
+                                        m_velocity.mut_replace(frontRight.getState().speedMetersPerSecond,
+                                                MetersPerSecond));
+
+                        log.motor("back-left")
+                                .voltage(
+                                        m_appliedVoltage.mut_replace(
+                                                backLeft.getState().speedMetersPerSecond
+                                                        * RobotController.getBatteryVoltage(),
+                                                Volts))
+                                .linearPosition(m_distance.mut_replace(backLeft.getPosition().distanceMeters, Meters))
+                                .linearVelocity(
+                                        m_velocity.mut_replace(backLeft.getState().speedMetersPerSecond,
+                                                MetersPerSecond));
+
+                        log.motor("back-right")
+                                .voltage(
+                                        m_appliedVoltage.mut_replace(
+                                                backRight.getState().speedMetersPerSecond
+                                                        * RobotController.getBatteryVoltage(),
+                                                Volts))
+                                .linearPosition(m_distance.mut_replace(backRight.getPosition().distanceMeters, Meters))
+                                .linearVelocity(
+                                        m_velocity.mut_replace(backRight.getState().speedMetersPerSecond,
+                                                MetersPerSecond));
+                    },
+                    (Subsystem) // Tell SysId to make generated commands require this subsystem, suffix test
+                                // state in
+                    // WPILog with this subsystem's name ("drive")
+                    this));
 
     @NotLogged
     SwerveModuleBase[] modules = new SwerveModuleBase[4];
@@ -86,7 +169,7 @@ public class SwerveDrive extends SubsystemBase {
     };
 
     public double exponentialResponseCurve(double input) {
-        return Math.pow(input, 3);
+        return Math.pow(input, 5);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -145,26 +228,26 @@ public class SwerveDrive extends SubsystemBase {
 
         Command command = Commands.runEnd(() -> {
 
-            double xinput = -controller.getLeftY();
-            double yinput = -controller.getLeftX();
-            double zinput = -controller.getRightX();
+            double xInput = -controller.getLeftY();
+            double yInput = -controller.getLeftX();
+            double zInput = -controller.getRightX();
 
-            if (inputMagnitude(xinput, yinput) < Constants.deadZone) {
-                xinput = 0;
-                yinput = 0;
+            if (inputMagnitude(xInput, yInput) < Constants.deadZone) {
+                xInput = 0;
+                yInput = 0;
             }
-            if (inputMagnitude(zinput, 0) < Constants.deadZone) {
-                zinput = 0;
+            if (inputMagnitude(zInput, 0) < Constants.deadZone) {
+                zInput = 0;
             }
 
             ChassisSpeeds targetSpeeds = new ChassisSpeeds(
 
                     MetersPerSecond.of(SwerveConstants.driveLimiterY.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(xinput)).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(xInput)).in(MetersPerSecond))),
                     MetersPerSecond.of(SwerveConstants.driveLimiterX.calculate(SwerveConstants.maxLinearVelocity
-                            .times(exponentialResponseCurve(yinput)).in(MetersPerSecond))),
+                            .times(exponentialResponseCurve(yInput)).in(MetersPerSecond))),
                     RadiansPerSecond.of(SwerveConstants.driveLimiterTheta.calculate(SwerveConstants.maxAngularVelocity
-                            .times(exponentialResponseCurve(zinput)).in(RadiansPerSecond))));
+                            .times(exponentialResponseCurve(zInput)).in(RadiansPerSecond))));
 
             switch (orientationChooser.getSelected()) {
                 case FieldOriented:
@@ -202,4 +285,18 @@ public class SwerveDrive extends SubsystemBase {
         }, this);
         return command;
     }
+
+    public void setModuleOpenLoop(Voltage voltage) {
+        for (SwerveModuleBase module : modules) {
+            module.runOpenLoop(voltage, Volts.of(0));
+        }
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.quasistatic(direction);
+      }
+
+      public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.dynamic(direction);
+      }
 }
