@@ -10,11 +10,11 @@
     "5 start",
     "6 start",
     "7 start",
-    "intake to reef face",
-    "Reef face to intake",
     "algae_paths",
     "coral_paths",
-    "intakes"
+    "intake to reef face",
+    "intakes",
+    "reef_face_to_intake"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.0,
