@@ -42,6 +42,7 @@ import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.IntakeDropper;
+import frc.robot.subsystems.LightsSubsystem;
 
 @Logged
 public class RobotContainer {
@@ -56,6 +57,7 @@ public class RobotContainer {
   ArmCommands armCommands;
   POICommands poiCommands;
   IntakeDropper intakeDropper;
+  LightsSubsystem lights;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
@@ -107,6 +109,7 @@ public class RobotContainer {
     armCommands = new ArmCommands(arm);
     climberSubsystem = new ClimberSubsystem();
     intakeDropper = new IntakeDropper();
+    lights = new LightsSubsystem();
 
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intake());
@@ -172,6 +175,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
+
+    lights.setDefaultCommand(new LightsCommand(lights, climberSubsystem, elevatorSubsystem, arm));
 
     startButton.debounce(3).whileTrue(intakeDropper.drop());
 
