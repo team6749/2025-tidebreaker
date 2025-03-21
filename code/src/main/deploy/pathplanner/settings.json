@@ -10,23 +10,23 @@
     "5 start",
     "6 start",
     "7 start",
+    "intake to reef face",
+    "Reef face to intake",
     "algae_paths",
     "coral_paths",
-    "intake to reef face",
-    "intakes",
-    "reef_face_to_intake"
+    "intakes"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.0,
-  "defaultMaxAccel": 4.0,
-  "defaultMaxAngVel": 320.0,
-  "defaultMaxAngAccel": 720.0,
+  "defaultMaxAccel": 8.0,
+  "defaultMaxAngVel": 90.0,
+  "defaultMaxAngAccel": 360.0,
   "defaultNominalVoltage": 12.0,
   "robotMass": 74.088,
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
-  "driveWheelRadius": 0.048,
-  "driveGearing": 5.143,
+  "driveWheelRadius": 0.051,
+  "driveGearing": 6.82,
   "maxDriveSpeed": 5.5,
   "driveMotorType": "krakenX60",
   "driveCurrentLimit": 60.0,
@@ -41,7 +41,5 @@
   "brModuleY": -0.267,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": [
-    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.36,\"y\":0.0},\"size\":{\"width\":0.356,\"length\":0.229},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
-  ]
+  "robotFeatures": []
 }
