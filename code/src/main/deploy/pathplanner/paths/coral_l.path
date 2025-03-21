@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.1696035387686,
-        "y": 2.1150893676019833
+        "x": 14.190119341299313,
+        "y": 2.1389650707984784
       },
       "isLocked": false,
       "linkedName": null
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 13.876,
-        "y": 2.75
+        "y": 2.881
       },
       "prevControl": {
-        "x": 13.73539919151177,
-        "y": 3.035960224032012
+        "x": 13.733230435320554,
+        "y": 3.0862239055306215
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "reversed": false,
   "folder": "coral_paths",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 1.0,
     "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
