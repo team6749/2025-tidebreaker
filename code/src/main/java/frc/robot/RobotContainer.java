@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -13,6 +15,7 @@ import java.util.function.DoubleSupplier;
 import org.json.simple.parser.ParseException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -27,27 +30,32 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ConstrainedArmSubsystem;
+import frc.robot.Commands.POICommands;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.IntakeDropper;
 
 @Logged
 public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
-  Arm arm;
+  ConstrainedArmSubsystem arm;
   // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
   ArmCommands armCommands;
   POICommands poiCommands;
+  IntakeDropper intakeDropper;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
@@ -57,6 +65,7 @@ public class RobotContainer {
   JoystickButton x = new JoystickButton(controller, 3);
   JoystickButton b = new JoystickButton(controller, 2);
   JoystickButton y = new JoystickButton(controller, 4);
+  JoystickButton startButton = new JoystickButton(controller, 8);
   JoystickButton rightBumper = new JoystickButton(controller, 5);
   JoystickButton leftBumper = new JoystickButton(controller, 6);
   DoubleSupplier rightTrigger = () -> controller.getRawAxis(3);
@@ -90,13 +99,22 @@ public class RobotContainer {
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
-    arm = new Arm();
+    arm = new ConstrainedArmSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
     elevatorCommands = new ElevatorCommands(elevatorSubsystem);
     armCommands = new ArmCommands(arm);
     climberSubsystem = new ClimberSubsystem();
+    intakeDropper = new IntakeDropper();
+
+    NamedCommands.registerCommand("home", home());
+    NamedCommands.registerCommand("intake", intake());
+    NamedCommands.registerCommand("score", score());
+    NamedCommands.registerCommand("l2", moveToLevel2());
+    NamedCommands.registerCommand("l3", moveToLevel3());
+    NamedCommands.registerCommand("l4", moveToLevel4());
+
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
       // Configure AutoBuilder last
@@ -137,14 +155,17 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("autoChooser", autoChooser);
 
-    // coralSubsystemTest();
+    coralSubsystemTest();
     configureBindings();
     // elevatorTest();
     // armTest();
+    //sysIDSwerve();
+    // sysIDElevator();
+    // sysIDArm();
+    
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -152,12 +173,42 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
+    startButton.debounce(3).whileTrue(intakeDropper.drop());
+
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
     }, localizationSubsystem));
 
     try {
+      SmartDashboard.putData("Command/Home", home());
+      SmartDashboard.putData("Command/Score", score());
+      SmartDashboard.putData("Command/Intake", intake());
+      SmartDashboard.putData("Command/L2", moveToLevel2());
+      SmartDashboard.putData("Command/L3", moveToLevel3());
+      SmartDashboard.putData("Command/L4", moveToLevel4());
+
+      SmartDashboard.putData("ElevatorID/Volts0", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.22)));
+      SmartDashboard.putData("ElevatorID/Volts1", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.24)));
+      SmartDashboard.putData("ElevatorID/Volts2", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.26)));
+      SmartDashboard.putData("ElevatorID/Volts3", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.28)));
+      SmartDashboard.putData("ElevatorID/Volts4", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.30)));
+
+      SmartDashboard.putData("ElevatorSetpoints/0.0", elevatorSubsystem.goToPositionCommand(Meters.of(0.0)));
+      SmartDashboard.putData("ElevatorSetpoints/0.2", elevatorSubsystem.goToPositionCommand(Meters.of(0.2)));
+      SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
+      SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
+
+      SmartDashboard.putData("arm/Volts0", arm.runOpenLoopCommand(Volts.of(0.1)));
+      SmartDashboard.putData("arm/Volts1", arm.runOpenLoopCommand(Volts.of(0.15)));
+      SmartDashboard.putData("arm/Volts2", arm.runOpenLoopCommand(Volts.of(0.2)));
+      SmartDashboard.putData("arm/Volts3", arm.runOpenLoopCommand(Volts.of(0.25)));
+      SmartDashboard.putData("arm/Volts4", arm.runOpenLoopCommand(Volts.of(0.3)));
+
+      SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
+      SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
+      SmartDashboard.putData("ArmSetpoints/45", arm.goToPositionCommand(Degrees.of(45)));
+
       SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
       SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
       SmartDashboard.putData("Align/C", poiCommands.pathToCoralC());
@@ -172,38 +223,26 @@ public class RobotContainer {
       SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
       SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
       SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
+
+      SmartDashboard.putData("Intake/Drop", intakeDropper.drop());
+      SmartDashboard.putData("Intake/Hold", intakeDropper.hold());
+
+
     } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
-    rightBumper.whileTrue(climberSubsystem.climbCommand());
-    leftBumper.whileTrue(climberSubsystem.unclimbCommand());
-    buttonHome.whileTrue(home());
-    buttonL2.whileTrue(moveToLevel2());
-    buttonL3.whileTrue(moveToLevel3());
-    buttonL4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intake());
-    buttonScore.whileTrue(score());
-    a.whileTrue(climberSubsystem.climbCommand());
-    b.whileTrue(climberSubsystem.unclimbCommand());
   }
 
   @SuppressWarnings("unused")
   private void elevatorTest() {
-    y.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l1));
-    b.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l2));
-    x.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l3));
-    a.whileTrue(elevatorSubsystem.goToPositionCommand(Constants.ElevatorSetPoints.l4));
-    rightBumper.whileTrue(elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.3)));
+    a.whileTrue(elevatorSubsystem.goToPositionCommand(Meters.of(0.33)));
   }
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.runOpenLoopCommand(Volts.of(0.5), Radians.of(0)));
-    y.whileTrue(arm.runOpenLoopCommand(Volts.of(1), Radians.of(1)));
-    b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
-    x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
+    a.whileTrue(arm.goToPositionCommand(Radians.of(0)));
+    // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
+    // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
 
   @SuppressWarnings("unused")
@@ -214,6 +253,27 @@ public class RobotContainer {
     buttonL4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
+  }
+
+  private void sysIDSwerve() {
+    a.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    x.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    y.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  private void sysIDElevator() {
+    a.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  private void sysIDArm() {
+    a.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   public Command getAutonomousCommand() {
@@ -237,7 +297,7 @@ public class RobotContainer {
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
-  public Command home() {
+  private Command home() {
     Command command = Commands.parallel(
         armCommands.Home(),
         elevatorCommands.home());
@@ -245,7 +305,7 @@ public class RobotContainer {
     return command;
   }
 
-  public Command moveToLevel2() {
+  private Command moveToLevel2() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel2(),
         armCommands.positionLevel2());
@@ -253,7 +313,7 @@ public class RobotContainer {
     return command;
   }
 
-  public Command moveToLevel3() {
+  private Command moveToLevel3() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel3(),
         armCommands.positionLevel3());
@@ -261,7 +321,7 @@ public class RobotContainer {
     return command;
   }
 
-  public Command moveToLevel4() {
+  private Command moveToLevel4() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel4(),
         armCommands.positionLevel4());
@@ -269,19 +329,27 @@ public class RobotContainer {
     return command;
   }
 
-  public Command intake() {
+  private Command intake() {
     Command command = Commands.sequence(Commands.parallel(
         elevatorCommands.home(),
-        armCommands.intakePosition()), elevatorCommands.intakePosition(), elevatorCommands.home());
+        armCommands.intakePosition()),
+        elevatorCommands.intakePosition(),
+        // Run open loop to push into the game piece for a few tenths
+        Commands.race(
+            elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.75)),
+            new WaitCommand(0.3)),
+        // Return to closed loop control after 0.3 seconds
+        elevatorCommands.home());
     command.setName("intake Coral");
     return command;
   }
 
-  public Command score() {
+  private Command score() {
     Command command = Commands.parallel(
         armCommands.score());
+    elevatorCommands.home();
     command.setName("Score");
     return command;
   }
-  
+
 }

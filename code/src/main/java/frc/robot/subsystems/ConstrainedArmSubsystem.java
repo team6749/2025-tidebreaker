@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
@@ -31,6 +33,9 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -47,32 +52,36 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 @Logged
-public class Arm extends SubsystemBase {
-  Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
+public class ConstrainedArmSubsystem extends SubsystemBase {
+  private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
-  boolean closedLoop = false;
-  boolean encoderConnected = true;
-  boolean motorInverted = true;;
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Radians.of(RobotBase.isSimulation() ? 0 : -0.22);
-  PIDController armPID = new PIDController(0, 0, 0);
-  ArmFeedforward feedForward = new ArmFeedforward(0, 0.1, 1);
-  TalonFX armMotor = new TalonFX(Constants.armMotorID);
-  DCMotor m_armGearbox = DCMotor.getFalcon500(1);
-
+  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.394); //-0.144 the encoder value - 0.25 for standard position.
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
-  public static Angle tolerance = Radians.of(0.04);
+  public static Angle tolerance = Degrees.of(2.5);
+  public static Angle maxAngle = Degrees.of(90);
+  public static Angle minAngle = Degrees.of(-90);
+
+  private PIDController armPID = new PIDController(2, 0, 0);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.2, 0.82);
+  private TalonFX armMotor = new TalonFX(Constants.armMotorID);
+  private DCMotor m_armGearbox = DCMotor.getFalcon500(1);
+
+  private boolean closedLoop = false;
+  private boolean encoderConnected = true;
+  private boolean motorInverted = true;
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
-  Angle maxAngle = Degrees.of(90);
-  Angle minAngle = Degrees.of(-90);
-  AngularVelocity maxVelocity = RadiansPerSecond.of(0.2);
-  AngularAcceleration maxAcceleration = RadiansPerSecondPerSecond.of(0.3); // to do, find these values.
+
+  AngularVelocity maxVelocity = DegreesPerSecond.of(100);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(90); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
           maxAcceleration.in(RadiansPerSecondPerSecond)));
@@ -109,11 +118,45 @@ public class Arm extends SubsystemBase {
           3,
           new Color8Bit(Color.kYellow)));
 
-  TrapezoidProfile.State desiredState = new State(0, 0);
-  TrapezoidProfile.State currentState = new State(0, 0);
+  TrapezoidProfile.State targetState = new State(0, 0);
+  TrapezoidProfile.State setpointState = new State(0, 0);
+
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle m_angle = Radians.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
+
+  // Create a new SysId routine for characterizing the shooter.
+  private final SysIdRoutine m_sysIdRoutine =
+      new SysIdRoutine(
+          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+          new SysIdRoutine.Config(),
+          new SysIdRoutine.Mechanism(
+              // Tell SysId how to plumb the driving voltage to the motor(s).
+              voltage -> {
+              setVolts(voltage);
+              },
+              // Tell SysId how to record a frame of data for each motor on the mechanism being
+              // characterized.
+              log -> {
+                // Record a frame for the shooter motor.
+                log.motor("arm")
+                    .voltage(
+                        m_appliedVoltage.mut_replace(
+                            armMotor.getMotorVoltage().getValueAsDouble(), Volts))
+                    .angularPosition(m_angle.mut_replace(getPosition().in(Rotations), Rotations))
+                    .angularVelocity(
+                        m_velocity.mut_replace(getVelocity().in(RotationsPerSecond), RotationsPerSecond));
+              },
+              // Tell SysId to make generated commands require this subsystem, suffix test state in
+              // WPILog with this subsystem's name ("shooter")
+              this));
 
   /** Creates a new Arm. */
-  public Arm() {
+  public ConstrainedArmSubsystem() {
+    stop();
     SmartDashboard.putData("Arm Sim", mech2d);
 
 
@@ -142,13 +185,13 @@ public class Arm extends SubsystemBase {
         return;
       }
       var currentAngle = getPosition();
-      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), currentState, desiredState);
+      var nextState = trapezoidProfile.calculate(Constants.simulationTimestep.in(Seconds), setpointState, targetState);
 
-      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), currentState.position));
-      Voltage feedForwardOutput = Volts.of(feedForward.calculate(currentState.position, currentState.velocity));
+      Voltage pidoutput = Volts.of(armPID.calculate(currentAngle.in(Radians), setpointState.position));
+      Voltage feedForwardOutput = Volts.of(feedForward.calculate(setpointState.position, setpointState.velocity));
 
       setVolts(pidoutput.plus(feedForwardOutput));
-      currentState = nextState;
+      setpointState = nextState;
     }
     armMech.setAngle(getPosition().in(Degrees));
 
@@ -156,7 +199,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void runClosedLoop(Angle desiredAngle) {
-    desiredState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
+    targetState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
     closedLoop = true;
   }
 
@@ -184,17 +227,40 @@ public class Arm extends SubsystemBase {
   }
 
   public void resetProfileState() {
-    currentState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
+    setpointState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
   }
 
-  public Command goToPositionArm(Angle desiredAngle) {
+   public Command goToPositionCommand(Angle desiredAngle) {
+    if(desiredAngle.gt(maxAngle)) {
+      Exception exception =  new Exception("WARNING: Arm instructed to go more than max angle. " + desiredAngle.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if(Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(maxAngle);
+    }
+    if(desiredAngle.lt(minAngle)) {
+      Exception exception =  new Exception("WARNING: Arm instructed to go less than min angle. " + desiredAngle.toString());
+      System.out.println(exception.getMessage());
+      exception.printStackTrace();
+      if(Robot.isSimulation()) {
+        // TODO: Crash the simulator
+      }
+      return goToPositionCommandPrivate(minAngle);
+    }
+    return goToPositionCommandPrivate(desiredAngle);
+  }
+
+
+  private Command goToPositionCommandPrivate(Angle desiredAngle) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
-      desiredState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
+      targetState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
   }
 
@@ -210,7 +276,15 @@ public class Arm extends SubsystemBase {
     closedLoop = false;
   }
 
-  public Command runOpenLoopCommand(Voltage Volts, Angle angle) {
-    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this).until(() -> isAtTarget(angle));
+  public Command runOpenLoopCommand(Voltage Volts) {
+    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2 : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
+  };
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2 : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
   }
 }
