@@ -174,7 +174,8 @@ public class RobotContainer {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
     startButton.debounce(3).whileTrue(intakeDropper.drop());
-
+    a.whileTrue(climberSubsystem.climbCommand());
+    b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
