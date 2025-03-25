@@ -1,3 +1,6 @@
 
 # prevent committing pathplanner deploy folders when people open the wrong directory
-deploy
+/deploy*
+
+
+/code/src/main/deploy/audit/*
