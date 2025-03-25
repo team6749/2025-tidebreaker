@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 @Logged
 public class SwerveModuleReal implements SwerveModuleBase {
   private Alert encoderDisconnectedAlert;
+  public boolean driveIsInverted = true;
 
   public TalonFX driveMotor;
   public TalonFX angleMotor;
@@ -51,6 +52,7 @@ public class SwerveModuleReal implements SwerveModuleBase {
 
     driveMotor = new TalonFX(driveMotorPort);
     angleMotor = new TalonFX(angleMotorPort);
+    driveMotor.setInverted(driveIsInverted);
     anglePID.enableContinuousInput(-Math.PI, Math.PI);
     encoder = new CANcoder(encoderPort);
     angleMotor.setNeutralMode(NeutralModeValue.Brake);
