@@ -71,31 +71,31 @@ public class RobotContainer {
   DoubleSupplier rightTrigger = () -> controller.getRawAxis(3);
   DoubleSupplier leftTrigger = () -> controller.getRawAxis(2);
 
-  JoystickButton buttonCoralJ = new JoystickButton(bottomButtonBoard, 1);
-  JoystickButton buttonCoralI = new JoystickButton(bottomButtonBoard, 2);
-  JoystickButton buttonCoralH = new JoystickButton(bottomButtonBoard, 3);
-  JoystickButton buttonCoralG = new JoystickButton(bottomButtonBoard, 4);
-  JoystickButton buttonCoralF = new JoystickButton(bottomButtonBoard, 5);
-  JoystickButton bottomButton6 = new JoystickButton(bottomButtonBoard, 6);
-  JoystickButton bottomButton7 = new JoystickButton(bottomButtonBoard, 7);
-  JoystickButton buttonCoralE = new JoystickButton(bottomButtonBoard, 8);
-  JoystickButton buttonCoralD = new JoystickButton(bottomButtonBoard, 9);
-  JoystickButton buttonCoralC = new JoystickButton(bottomButtonBoard, 10);
-  JoystickButton buttonCoralB = new JoystickButton(bottomButtonBoard, 11);
-  JoystickButton buttonCoralA = new JoystickButton(bottomButtonBoard, 12);
+  JoystickButton buttonLevel2 = new JoystickButton(bottomButtonBoard, 1);
+  JoystickButton buttonLevel3 = new JoystickButton(bottomButtonBoard, 2);
+  JoystickButton buttonLevel4 = new JoystickButton(bottomButtonBoard, 3);
+  JoystickButton buttonHome = new JoystickButton(bottomButtonBoard, 4);
+  JoystickButton buttonScore = new JoystickButton(bottomButtonBoard, 5);
+  JoystickButton buttonIntake = new JoystickButton(bottomButtonBoard, 6);
+  JoystickButton buttonTopAlgae = new JoystickButton(bottomButtonBoard, 7);
+  JoystickButton buttonBottomAlgae = new JoystickButton(bottomButtonBoard, 8);
+  JoystickButton buttonCoralC = new JoystickButton(bottomButtonBoard, 9);
+  JoystickButton buttonCoralD = new JoystickButton(bottomButtonBoard, 10);
+  JoystickButton buttonCoralF = new JoystickButton(bottomButtonBoard, 11);
+  JoystickButton buttonCoralE = new JoystickButton(bottomButtonBoard, 12);
 
-  JoystickButton buttonScore = new JoystickButton(topButtonBoard, 1);
-  JoystickButton buttonHome = new JoystickButton(topButtonBoard, 2);
-  JoystickButton buttonIntake = new JoystickButton(topButtonBoard, 3);
-  JoystickButton buttonL4 = new JoystickButton(topButtonBoard, 4);
-  JoystickButton buttonL3 = new JoystickButton(topButtonBoard, 5);
-  JoystickButton buttonTop6 = new JoystickButton(topButtonBoard, 6);
-  JoystickButton buttonTop7 = new JoystickButton(topButtonBoard, 7);
-  JoystickButton buttonL2 = new JoystickButton(topButtonBoard, 8);
-  JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 9);
+  JoystickButton buttonCoralL = new JoystickButton(topButtonBoard, 1);
+  JoystickButton buttonCoralK = new JoystickButton(topButtonBoard, 2);
+  JoystickButton buttonCoralJ = new JoystickButton(topButtonBoard, 3);
+  JoystickButton buttonCoralI = new JoystickButton(topButtonBoard, 4);
+  JoystickButton buttonCoralB = new JoystickButton(topButtonBoard, 5);
+  JoystickButton buttonIntakeDrop = new JoystickButton(topButtonBoard, 6);
+  JoystickButton buttonCoralH = new JoystickButton(topButtonBoard, 7);
+  JoystickButton buttonCoralA = new JoystickButton(topButtonBoard, 8);
+  JoystickButton buttonCage = new JoystickButton(topButtonBoard, 9);
   JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 10);
-  JoystickButton buttonCoralL = new JoystickButton(topButtonBoard, 11);
-  JoystickButton buttonCoralK = new JoystickButton(topButtonBoard, 12);
+  JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 11);
+  JoystickButton buttonCoralG = new JoystickButton(topButtonBoard, 12);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -191,8 +191,8 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorID/Volts0", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.22)));
       SmartDashboard.putData("ElevatorID/Volts1", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.24)));
       SmartDashboard.putData("ElevatorID/Volts2", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.26)));
-      SmartDashboard.putData("ElevatorID/Volts3", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.28)));
-      SmartDashboard.putData("ElevatorID/Volts4", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.30)));
+      SmartDashboard.putData("ElevatorID/Volts3", elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
+      SmartDashboard.putData("ElevatorID/Volts4", elevatorSubsystem.runOpenLoopCommand(Volts.of(2)));
 
       SmartDashboard.putData("ElevatorSetpoints/0.0", elevatorSubsystem.goToPositionCommand(Meters.of(0.0)));
       SmartDashboard.putData("ElevatorSetpoints/0.2", elevatorSubsystem.goToPositionCommand(Meters.of(0.2)));
@@ -248,9 +248,9 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private void coralSubsystemTest() {
     buttonHome.whileTrue(home());
-    buttonL2.whileTrue(moveToLevel2());
-    buttonL3.whileTrue(moveToLevel3());
-    buttonL4.whileTrue(moveToLevel4());
+    buttonLevel2.whileTrue(moveToLevel2());
+    buttonLevel3.whileTrue(moveToLevel3());
+    buttonLevel4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intake());
     buttonScore.whileTrue(score());
   }
