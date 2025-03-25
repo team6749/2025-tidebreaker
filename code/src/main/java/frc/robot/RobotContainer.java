@@ -93,8 +93,8 @@ public class RobotContainer {
   JoystickButton buttonCoralH = new JoystickButton(topButtonBoard, 7);
   JoystickButton buttonCoralA = new JoystickButton(topButtonBoard, 8);
   JoystickButton buttonCage = new JoystickButton(topButtonBoard, 9);
-  JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 10);
-  JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 11);
+  JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 10);
+  JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 11);
   JoystickButton buttonCoralG = new JoystickButton(topButtonBoard, 12);
 
   public RobotContainer() {
