@@ -12,7 +12,7 @@
         "y": 4.048097344884727
       },
       "isLocked": false,
-      "linkedName": "mid_start"
+      "linkedName": "start_mid"
     },
     {
       "anchor": {
@@ -45,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "start_mid",
+  "folder": "mid",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
