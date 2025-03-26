@@ -3,18 +3,12 @@
   "robotLength": 0.96,
   "holonomicMode": true,
   "pathFolders": [
-    "1 start",
-    "2 start",
-    "3 start",
-    "4 start",
-    "5 start",
-    "6 start",
-    "7 start",
+    "start_right",
     "algae_paths",
-    "coral to intake",
     "coral_paths",
-    "intake to coral",
-    "intakes"
+    "intakes",
+    "start_left",
+    "start_mid"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.5,

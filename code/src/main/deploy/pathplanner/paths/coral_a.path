@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 14.466548279925611,
-        "y": 3.8638163601418403
+        "x": 14.46,
+        "y": 3.891
       },
       "prevControl": {
-        "x": 14.965242983089288,
-        "y": 3.8633713054623904
+        "x": 14.958694703163678,
+        "y": 3.89055494532055
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.6848531282428
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "coral_paths",
