@@ -31,7 +31,6 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public Command climbCommand() {
-    // System.out.println("CLIMBING " + inputVoltage.in(Volts));
     return Commands.runEnd(() -> {
       climberMotor.setVoltage(inputVoltage.in(Volts));
     }, () -> {
