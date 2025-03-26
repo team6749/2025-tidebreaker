@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 @Logged
 public class SwerveModuleReal implements SwerveModuleBase {
   private Alert encoderDisconnectedAlert;
-  public boolean driveIsInverted = true;
+  public boolean driveIsInverted = false;
 
   public TalonFX driveMotor;
   public TalonFX angleMotor;
