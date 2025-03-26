@@ -17,8 +17,8 @@
     "intakes"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 4.0,
-  "defaultMaxAccel": 8.0,
+  "defaultMaxVel": 3.5,
+  "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 180.0,
   "defaultMaxAngAccel": 360.0,
   "defaultNominalVoltage": 12.0,
@@ -32,7 +32,7 @@
   "driveCurrentLimit": 60.0,
   "wheelCOF": 1.2,
   "flModuleX": 0.343,
-  "flModuleY": 0.2667,
+  "flModuleY": 0.267,
   "frModuleX": 0.343,
   "frModuleY": -0.267,
   "blModuleX": -0.3429,
@@ -41,5 +41,8 @@
   "brModuleY": -0.267,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"score\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.6,\"y\":0.0},\"radius\":0.06,\"strokeWidth\":0.07,\"filled\":false}}",
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":-0.35,\"y\":0.0},\"size\":{\"width\":0.41,\"length\":0.2},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }
