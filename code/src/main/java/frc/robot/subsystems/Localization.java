@@ -42,11 +42,11 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 
 @Logged
 public class Localization extends SubsystemBase {
-    Alert frontLimelightFailure = new Alert("Front Limelight Failure", AlertType.kError);
-    Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
+    Alert frontLeftLimelightFailure = new Alert("Front Left Limelight Failure", AlertType.kError);
+    Alert frontRightLimelightFailure = new Alert("Front Right Limelight Failure", AlertType.kError);
 
-    public static final String LimeLightFront = "limelight-front";
-    public static final String LimeLightBack = "limelight-back";
+    public static final String LimeLightFrontLeft = "limelight-fleft";
+    public static final String LimeLightFrontRight = "limelight-fright";
     
     boolean applyLimePositioning = true; // For now, log only, don't actually apply to odometry
 
@@ -57,8 +57,8 @@ public class Localization extends SubsystemBase {
 
     ADIS16470_IMU gyro = new ADIS16470_IMU();
 
-    Pose2d backLimelight = null;
-    Pose2d frontLimelight = null;
+    Pose2d frontLeftLimelight = null;
+    Pose2d frontRightLimelight = null;
 
     @NotLogged
     SwerveDrivePoseEstimator poseEstimator;
@@ -129,20 +129,20 @@ public class Localization extends SubsystemBase {
         odometry.update(getGyroAngle(), swerve.getModulePositions());
         poseEstimator.update(getGyroAngle(), swerve.getModulePositions());
 
-        LimelightHelpers.SetRobotOrientation(LimeLightFront,
+        LimelightHelpers.SetRobotOrientation(LimeLightFrontLeft,
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
-        PoseEstimate mt1Front = LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLightFront);
-        frontLimelightFailure.set(mt1Front == null);
-        if (mt1Front != null) {
-            frontLimelight = applyVisionUpdates(mt1Front);
+        PoseEstimate mt1FrontLeft = LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLightFrontLeft);
+        frontLeftLimelightFailure.set(mt1FrontLeft == null);
+        if (mt1FrontLeft != null) {
+            frontLeftLimelight = applyVisionUpdates(mt1FrontLeft);
         }
 
-        LimelightHelpers.SetRobotOrientation(LimeLightBack,
+        LimelightHelpers.SetRobotOrientation(LimeLightFrontRight,
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
-        PoseEstimate mt1Back = LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLightBack);
-        backLimelightFailure.set(mt1Back == null);
-        if (mt1Back != null) {
-            backLimelight = applyVisionUpdates(mt1Back);
+        PoseEstimate mt1FrontRight = LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLightFrontRight);
+        frontRightLimelightFailure.set(mt1FrontRight == null);
+        if (mt1FrontRight != null) {
+            frontRightLimelight = applyVisionUpdates(mt1FrontRight);
         }
 
         // Update Dashboard (this is for elastic/driver)
