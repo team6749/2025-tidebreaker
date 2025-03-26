@@ -97,6 +97,7 @@ public class Elevator extends SubsystemBase {
   private TrapezoidProfile.State targetState = new State(0, 0);
   private TrapezoidProfile.State setpointState = new State(0, 0);
 
+  private boolean isNear = false;
   private boolean isHomed = false;
   private boolean closedLoop = false;
   private boolean motorInverted = false;
@@ -255,10 +256,12 @@ public class Elevator extends SubsystemBase {
 
   private Command goToPositionCommandPrivate(Distance targetHeight) {
     return Commands.startRun(() -> {
+      isNear = false;
       resetProfileState();
     }, () -> {
       runClosedLoopSetGoal(targetHeight);
     }, this).until(() -> isAtTarget(targetHeight)).handleInterrupt(() -> {
+      isNear = true;
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
       targetState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
     });
@@ -272,6 +275,10 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
     closedLoop = false;
+  }
+
+  public boolean returnNearState() {
+    return isNear;
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

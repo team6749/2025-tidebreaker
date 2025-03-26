@@ -15,6 +15,7 @@ import frc.robot.Constants;
 
 @Logged
 public class ClimberSubsystem extends SubsystemBase {
+  Boolean isClimbing = false;
   Timer timer = new Timer();
   TalonFX climberMotor = new TalonFX(Constants.climberMotorPort);
   Voltage inputVoltage = Volts.of(2);
@@ -31,6 +32,7 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public Command climbCommand() {
+    isClimbing = true;
     return Commands.runEnd(() -> {
       climberMotor.setVoltage(inputVoltage.in(Volts));
     }, () -> {
@@ -46,7 +48,12 @@ public class ClimberSubsystem extends SubsystemBase {
     }, this);
   }
 
+  public Boolean isClimbing() {
+    return isClimbing;
+  }
+
   public void stop() {
+    isClimbing = false;
     climberMotor.setVoltage(0);
   }
 }

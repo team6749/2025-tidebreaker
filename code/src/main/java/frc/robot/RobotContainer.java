@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
+import frc.robot.Commands.LightsCommand;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -176,7 +177,7 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    lights.setDefaultCommand(new LightsCommand(lights, climberSubsystem, elevatorSubsystem, arm));
+    lights.setDefaultCommand(new LightsCommand(lights, climberSubsystem, arm, elevatorSubsystem));
 
     startButton.debounce(3).whileTrue(intakeDropper.drop());
 

@@ -61,7 +61,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.394); //-0.144 the encoder value - 0.25 for standard position.
+  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.394); // -0.144 the encoder value -
+                                                                                         // 0.25 for standard position.
   public static Distance armLength = Meters.of(0.2);
   public static Mass armMass = Kilograms.of(0.3);
   public static Angle tolerance = Degrees.of(2.5);
@@ -76,9 +77,9 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   private boolean closedLoop = false;
   private boolean encoderConnected = true;
   private boolean motorInverted = true;
+  public boolean isNear = false;
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
-
 
   AngularVelocity maxVelocity = DegreesPerSecond.of(100);
   AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(90); // to do, find these values.
@@ -121,38 +122,41 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   TrapezoidProfile.State targetState = new State(0, 0);
   TrapezoidProfile.State setpointState = new State(0, 0);
 
-    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  // Mutable holder for unit-safe linear distance values, persisted to avoid
+  // reallocation.
   private final MutAngle m_angle = Radians.mutable(0);
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid
+  // reallocation.
   private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
 
   // Create a new SysId routine for characterizing the shooter.
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(
-          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(),
-          new SysIdRoutine.Mechanism(
-              // Tell SysId how to plumb the driving voltage to the motor(s).
-              voltage -> {
-              setVolts(voltage);
-              },
-              // Tell SysId how to record a frame of data for each motor on the mechanism being
-              // characterized.
-              log -> {
-                // Record a frame for the shooter motor.
-                log.motor("arm")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            armMotor.getMotorVoltage().getValueAsDouble(), Volts))
-                    .angularPosition(m_angle.mut_replace(getPosition().in(Rotations), Rotations))
-                    .angularVelocity(
-                        m_velocity.mut_replace(getVelocity().in(RotationsPerSecond), RotationsPerSecond));
-              },
-              // Tell SysId to make generated commands require this subsystem, suffix test state in
-              // WPILog with this subsystem's name ("shooter")
-              this));
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motor(s).
+          voltage -> {
+            setVolts(voltage);
+          },
+          // Tell SysId how to record a frame of data for each motor on the mechanism
+          // being
+          // characterized.
+          log -> {
+            // Record a frame for the shooter motor.
+            log.motor("arm")
+                .voltage(
+                    m_appliedVoltage.mut_replace(
+                        armMotor.getMotorVoltage().getValueAsDouble(), Volts))
+                .angularPosition(m_angle.mut_replace(getPosition().in(Rotations), Rotations))
+                .angularVelocity(
+                    m_velocity.mut_replace(getVelocity().in(RotationsPerSecond), RotationsPerSecond));
+          },
+          // Tell SysId to make generated commands require this subsystem, suffix test
+          // state in
+          // WPILog with this subsystem's name ("shooter")
+          this));
 
   /** Creates a new Arm. */
   public ConstrainedArmSubsystem() {
@@ -229,21 +233,23 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     setpointState = new TrapezoidProfile.State(getPosition().in(Radians), getVelocity().in(RadiansPerSecond));
   }
 
-   public Command goToPositionCommand(Angle desiredAngle) {
-    if(desiredAngle.gt(maxAngle)) {
-      Exception exception =  new Exception("WARNING: Arm instructed to go more than max angle. " + desiredAngle.toString());
+  public Command goToPositionCommand(Angle desiredAngle) {
+    if (desiredAngle.gt(maxAngle)) {
+      Exception exception = new Exception(
+          "WARNING: Arm instructed to go more than max angle. " + desiredAngle.toString());
       System.out.println(exception.getMessage());
       exception.printStackTrace();
-      if(Robot.isSimulation()) {
+      if (Robot.isSimulation()) {
         // TODO: Crash the simulator
       }
       return goToPositionCommandPrivate(maxAngle);
     }
-    if(desiredAngle.lt(minAngle)) {
-      Exception exception =  new Exception("WARNING: Arm instructed to go less than min angle. " + desiredAngle.toString());
+    if (desiredAngle.lt(minAngle)) {
+      Exception exception = new Exception(
+          "WARNING: Arm instructed to go less than min angle. " + desiredAngle.toString());
       System.out.println(exception.getMessage());
       exception.printStackTrace();
-      if(Robot.isSimulation()) {
+      if (Robot.isSimulation()) {
         // TODO: Crash the simulator
       }
       return goToPositionCommandPrivate(minAngle);
@@ -251,13 +257,14 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     return goToPositionCommandPrivate(desiredAngle);
   }
 
-
   private Command goToPositionCommandPrivate(Angle desiredAngle) {
     return Commands.startRun(() -> {
+      isNear = false;
       resetProfileState();
     }, () -> {
       runClosedLoop(desiredAngle);
     }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
+      isNear = true;
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
       targetState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
     });
@@ -275,15 +282,23 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     closedLoop = false;
   }
 
+  public boolean returnNearState() {
+    return isNear;
+  }
+
   public Command runOpenLoopCommand(Voltage Volts) {
     return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2 : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
+    return m_sysIdRoutine.quasistatic(direction).until(
+        () -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2
+            : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
   };
 
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction).until(() -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2 : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
+    return m_sysIdRoutine.dynamic(direction).until(
+        () -> direction == SysIdRoutine.Direction.kForward ? getPosition().in(Radians) > maxAngle.in(Radians) - 0.2
+            : getPosition().in(Radians) < minAngle.in(Radians) + 0.2);
   }
 }

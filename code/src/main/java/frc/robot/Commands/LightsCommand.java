@@ -13,6 +13,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.LightsSubsystem;
 
 public class LightsCommand extends Command {
+    boolean coralSubsystemAtTarget = false;
     ClimberSubsystem m_climber;
     ConstrainedArmSubsystem m_arm;
     Elevator m_elevator;
@@ -37,15 +38,13 @@ public class LightsCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (m_climber.isCurrentlyClimbing()) { // works
+        if (m_climber.isClimbing()) { // works
             m_lights.violet();
-        } else if (arm.isNear()) { // works
+        } else if (coralSubsystemAtTarget()) { // works
             m_lights.aqua();
         } else if (beam.isBeamBreakTriggered()) { // works
             m_lights.green();
-        } else if(_climber.isAmplify() == true){
-            m_lights.amplificationCommand();
-        }else if (!_intake.isBeamBreakTriggered() && !_shooter.isShooting() && !_climber.isCurrentlyClimbing() && !_climber.isAmplify() && !m_lights.isCoopertition()){
+        } else if (!beam.isBeamBreakTriggered() && !coralSubsystemAtTarget() && !m_climber.isClimbing() && !m_lights.isCoopertition()){
             if (DriverStation.getAlliance().get() == Alliance.Blue) {
                 m_lights.blue();
             } else {
@@ -63,5 +62,13 @@ public class LightsCommand extends Command {
     @Override
     public boolean isFinished() {
         return false;
+    }
+
+    public boolean coralSubsystemAtTarget() {
+            coralSubsystemAtTarget = false;
+        if(m_elevator.returnNearState() && m_arm.returnNearState()) {
+            coralSubsystemAtTarget = true;
+        }
+        return coralSubsystemAtTarget;
     }
 }
