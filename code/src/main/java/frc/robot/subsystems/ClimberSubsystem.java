@@ -17,7 +17,7 @@ import frc.robot.Constants;
 public class ClimberSubsystem extends SubsystemBase {
   Timer timer = new Timer();
   TalonFX climberMotor = new TalonFX(Constants.climberMotorPort);
-  Voltage inputVoltage = Volts.of(2);
+  Voltage inputVoltage = Volts.of(3.5);
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
