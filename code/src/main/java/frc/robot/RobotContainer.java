@@ -49,7 +49,6 @@ public class RobotContainer {
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem arm;
-  // ArmSample armSample = new ArmSample();
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
@@ -109,8 +108,8 @@ public class RobotContainer {
     intakeDropper = new IntakeDropper();
 
     NamedCommands.registerCommand("home", home());
-    NamedCommands.registerCommand("intake", intake());
-    NamedCommands.registerCommand("score", score());
+    NamedCommands.registerCommand("intake", intakeAuto());
+    NamedCommands.registerCommand("score", scoreAuto());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
@@ -159,10 +158,10 @@ public class RobotContainer {
     configureBindings();
     // elevatorTest();
     // armTest();
-    //sysIDSwerve();
+    // sysIDSwerve();
     // sysIDElevator();
     // sysIDArm();
-    
+
     try {
       autoAlignTest();
     } catch (FileVersionException | IOException | ParseException e) {
@@ -182,8 +181,8 @@ public class RobotContainer {
 
     try {
       SmartDashboard.putData("Command/Home", home());
-      SmartDashboard.putData("Command/Score", score());
-      SmartDashboard.putData("Command/Intake", intake());
+      SmartDashboard.putData("Command/Score", scoreTeleop());
+      SmartDashboard.putData("Command/Intake", intakeTeleop());
       SmartDashboard.putData("Command/L2", moveToLevel2());
       SmartDashboard.putData("Command/L3", moveToLevel3());
       SmartDashboard.putData("Command/L4", moveToLevel4());
@@ -227,7 +226,6 @@ public class RobotContainer {
       SmartDashboard.putData("Intake/Drop", intakeDropper.drop());
       SmartDashboard.putData("Intake/Hold", intakeDropper.hold());
 
-
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
     }
@@ -251,8 +249,8 @@ public class RobotContainer {
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
     buttonLevel4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intake());
-    buttonScore.whileTrue(score());
+    buttonIntake.whileTrue(intakeTeleop());
+    buttonScore.whileTrue(scoreTeleop());
   }
 
   private void sysIDSwerve() {
@@ -308,7 +306,7 @@ public class RobotContainer {
   private Command moveToLevel2() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel2(),
-        armCommands.positionLevel2());
+        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance)).andThen(armCommands.positionLevel2()));
     command.setName("Level 2");
     return command;
   }
@@ -316,7 +314,7 @@ public class RobotContainer {
   private Command moveToLevel3() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel3(),
-        armCommands.positionLevel3());
+        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance)).andThen(armCommands.positionLevel3()));
     command.setName("Level 3");
     return command;
   }
@@ -324,30 +322,43 @@ public class RobotContainer {
   private Command moveToLevel4() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel4(),
-        armCommands.positionLevel4());
+        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance)).andThen(armCommands.positionLevel4()));
     command.setName("Level 4");
     return command;
   }
 
-  private Command intake() {
+  private Command intakeTeleop() {
+    Command command = Commands.sequence(
+        intakeAuto(),
+        elevatorCommands.home());
+    command.setName("intake Coral teleop");
+    return command;
+  }
+
+  // Intake auto does not return to the home position because this saves ~0.5 seconds
+  private Command intakeAuto() {
     Command command = Commands.sequence(Commands.parallel(
         elevatorCommands.home(),
         armCommands.intakePosition()),
         elevatorCommands.intakePosition(),
         // Run open loop to push into the game piece for a few tenths
         Commands.race(
-            elevatorSubsystem.runOpenLoopCommand(Volts.of(-0.75)),
-            new WaitCommand(0.3)),
-        // Return to closed loop control after 0.3 seconds
-        elevatorCommands.home());
-    command.setName("intake Coral");
+            elevatorSubsystem.runOpenLoopCommand(Volts.of(-1)),
+            new WaitCommand(0.3))
+        );
+    command.setName("intake Coral auto");
     return command;
   }
 
-  private Command score() {
-    Command command = Commands.parallel(
-        armCommands.score());
-    elevatorCommands.home();
+  // Scores just level 4
+  private Command scoreAuto() {
+    Command command = arm.runOpenLoopCommand(Volts.of(-1)).withTimeout(0.4);
+    command.setName("Score Auto");
+    return command;
+  }
+
+  private Command scoreTeleop() {
+    Command command = armCommands.score();
     command.setName("Score");
     return command;
   }

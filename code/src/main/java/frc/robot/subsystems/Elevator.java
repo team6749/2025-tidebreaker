@@ -56,13 +56,14 @@ public class Elevator extends SubsystemBase {
   public static Distance simStartHeight = Meters.of(0.665);
   public static double gearboxRatio = (4.0 / 1.0) * (5.0 / 1.0);
   public static Mass carriageMass = Kilograms.of(4);
+  public static double simulationFriction = 0.6; // fudge factor to simulate loss due to friction to make the simulated elevator match the real one
   public static Distance sprocketDiameter = Centimeters.of(5.3);
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Centimeters.of(2);
   public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.9);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(1);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
@@ -205,7 +206,7 @@ public class Elevator extends SubsystemBase {
 
   private void setVolts(Voltage voltInput) {
     if (RobotBase.isSimulation()) {
-      simElevator.setInputVoltage(voltInput.in(Volts));
+      simElevator.setInputVoltage(voltInput.in(Volts) * simulationFriction);
     } else {
       elevatorMotor.setVoltage(voltInput.in(Volts));
     }

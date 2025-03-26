@@ -75,13 +75,12 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
 
   private boolean closedLoop = false;
   private boolean encoderConnected = true;
-  private boolean motorInverted = true;
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
+  AngularVelocity maxVelocity = DegreesPerSecond.of(240);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(180);
 
-  AngularVelocity maxVelocity = DegreesPerSecond.of(100);
-  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(90); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
           maxAcceleration.in(RadiansPerSecondPerSecond)));
