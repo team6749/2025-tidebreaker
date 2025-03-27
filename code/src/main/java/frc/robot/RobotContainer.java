@@ -338,10 +338,15 @@ public class RobotContainer {
 
   // Intake auto does not return to the home position because this saves ~0.5 seconds
   private Command intakeAuto() {
-    Command command = Commands.sequence(Commands.parallel(
+    Command command = Commands.sequence(
+      Commands.parallel(
         elevatorCommands.home(),
-        armCommands.intakePosition()),
-        elevatorCommands.intakeAction()
+        armCommands.intakePosition()
+      ),
+      Commands.race(
+      elevatorCommands.intakeAction(),
+      // adding a damping to the arm as it lowers to keep the arm flush against the end stop as the chain has slop
+      arm.runVoltsCommand(Volts.of(-0.5))) 
     );
     command.setName("intake Coral auto");
     return command;
