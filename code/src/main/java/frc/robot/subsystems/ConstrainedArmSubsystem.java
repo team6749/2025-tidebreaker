@@ -120,6 +120,9 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   TrapezoidProfile.State targetState = new State(0, 0);
   TrapezoidProfile.State setpointState = new State(0, 0);
 
+  private Angle lastPosition = simStartAngle;
+  private AngularVelocity lastVelocity = DegreesPerSecond.zero();
+
     // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
@@ -175,6 +178,10 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     encoderConnected = encoder.isConnected();
     encoderDisconnectedAlert.set(encoderConnected == false);
 
+    Angle nextPosition = getPosition();
+    lastVelocity = nextPosition.minus(lastPosition).div(Constants.simulationTimestep);
+    lastPosition = nextPosition;
+
     if (closedLoop) {
       if (encoderConnected == false) {
         System.out.println("WARNING: Arm encoder disconnected");
@@ -207,8 +214,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   }
 
   public AngularVelocity getVelocity() {
-    // TODO implement
-    return RotationsPerSecond.of(0);
+    return lastVelocity;
   }
 
   public Angle getPosition() {
