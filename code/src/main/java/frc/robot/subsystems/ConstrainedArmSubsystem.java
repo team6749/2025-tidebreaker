@@ -78,8 +78,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
-  AngularVelocity maxVelocity = DegreesPerSecond.of(240);
-  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(320);
+  AngularVelocity maxVelocity = DegreesPerSecond.of(180);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(360);
 
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
@@ -204,7 +204,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void runClosedLoop(Angle desiredAngle) {
+  private void runClosedLoop(Angle desiredAngle) {
     targetState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
     closedLoop = true;
   }
@@ -281,8 +281,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     closedLoop = false;
   }
 
-  public Command runOpenLoopCommand(Voltage Volts) {
-    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  public Command runVoltsCommand(Voltage volts) {
+    return Commands.runEnd(() -> runVolts(volts), () -> stop(), this);
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

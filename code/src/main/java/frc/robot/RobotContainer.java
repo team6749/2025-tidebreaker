@@ -188,22 +188,22 @@ public class RobotContainer {
       SmartDashboard.putData("Command/L3", moveToLevel3());
       SmartDashboard.putData("Command/L4", moveToLevel4());
 
-      SmartDashboard.putData("ElevatorID/Volts0", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.22)));
-      SmartDashboard.putData("ElevatorID/Volts1", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.24)));
-      SmartDashboard.putData("ElevatorID/Volts2", elevatorSubsystem.runOpenLoopCommand(Volts.of(0.26)));
-      SmartDashboard.putData("ElevatorID/Volts3", elevatorSubsystem.runOpenLoopCommand(Volts.of(1)));
-      SmartDashboard.putData("ElevatorID/Volts4", elevatorSubsystem.runOpenLoopCommand(Volts.of(2)));
+      SmartDashboard.putData("ElevatorID/Volts0", elevatorSubsystem.runVoltsCommand(Volts.of(0.22)));
+      SmartDashboard.putData("ElevatorID/Volts1", elevatorSubsystem.runVoltsCommand(Volts.of(0.24)));
+      SmartDashboard.putData("ElevatorID/Volts2", elevatorSubsystem.runVoltsCommand(Volts.of(0.26)));
+      SmartDashboard.putData("ElevatorID/Volts3", elevatorSubsystem.runVoltsCommand(Volts.of(1)));
+      SmartDashboard.putData("ElevatorID/Volts4", elevatorSubsystem.runVoltsCommand(Volts.of(2)));
 
       SmartDashboard.putData("ElevatorSetpoints/0.0", elevatorSubsystem.goToPositionCommand(Meters.of(0.0)));
       SmartDashboard.putData("ElevatorSetpoints/0.2", elevatorSubsystem.goToPositionCommand(Meters.of(0.2)));
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
-      SmartDashboard.putData("arm/Volts0", arm.runOpenLoopCommand(Volts.of(0.1)));
-      SmartDashboard.putData("arm/Volts1", arm.runOpenLoopCommand(Volts.of(0.15)));
-      SmartDashboard.putData("arm/Volts2", arm.runOpenLoopCommand(Volts.of(0.2)));
-      SmartDashboard.putData("arm/Volts3", arm.runOpenLoopCommand(Volts.of(0.25)));
-      SmartDashboard.putData("arm/Volts4", arm.runOpenLoopCommand(Volts.of(0.3)));
+      SmartDashboard.putData("arm/Volts0", arm.runVoltsCommand(Volts.of(0.1)));
+      SmartDashboard.putData("arm/Volts1", arm.runVoltsCommand(Volts.of(0.15)));
+      SmartDashboard.putData("arm/Volts2", arm.runVoltsCommand(Volts.of(0.2)));
+      SmartDashboard.putData("arm/Volts3", arm.runVoltsCommand(Volts.of(0.25)));
+      SmartDashboard.putData("arm/Volts4", arm.runVoltsCommand(Volts.of(0.3)));
 
       SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
       SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
@@ -341,19 +341,15 @@ public class RobotContainer {
     Command command = Commands.sequence(Commands.parallel(
         elevatorCommands.home(),
         armCommands.intakePosition()),
-        elevatorCommands.intakePosition(),
-        // Run open loop to push into the game piece for a few tenths
-        Commands.race(
-            elevatorSubsystem.runOpenLoopCommand(Volts.of(-1)),
-            new WaitCommand(0.3))
-        );
+        elevatorCommands.intakeAction()
+    );
     command.setName("intake Coral auto");
     return command;
   }
 
   // Scores just level 4
   private Command scoreAuto() {
-    Command command = arm.runOpenLoopCommand(Volts.of(-1)).withTimeout(0.4);
+    Command command = arm.runVoltsCommand(Volts.of(-1)).withTimeout(0.4);
     command.setName("Score Auto");
     return command;
   }
