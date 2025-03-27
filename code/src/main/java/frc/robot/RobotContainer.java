@@ -109,6 +109,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
+    NamedCommands.registerCommand("wait_for_coral", Commands.waitSeconds(1.25));
     NamedCommands.registerCommand("score", scoreAuto());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());

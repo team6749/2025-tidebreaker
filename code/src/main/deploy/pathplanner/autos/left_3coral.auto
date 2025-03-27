@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "left_to_i"
+                  "pathName": "left_to_j"
                 }
               }
             ]
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "i_to_intake"
+                  "pathName": "j_to_intake"
                 }
               },
               {
@@ -49,9 +49,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.5
+            "name": "wait_for_coral"
           }
         },
         {
@@ -105,9 +105,15 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.5
+            "name": "wait_for_coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
           }
         },
         {
@@ -136,9 +142,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "l_to_intake"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "l_to_intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "home"
+                }
+              }
+            ]
           }
         }
       ]
