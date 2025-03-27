@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.376288616595718,
-        "y": 4.191089451395248
+        "x": 7.583,
+        "y": 4.049391415832925
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.889242403374476,
-        "y": 4.1896093530249985
+        "x": 6.744819078947367,
+        "y": 4.140460526315789
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "start_mid"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 4.191089451395248
       },
       "prevControl": {
-        "x": 6.3883263730157305,
-        "y": 4.202107304889966
+        "x": 6.76428540803592,
+        "y": 4.184150469912966
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,10 +45,10 @@
     "rotation": -179.70321346992523
   },
   "reversed": false,
-  "folder": "coral_paths",
+  "folder": "mid",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.64632684075366
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

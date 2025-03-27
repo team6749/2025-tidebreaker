@@ -56,15 +56,16 @@ public class Elevator extends SubsystemBase {
   public static Distance simStartHeight = Meters.of(0.665);
   public static double gearboxRatio = (4.0 / 1.0) * (5.0 / 1.0);
   public static Mass carriageMass = Kilograms.of(4);
+  public static double simulationFriction = 0.6; // fudge factor to simulate loss due to friction to make the simulated elevator match the real one
   public static Distance sprocketDiameter = Centimeters.of(5.3);
   public BooleanSupplier limitSwitch;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Centimeters.of(2);
-  public static TalonFX elevatorMotor = new TalonFX(18);
-  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.9);
-  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
+  public static LinearVelocity maxVelocity = MetersPerSecond.of(0.8);
+  public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1.5);
 
+  private final TalonFX elevatorMotor = new TalonFX(18);
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
 
@@ -205,7 +206,7 @@ public class Elevator extends SubsystemBase {
 
   private void setVolts(Voltage voltInput) {
     if (RobotBase.isSimulation()) {
-      simElevator.setInputVoltage(voltInput.in(Volts));
+      simElevator.setInputVoltage(voltInput.in(Volts) * simulationFriction);
     } else {
       elevatorMotor.setVoltage(voltInput.in(Volts));
     }
@@ -216,8 +217,8 @@ public class Elevator extends SubsystemBase {
     setVolts(voltInput);
   }
 
-  private void runClosedLoopSetGoal(Distance goal) {
-    targetState = new TrapezoidProfile.State(goal.in(Meters), 0);
+  private void runClosedLoopSetGoal(Distance goal, LinearVelocity targetEndVelocity) {
+    targetState = new TrapezoidProfile.State(goal.in(Meters), targetEndVelocity.in(MetersPerSecond));
     closedLoop = true;
   }
 
@@ -225,8 +226,12 @@ public class Elevator extends SubsystemBase {
     setpointState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
   }
 
-  public Command runOpenLoopCommand(Voltage Volts) {
-    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  public Command runVoltsCommand(Voltage volts) {
+    return Commands.runEnd(() -> runVolts(volts), () -> stop(), this);
+  }
+
+  public Command runFeedForwardOpenLoopCommand(LinearVelocity goalVelocity) {
+    return Commands.runEnd(() -> runVolts(Volts.of(feedforward.calculate(goalVelocity.in(MetersPerSecond)))), () -> stop(), this);
   }
 
   public Command goToPositionCommand(Distance targetHeight) {
@@ -238,7 +243,7 @@ public class Elevator extends SubsystemBase {
       if (Robot.isSimulation()) {
         // TODO: Crash the simulator
       }
-      return goToPositionCommandPrivate(maxHeight);
+      return goToPositionCommandUnsafe(maxHeight);
     }
     if (targetHeight.lt(minHeight)) {
       Exception exception = new Exception(
@@ -248,16 +253,21 @@ public class Elevator extends SubsystemBase {
       if (Robot.isSimulation()) {
         // TODO: Crash the simulator
       }
-      return goToPositionCommandPrivate(minHeight);
+      return goToPositionCommandUnsafe(minHeight);
     }
-    return goToPositionCommandPrivate(targetHeight);
+    return goToPositionCommandUnsafe(targetHeight);
   }
 
-  private Command goToPositionCommandPrivate(Distance targetHeight) {
+  private Command goToPositionCommandUnsafe(Distance targetHeight) {
+    return getToStateCommandUnsafe(targetHeight, MetersPerSecond.zero());
+  }
+
+  /// Warning this command is unsafe, meaning it does not check for valid constraints nor is the end state well defined
+  public Command getToStateCommandUnsafe(Distance targetHeight, LinearVelocity targetEndVelocity) {
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
-      runClosedLoopSetGoal(targetHeight);
+      runClosedLoopSetGoal(targetHeight, targetEndVelocity);
     }, this).until(() -> isAtTarget(targetHeight)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
       targetState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
