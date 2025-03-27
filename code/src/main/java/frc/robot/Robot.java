@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
@@ -97,7 +100,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    //Intake should be set to hold the intake
     m_robotContainer.intakeDropper.disabledInit();
+
+    //Arm and Elevator should be set IN and DOWN
+    m_robotContainer.armCommands.intakePosition();
+    m_robotContainer.elevatorCommands.intakePosition();
+
   }
 
   @Override
