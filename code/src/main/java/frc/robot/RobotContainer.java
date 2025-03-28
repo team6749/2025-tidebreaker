@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.io.IOException;
@@ -23,6 +24,8 @@ import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -361,7 +364,14 @@ public class RobotContainer {
   }
 
   private Command scoreTeleop() {
-    Command command = armCommands.score();
+    Command command = Commands.sequence(
+      armCommands.score().withTimeout(Seconds.of(0.2)),
+      Commands.race(
+      armCommands.score(),
+      swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.5, 0 ,0)).withTimeout(Seconds.of(0.3))
+    ),
+    armCommands.score()
+    );
     command.setName("Score");
     return command;
   }
