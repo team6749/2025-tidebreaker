@@ -38,6 +38,7 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -58,7 +59,8 @@ public class Elevator extends SubsystemBase {
   public static Mass carriageMass = Kilograms.of(4);
   public static double simulationFriction = 0.6; // fudge factor to simulate loss due to friction to make the simulated elevator match the real one
   public static Distance sprocketDiameter = Centimeters.of(5.3);
-  public BooleanSupplier limitSwitch;
+  public BooleanSupplier isBottomLimitSwitchActivated;
+  public BooleanSupplier isCoralLimitSwitchActivated;
   // Total Ratio for elevator motor in meters
   public static double outputRatio = (1.0 / gearboxRatio) * sprocketDiameter.in(Meters) * Math.PI;
   public static Distance toleranceOnReachedGoal = Centimeters.of(2);
@@ -68,6 +70,9 @@ public class Elevator extends SubsystemBase {
   private final TalonFX elevatorMotor = new TalonFX(18);
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
+  public DigitalInput bottomLimitSwitch = new DigitalInput(3);
+  public DigitalInput coralLimitSwitch = new DigitalInput(4);
+
 
   private final ElevatorSim simElevator = new ElevatorSim(
       elevatorGearbox,
@@ -114,10 +119,14 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.getConfigurator().apply(angleMotorCurrentLimits);
 
     if (Robot.isSimulation()) {
-      limitSwitch = () -> getPosition().isNear(minHeight, Meters.of(0.01));
+      isBottomLimitSwitchActivated = () -> getPosition().isNear(minHeight, Meters.of(0.01));
+      isCoralLimitSwitchActivated = () -> true;
     } else {
-      limitSwitch = () -> true;
+      isBottomLimitSwitchActivated = () -> bottomLimitSwitch.get();
+      isCoralLimitSwitchActivated = () -> coralLimitSwitch.get();
     }
+    SmartDashboard.putBoolean("Elevator LimitSwitch Activated", isBottomLimitSwitchActivated.getAsBoolean());
+    SmartDashboard.putBoolean("Coral LimitSwitch Activated", isCoralLimitSwitchActivated.getAsBoolean());
     SmartDashboard.putData("Elevator Sim", mech2d);
   }
 
@@ -163,7 +172,7 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     if (isHomed == false) {
       setVolts(Volts.of(-0.1));
-      if (getLimitSwitch()) {
+      if (getIsBottomLimitSwitchActivated()) {
         isHomed = true;
         elevatorMotor.setPosition(minHeight.in(Meters) / outputRatio);
         stop();
@@ -274,8 +283,11 @@ public class Elevator extends SubsystemBase {
     });
   }
 
-  public boolean getLimitSwitch() {
-    return limitSwitch.getAsBoolean();
+  public boolean getIsBottomLimitSwitchActivated() {
+    return isBottomLimitSwitchActivated.getAsBoolean();
+  }
+  public boolean getIsCoralLimitSwitchActivated() {
+    return isCoralLimitSwitchActivated.getAsBoolean();
   }
 
   public void stop() {
