@@ -79,7 +79,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
   AngularVelocity maxVelocity = DegreesPerSecond.of(180);
-  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(360);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(420);
 
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),

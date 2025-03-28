@@ -55,25 +55,32 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "l4"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "intake_to_k"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "l4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -111,12 +118,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -127,9 +128,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "l4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "l4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
