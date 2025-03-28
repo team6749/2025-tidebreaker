@@ -53,4 +53,10 @@ public class ElevatorCommands {
         command.setName("Elevator Score Level 4");
         return command;
     }
+
+    public Command reHome() {
+        Command command = elevatorSubsystem.reHome();
+        command.setName("Elevator Score Level 4");
+        return command;
+    }
 }

@@ -231,6 +231,8 @@ public class RobotContainer {
       SmartDashboard.putData("Intake/Drop", intakeDropper.drop());
       SmartDashboard.putData("Intake/Hold", intakeDropper.hold());
 
+      SmartDashboard.putData("Elevator RE-HOME", elevatorCommands.reHome());
+
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
     }
