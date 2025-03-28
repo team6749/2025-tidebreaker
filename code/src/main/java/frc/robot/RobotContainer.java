@@ -162,7 +162,7 @@ public class RobotContainer {
     configureBindings();
     // elevatorTest();
     // armTest();
-    sysIDSwerve();
+    // sysIDSwerve();
     // sysIDElevator();
     // sysIDArm();
 
@@ -176,9 +176,9 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    startButton.debounce(3).whileTrue(intakeDropper.drop());
-    // a.whileTrue(climberSubsystem.climbCommand());
-    // b.whileTrue(climberSubsystem.unclimbCommand());
+    buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
+    a.whileTrue(climberSubsystem.climbCommand());
+    b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
