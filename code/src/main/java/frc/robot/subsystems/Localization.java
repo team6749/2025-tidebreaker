@@ -209,7 +209,7 @@ public class Localization extends SubsystemBase {
         if (robotAnglePerSecond.in(DegreesPerSecond) > 30) {
             returnValue = rejectValue;
         }
-        if (tagDistance.in(Meters) > 2.75) {
+        if (tagDistance.in(Meters) > 2.5) {
             returnValue = rejectValue;
         }
         // Speed range: 0 - 3 m/s
@@ -228,12 +228,6 @@ public class Localization extends SubsystemBase {
         /// enough for a simulated robot.
         ChassisSpeeds chassisSpeedsFromKinematics = SwerveConstants.kinematics
                 .toChassisSpeeds(swerve.getModuleStates());
-
-        var random = new Random();
-        if(random.nextDouble() > 0.8) {
-            // Introduce noise
-            
-        }
 
         // Update the gyro with the simulated data
         gyroSim.setGyroRateZ(Rotation2d.fromRadians(chassisSpeedsFromKinematics.omegaRadiansPerSecond).getDegrees());
