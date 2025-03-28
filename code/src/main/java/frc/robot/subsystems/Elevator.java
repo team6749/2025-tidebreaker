@@ -171,7 +171,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     if (isHomed == false) {
-      setVolts(Volts.of(-0.1));
+      setVolts(Volts.of(-0.5));
       if (getIsBottomLimitSwitchActivated()) {
         isHomed = true;
         elevatorMotor.setPosition(minHeight.in(Meters) / outputRatio);
@@ -291,7 +291,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command reHome() {
-    return Commands.runEnd(() -> isHomed = false, () -> stop(), this);
+    return Commands.runOnce(() -> isHomed = false, this);
   }
 
   public void stop() {
