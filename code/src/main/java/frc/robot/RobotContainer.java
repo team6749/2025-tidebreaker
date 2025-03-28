@@ -173,7 +173,7 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    startButton.debounce(3).whileTrue(intakeDropper.drop());
+    buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
     // a.whileTrue(climberSubsystem.climbCommand());
     // b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
