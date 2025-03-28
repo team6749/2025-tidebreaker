@@ -290,6 +290,10 @@ public class Elevator extends SubsystemBase {
     return isCoralLimitSwitchActivated.getAsBoolean();
   }
 
+  public Command reHome() {
+    return Commands.runEnd(() -> isHomed = false, () -> stop(), this);
+  }
+
   public void stop() {
     elevatorMotor.setVoltage(0);
     simElevator.setInputVoltage(0);
