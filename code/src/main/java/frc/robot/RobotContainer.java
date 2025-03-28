@@ -355,7 +355,7 @@ public class RobotContainer {
 
   // Scores just level 4
   private Command scoreAuto() {
-    Command command = arm.runVoltsCommand(Volts.of(-1)).withTimeout(0.4);
+    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
     return command;
   }
