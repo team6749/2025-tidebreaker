@@ -24,7 +24,7 @@ public class POICommands {
                 driveSubsystem = swerveDrive;
         }
 
-        PathConstraints constraints = new PathConstraints(3, 2, Degrees.of(180).in(Radians), Degrees.of(360).in(Radians));  // The constraints for this
+        PathConstraints constraints = new PathConstraints(2.5, 1.5, Degrees.of(120).in(Radians), Degrees.of(180).in(Radians));  // The constraints for this
                                                                                              // path.
         // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
         // You can also use unlimited constraints, only limited by motor torque and

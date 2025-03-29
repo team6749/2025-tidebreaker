@@ -25,7 +25,6 @@ import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -33,7 +32,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.ArmCommands;
@@ -112,7 +110,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
-    NamedCommands.registerCommand("wait_for_coral", Commands.waitSeconds(1.25));
+    NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem).until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(2.5));
     NamedCommands.registerCommand("score", scoreAuto());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
@@ -367,10 +365,10 @@ public class RobotContainer {
 
   private Command scoreTeleop() {
     Command command = Commands.sequence(
-      armCommands.score().withTimeout(Seconds.of(0.2)),
+      armCommands.score().withTimeout(Seconds.of(0.3)),
       Commands.race(
       armCommands.score(),
-      swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.5, 0 ,0)).withTimeout(Seconds.of(0.3))
+      swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0 ,0)).withTimeout(Seconds.of(0.75))
     ),
     armCommands.score()
     );

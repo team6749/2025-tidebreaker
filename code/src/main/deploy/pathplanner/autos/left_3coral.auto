@@ -9,15 +9,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "l4"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "left_to_j"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "l4"
                 }
               }
             ]
