@@ -75,7 +75,6 @@ public class Localization extends SubsystemBase {
     Field2d dashboardField = new Field2d();
 
     private final SendableChooser<Boolean> limelightToggleChooser = new SendableChooser<>();
-    private final SendableChooser<Boolean> limelightBackToggleChooser = new SendableChooser<>();
 
     public Localization(SwerveDrive swerve) {
 
@@ -111,10 +110,6 @@ public class Localization extends SubsystemBase {
         limelightToggleChooser.addOption("Disabled", false);
         limelightToggleChooser.setDefaultOption("Enabled", true);
         SmartDashboard.putData("Limelight Toggle", limelightToggleChooser);
-
-        limelightBackToggleChooser.addOption("Disabled", true);
-        limelightBackToggleChooser.setDefaultOption("Enabled", false);
-        SmartDashboard.putData("Limelight Back Toggle", limelightBackToggleChooser);
     }
 
     /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
