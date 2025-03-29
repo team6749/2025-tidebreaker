@@ -45,6 +45,9 @@ public class SwerveModuleReal implements SwerveModuleBase {
   public PIDController anglePID = new PIDController(3.7, 0, 0);
   public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.18, 2.45);
 
+  private SwerveModuleState closedLoopGoal = new SwerveModuleState();
+  private boolean isClosedLoop = false;
+
   /** Creates a new SwerveModule. */
   public SwerveModuleReal(int driveMotorPort, int angleMotorPort, int encoderPort) {
     encoderDisconnectedAlert = new Alert("Swerve module encoder " + encoderPort + " disconnected", AlertType.kError);
@@ -70,8 +73,22 @@ public class SwerveModuleReal implements SwerveModuleBase {
         * SwerveConstants.wheelCircumference.in(Meters));
     // This method will be called once per scheduler run
     encoderDisconnectedAlert.set(encoder.isConnected() == false);
-  }
 
+    if (isClosedLoop) {
+      SwerveModuleState currentState = getState();
+      SwerveModuleState desiredState = new SwerveModuleState(closedLoopGoal.speedMetersPerSecond, closedLoopGoal.angle);
+      desiredState.optimize(currentState.angle);
+      desiredState.cosineScale(currentState.angle);
+      Voltage driveOutput = Volts
+          .of(drivePID.calculate(currentState.speedMetersPerSecond, desiredState.speedMetersPerSecond));
+
+      Voltage angleOutput = Volts
+          .of(anglePID.calculate(MathUtil.angleModulus(currentState.angle.getRadians()),
+              desiredState.angle.getRadians()));
+      driveMotor.setVoltage((driveFeedForward.calculate(desiredState.speedMetersPerSecond) + driveOutput.in(Volts)));
+      angleMotor.setVoltage(-angleOutput.in(Volts));
+    }
+  }
 
   @Override
   public SwerveModuleState getState() {
@@ -84,30 +101,23 @@ public class SwerveModuleReal implements SwerveModuleBase {
   }
 
   @Override
-  public void runClosedLoop(SwerveModuleState inState) {
-    SwerveModuleState currentState = getState();
-    SwerveModuleState desiredState = new SwerveModuleState(inState.speedMetersPerSecond, inState.angle);
-    desiredState.optimize(currentState.angle);
-    desiredState.cosineScale(currentState.angle);
-    Voltage driveOutput = Volts
-        .of(drivePID.calculate(currentState.speedMetersPerSecond, desiredState.speedMetersPerSecond));
-
-    Voltage angleOutput = Volts
-        .of(anglePID.calculate(MathUtil.angleModulus(currentState.angle.getRadians()),
-            desiredState.angle.getRadians()));
-    driveMotor.setVoltage((driveFeedForward.calculate(desiredState.speedMetersPerSecond) + driveOutput.in(Volts)));
-    angleMotor.setVoltage(-angleOutput.in(Volts));
+  public void setClosedLoopGoal(SwerveModuleState inState) {
+    isClosedLoop = true;
+    closedLoopGoal = inState;
   }
 
   @Override
   public void runOpenLoop(Voltage drive, Voltage turn) {
+    isClosedLoop = false;
+    closedLoopGoal = new SwerveModuleState();
+
     driveMotor.setVoltage(drive.in(Volts));
     SwerveModuleState currentState = getState();
     SwerveModuleState desiredState = new SwerveModuleState(MetersPerSecond.of(0), Rotation2d.fromRadians(0));
-        Voltage angleOutput = Volts
+    Voltage angleOutput = Volts
         .of(anglePID.calculate(MathUtil.angleModulus(currentState.angle.getRadians()),
             desiredState.angle.getRadians()));
-            angleMotor.setVoltage(-angleOutput.in(Volts));
+    angleMotor.setVoltage(-angleOutput.in(Volts));
   }
 
   @Override

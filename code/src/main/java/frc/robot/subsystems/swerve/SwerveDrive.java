@@ -123,7 +123,8 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModuleBase[] modules = new SwerveModuleBase[4];
 
     // For logging purposes right now.
-    ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
+    @Logged
+    private ChassisSpeeds loggedTargetChassisSpeeds = new ChassisSpeeds();
 
     public SwerveDrive() {
         if (RobotBase.isSimulation()) {
@@ -196,13 +197,13 @@ public class SwerveDrive extends SubsystemBase {
     /// Chassis Speeds can saturate the modules, this method desaturates the modules
     public void runChassisSpeeds(ChassisSpeeds speeds) {
         loggedTargetChassisSpeeds = speeds;
-        runModuleStates(SwerveConstants.kinematics.toSwerveModuleStates(speeds));
+        setModuleStates(SwerveConstants.kinematics.toSwerveModuleStates(speeds));
     }
 
-    public void runModuleStates(SwerveModuleState[] states) {
+    private void setModuleStates(SwerveModuleState[] states) {
         loggedTargetChassisSpeeds = SwerveConstants.kinematics.toChassisSpeeds(states);
         for (int i = 0; i < states.length; i++) {
-            modules[i].runClosedLoop(states[i]);
+            modules[i].setClosedLoopGoal(states[i]);
         }
     }
 
@@ -264,7 +265,7 @@ public class SwerveDrive extends SubsystemBase {
             // Desaturate the input
             SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(targetSpeeds);
             SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConstants.maxLinearVelocity);
-            runModuleStates(states);
+            setModuleStates(states);
 
         }, () -> {
             stop();
@@ -279,7 +280,7 @@ public class SwerveDrive extends SubsystemBase {
             // targetSpeeds = new ChassisSpeeds(3,0,0);
             // targetSpeeds = new ChassisSpeeds(0,0.5,0);
             // targetSpeeds = new ChassisSpeeds(0,0,1);
-            runModuleStates(new SwerveModuleState[] { target, target, target, target });
+            setModuleStates(new SwerveModuleState[] { target, target, target, target });
         }, () -> {
             stop();
         }, this);
