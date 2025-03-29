@@ -39,6 +39,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
@@ -79,7 +80,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
   AngularVelocity maxVelocity = DegreesPerSecond.of(180);
-  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(360);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(420);
 
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),

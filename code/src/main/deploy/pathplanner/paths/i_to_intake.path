@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.33794060324523,
-        "y": 5.151384675571294
+        "x": 5.328368916176853,
+        "y": 5.167517429373982
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.695394736842105,
-        "y": 5.978207236842105
+        "x": 4.685823049773727,
+        "y": 5.994339990644793
       },
       "isLocked": false,
       "linkedName": "coral_i"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 360.0,
@@ -48,7 +48,7 @@
   "folder": "left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -120.8157057517292
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

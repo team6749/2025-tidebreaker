@@ -16,7 +16,7 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorCommands {
     Elevator elevatorSubsystem;
 
-    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.2);
+    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.25);
 
     public ElevatorCommands(Elevator elevator) {
         this.elevatorSubsystem = elevator;
@@ -50,6 +50,12 @@ public class ElevatorCommands {
 
     public Command positionLevel4() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.651));
+        command.setName("Elevator Score Level 4");
+        return command;
+    }
+
+    public Command reHome() {
+        Command command = elevatorSubsystem.reHome();
         command.setName("Elevator Score Level 4");
         return command;
     }

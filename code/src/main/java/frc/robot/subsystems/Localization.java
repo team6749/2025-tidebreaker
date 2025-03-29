@@ -46,11 +46,13 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 public class Localization extends SubsystemBase {
     Alert frontLeftLimelightFailure = new Alert("Front Left Limelight Failure", AlertType.kError);
     Alert frontRightLimelightFailure = new Alert("Front Right Limelight Failure", AlertType.kError);
+    Alert backLimelightFailure = new Alert("Back Limelight Failure", AlertType.kError);
 
     public static final String LimeLightFrontLeft = "limelight-fleft";
     public static final String LimeLightFrontRight = "limelight-fright";
-    
-    boolean applyLimePositioning = true; // For now, log only, don't actually apply to odometry
+    public static final String LimeLightBack = "limelight-back";
+
+    boolean applyLimePositioning = true;
 
     @NotLogged
     SwerveDrive swerve;
@@ -61,6 +63,8 @@ public class Localization extends SubsystemBase {
 
     Pose2d frontLeftLimelight = null;
     Pose2d frontRightLimelight = null;
+    Pose2d backLimelight = null;
+
 
     @NotLogged
     SwerveDrivePoseEstimator poseEstimator;
@@ -146,6 +150,16 @@ public class Localization extends SubsystemBase {
         if (mt1FrontRight != null) {
             frontRightLimelight = applyVisionUpdates(mt1FrontRight);
         }
+
+        // Since the back limelight is 3a, we may have issues.  Allow for a separate toggle for the back.
+            LimelightHelpers.SetRobotOrientation(LimeLightBack,
+                    poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
+            PoseEstimate mt1Back = LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLightBack);
+            backLimelightFailure.set(mt1Back == null);
+            if (mt1Back != null) {
+                backLimelight = applyVisionUpdates(mt1Back);
+            }
+
 
         // Update Dashboard (this is for elastic/driver)
         dashboardField.setRobotPose(getRobotPose());

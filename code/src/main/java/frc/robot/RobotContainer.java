@@ -162,7 +162,7 @@ public class RobotContainer {
     configureBindings();
     // elevatorTest();
     // armTest();
-    sysIDSwerve();
+    // sysIDSwerve();
     // sysIDElevator();
     // sysIDArm();
 
@@ -176,9 +176,9 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    startButton.debounce(3).whileTrue(intakeDropper.drop());
-    // a.whileTrue(climberSubsystem.climbCommand());
-    // b.whileTrue(climberSubsystem.unclimbCommand());
+    buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
+    a.whileTrue(climberSubsystem.climbCommand());
+    b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
@@ -230,6 +230,8 @@ public class RobotContainer {
 
       SmartDashboard.putData("Intake/Drop", intakeDropper.drop());
       SmartDashboard.putData("Intake/Hold", intakeDropper.hold());
+
+      SmartDashboard.putData("Elevator RE-HOME", elevatorCommands.reHome());
 
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
@@ -358,7 +360,7 @@ public class RobotContainer {
 
   // Scores just level 4
   private Command scoreAuto() {
-    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
+    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.3);
     command.setName("Score Auto");
     return command;
   }

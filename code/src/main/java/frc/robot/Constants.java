@@ -26,5 +26,5 @@ public class Constants {
     public static final int kTopButtonBoardPort = 2;
     public static final int kBottomButtonBoardPort = 3;
 
-    public static final Distance armClearance = Centimeters.of(5);
+    public static final Distance armClearance = Centimeters.of(3);
 }
