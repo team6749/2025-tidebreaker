@@ -5,6 +5,7 @@
 package frc.robot.Commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
@@ -48,8 +49,8 @@ public class ArmCommands {
     }
 
     public Command score() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-90));
-        command.setName("Arm Score Level 4");
+        Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(1);
+        command.setName("Arm Score");
         return command;
     }
 

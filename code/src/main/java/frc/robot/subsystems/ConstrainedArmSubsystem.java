@@ -39,6 +39,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
@@ -75,13 +76,12 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
 
   private boolean closedLoop = false;
   private boolean encoderConnected = true;
-  private boolean motorInverted = true;
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
+  AngularVelocity maxVelocity = DegreesPerSecond.of(180);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(420);
 
-  AngularVelocity maxVelocity = DegreesPerSecond.of(100);
-  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(90); // to do, find these values.
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),
           maxAcceleration.in(RadiansPerSecondPerSecond)));
@@ -121,6 +121,9 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   TrapezoidProfile.State targetState = new State(0, 0);
   TrapezoidProfile.State setpointState = new State(0, 0);
 
+  private Angle lastPosition = simStartAngle;
+  private AngularVelocity lastVelocity = DegreesPerSecond.zero();
+
     // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
@@ -159,6 +162,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     stop();
     SmartDashboard.putData("Arm Sim", mech2d);
 
+
     var angleMotorCurrentLimits = new CurrentLimitsConfigs().withStatorCurrentLimit(Amps.of(60))
         .withStatorCurrentLimitEnable(true);
     armMotor.getConfigurator().apply(angleMotorCurrentLimits);
@@ -174,6 +178,10 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     simArm.getOutput();
     encoderConnected = encoder.isConnected();
     encoderDisconnectedAlert.set(encoderConnected == false);
+
+    Angle nextPosition = getPosition();
+    lastVelocity = nextPosition.minus(lastPosition).div(Constants.simulationTimestep);
+    lastPosition = nextPosition;
 
     if (closedLoop) {
       if (encoderConnected == false) {
@@ -197,7 +205,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void runClosedLoop(Angle desiredAngle) {
+  private void runClosedLoop(Angle desiredAngle) {
     targetState = new TrapezoidProfile.State(desiredAngle.in(Radians), 0);
     closedLoop = true;
   }
@@ -207,8 +215,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   }
 
   public AngularVelocity getVelocity() {
-    // TODO implement
-    return RotationsPerSecond.of(0);
+    return lastVelocity;
   }
 
   public Angle getPosition() {
@@ -275,8 +282,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     closedLoop = false;
   }
 
-  public Command runOpenLoopCommand(Voltage Volts) {
-    return Commands.runEnd(() -> runVolts(Volts), () -> stop(), this);
+  public Command runVoltsCommand(Voltage volts) {
+    return Commands.runEnd(() -> runVolts(volts), () -> stop(), this);
   }
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

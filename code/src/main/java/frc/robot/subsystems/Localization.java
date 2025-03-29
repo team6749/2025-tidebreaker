@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Random;
+
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.epilogue.Logged;
@@ -201,20 +203,18 @@ public class Localization extends SubsystemBase {
         final Matrix<N3, N1> rejectValue = VecBuilder.fill(9999999, 9999999, 9999999);
         final Matrix<N3, N1> acceptValue = VecBuilder.fill(8, 8, 128);
         final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 24);
-
+        
+        // Start with assuming ideal conditions
         var returnValue = idealValue;
 
-        // Not Ideal but still accept Conditions
+        // Not Ideal but still accept with reduced confidence Conditions
         if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(0.3))) {
-            // reject when moving quickly
             returnValue = acceptValue;
         }
         if (robotAnglePerSecond.in(DegreesPerSecond) > 5) {
-            // reject when rotating
             returnValue = acceptValue;
         }
         if (tagDistance.in(Meters) > 1.5) {
-            // reject far away tags
             returnValue = acceptValue;
         }
 
@@ -223,15 +223,12 @@ public class Localization extends SubsystemBase {
             returnValue = rejectValue;
         }
         if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(2))) {
-            // reject when moving quickly
             returnValue = rejectValue;
         }
         if (robotAnglePerSecond.in(DegreesPerSecond) > 30) {
-            // reject when rotating
             returnValue = rejectValue;
         }
-        if (tagDistance.in(Meters) > 3) {
-            // reject far away tags
+        if (tagDistance.in(Meters) > 2.5) {
             returnValue = rejectValue;
         }
         // Speed range: 0 - 3 m/s

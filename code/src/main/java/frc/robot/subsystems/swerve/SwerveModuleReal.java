@@ -43,7 +43,7 @@ public class SwerveModuleReal implements SwerveModuleBase {
   private Distance position = Meters.zero();
   public PIDController drivePID = new PIDController(1.8, 0, 0);
   public PIDController anglePID = new PIDController(3.7, 0, 0);
-  public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(1, 2);
+  public SimpleMotorFeedforward driveFeedForward = new SimpleMotorFeedforward(0.18, 2.45);
 
   /** Creates a new SwerveModule. */
   public SwerveModuleReal(int driveMotorPort, int angleMotorPort, int encoderPort) {
