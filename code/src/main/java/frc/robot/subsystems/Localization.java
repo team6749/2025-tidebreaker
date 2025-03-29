@@ -155,7 +155,6 @@ public class Localization extends SubsystemBase {
         }
 
         // Since the back limelight is 3a, we may have issues.  Allow for a separate toggle for the back.
-        if (limelightBackToggleChooser.getSelected()) {
             LimelightHelpers.SetRobotOrientation(LimeLightBack,
                     poseEstimator.getEstimatedPosition().getRotation().getRadians(), 0, 0, 0, 0, 0);
             PoseEstimate mt1Back = LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLightBack);
@@ -163,7 +162,6 @@ public class Localization extends SubsystemBase {
             if (mt1Back != null) {
                 backLimelight = applyVisionUpdates(mt1Back);
             }
-        }
 
 
         // Update Dashboard (this is for elastic/driver)
