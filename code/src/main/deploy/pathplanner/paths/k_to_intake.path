@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9004585101623275,
-        "y": 5.733626087445489
+        "x": 3.290625,
+        "y": 5.730415239726027
       },
       "isLocked": false,
       "linkedName": "coral_k"
@@ -20,8 +20,8 @@
         "y": 7.023381025797601
       },
       "prevControl": {
-        "x": 2.0720623948807075,
-        "y": 6.38834813106076
+        "x": 1.8030821917808217,
+        "y": 6.631956335616438
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 3.75,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,

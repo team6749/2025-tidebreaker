@@ -111,7 +111,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
-        .until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(2.5));
+        .until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5));
     NamedCommands.registerCommand("score", scoreAuto());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
