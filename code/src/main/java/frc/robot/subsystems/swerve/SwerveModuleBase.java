@@ -13,7 +13,7 @@ public interface SwerveModuleBase {
     void periodic();
 
     // Tells the module to run to this state
-    void runClosedLoop(SwerveModuleState state);
+    void setClosedLoopGoal(SwerveModuleState state);
 
     // should apply open loop voltage to the motors.
     // Useful for running characterization

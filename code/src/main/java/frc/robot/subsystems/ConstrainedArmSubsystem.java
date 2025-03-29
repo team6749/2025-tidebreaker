@@ -70,7 +70,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   public static Angle minAngle = Degrees.of(-90);
 
   private PIDController armPID = new PIDController(2, 0, 0);
-  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.2, 0.82);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.2, 0.78);
   private TalonFX armMotor = new TalonFX(Constants.armMotorID);
   private DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 
@@ -78,9 +78,9 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   private boolean encoderConnected = true;
 
   DutyCycleEncoder encoder = new DutyCycleEncoder(2);
-
-  AngularVelocity maxVelocity = DegreesPerSecond.of(180);
-  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(420);
+ 
+  AngularVelocity maxVelocity = DegreesPerSecond.of(240);
+  AngularAcceleration maxAcceleration = DegreesPerSecondPerSecond.of(720);
 
   private final TrapezoidProfile trapezoidProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVelocity.in(RadiansPerSecond),

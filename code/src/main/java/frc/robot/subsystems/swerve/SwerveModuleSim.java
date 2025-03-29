@@ -37,6 +37,9 @@ public class SwerveModuleSim implements SwerveModuleBase {
     private PIDController driveController = new PIDController(2, 0, 0);
     private PIDController turnController = new PIDController(4, 0, 0);
 
+    private boolean isClosedLoop;
+    private SwerveModuleState closedLoopGoal;
+
     SwerveModuleSim() {
         turnController.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -45,37 +48,47 @@ public class SwerveModuleSim implements SwerveModuleBase {
     public void periodic() {
         driveSim.update(Constants.simulationTimestep.in(Seconds));
         turnSim.update(Constants.simulationTimestep.in(Seconds));
+
+        if (isClosedLoop) {
+            SwerveModuleState currentState = getState();
+
+            SwerveModuleState targetState = new SwerveModuleState(closedLoopGoal.speedMetersPerSecond,
+                    closedLoopGoal.angle);
+
+            targetState.optimize(currentState.angle);
+            targetState.cosineScale(currentState.angle);
+
+            driveController.setSetpoint(targetState.speedMetersPerSecond);
+            turnController.setSetpoint(targetState.angle.getRadians());
+
+            // Jank easy feed forward
+            Double driveVolts = (targetState.speedMetersPerSecond * 2.2)
+                    + driveController.calculate(currentState.speedMetersPerSecond);
+            Double turnVolts = turnController.calculate(currentState.angle.getRadians());
+
+            // Test max speed
+            // driveVolts = 12d;
+
+            // TODO eventually calculate the current draw of all simulated systems
+            // double drawAmps = driveSim.getCurrentDrawAmps() +
+            // turnSim.getCurrentDrawAmps();
+            // double voltage = BatterySim.calculateDefaultBatteryLoadedVoltage(drawAmps);
+
+            driveSim.setInputVoltage(clampVolts(driveVolts, 12));
+            turnSim.setInputVoltage(clampVolts(turnVolts, 12));
+        }
     }
 
     @Override
-    public void runClosedLoop(SwerveModuleState targetState) {
-        SwerveModuleState currentState = getState();
-
-        targetState.optimize(currentState.angle);
-        targetState.cosineScale(currentState.angle);
-
-        driveController.setSetpoint(targetState.speedMetersPerSecond);
-        turnController.setSetpoint(targetState.angle.getRadians());
-
-        // Jank easy feed forward
-        Double driveVolts = (targetState.speedMetersPerSecond * 2.2)
-                + driveController.calculate(currentState.speedMetersPerSecond);
-        Double turnVolts = turnController.calculate(currentState.angle.getRadians());
-
-        // Test max speed
-        // driveVolts = 12d;
-
-        // TODO eventually calculate the current draw of all simulated systems
-        // double drawAmps = driveSim.getCurrentDrawAmps() +
-        // turnSim.getCurrentDrawAmps();
-        // double voltage = BatterySim.calculateDefaultBatteryLoadedVoltage(drawAmps);
-
-        driveSim.setInputVoltage(clampVolts(driveVolts, 12));
-        turnSim.setInputVoltage(clampVolts(turnVolts, 12));
+    public void setClosedLoopGoal(SwerveModuleState targetState) {
+        isClosedLoop = true;
+        closedLoopGoal = targetState;
     }
 
     @Override
     public void runOpenLoop(Voltage drive, Voltage turn) {
+        isClosedLoop = false;
+        closedLoopGoal = new SwerveModuleState();
         driveSim.setInputVoltage(drive.in(Volts));
         turnSim.setInputVoltage(turn.in(Volts));
     }
@@ -87,7 +100,6 @@ public class SwerveModuleSim implements SwerveModuleBase {
                         * SwerveConstants.wheelCircumference.in(Meters),
                 Rotation2d.fromRadians(turnSim.getAngularPositionRad()));
     }
-
 
     @Override
     public SwerveModuleState getState() {
