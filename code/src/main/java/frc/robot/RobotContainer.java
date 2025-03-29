@@ -110,7 +110,8 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
-    NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem).until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(2.5));
+    NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
+        .until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(2.5));
     NamedCommands.registerCommand("score", scoreAuto());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
@@ -311,15 +312,17 @@ public class RobotContainer {
   private Command moveToLevel2() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel2(),
-        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance)).andThen(armCommands.positionLevel2()));
+        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
+            .andThen(armCommands.positionLevel2()));
     command.setName("Level 2");
     return command;
   }
 
   private Command moveToLevel3() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel3(),
-        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance)).andThen(armCommands.positionLevel3()));
+    Command command = Commands.sequence(
+        elevatorCommands.home(),
+        armCommands.positionLevel3(),
+        elevatorCommands.positionLevel3());
     command.setName("Level 3");
     return command;
   }
@@ -327,7 +330,8 @@ public class RobotContainer {
   private Command moveToLevel4() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel4(),
-        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance)).andThen(armCommands.positionLevel4()));
+        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
+            .andThen(armCommands.positionLevel4()));
     command.setName("Level 4");
     return command;
   }
@@ -340,18 +344,18 @@ public class RobotContainer {
     return command;
   }
 
-  // Intake auto does not return to the home position because this saves ~0.5 seconds
+  // Intake auto does not return to the home position because this saves ~0.5
+  // seconds
   private Command intakeAuto() {
     Command command = Commands.sequence(
-      Commands.parallel(
-        elevatorCommands.home(),
-        armCommands.intakePosition()
-      ),
-      Commands.race(
-      elevatorCommands.intakeAction(),
-      // adding a damping to the arm as it lowers to keep the arm flush against the end stop as the chain has slop
-      arm.runVoltsCommand(Volts.of(-0.5))) 
-    );
+        Commands.parallel(
+            elevatorCommands.home(),
+            armCommands.intakePosition()),
+        Commands.race(
+            elevatorCommands.intakeAction(),
+            // adding a damping to the arm as it lowers to keep the arm flush against the
+            // end stop as the chain has slop
+            arm.runVoltsCommand(Volts.of(-0.5))));
     command.setName("intake Coral auto");
     return command;
   }
@@ -365,13 +369,11 @@ public class RobotContainer {
 
   private Command scoreTeleop() {
     Command command = Commands.sequence(
-      armCommands.score().withTimeout(Seconds.of(0.3)),
-      Commands.race(
-      armCommands.score(),
-      swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0 ,0)).withTimeout(Seconds.of(0.75))
-    ),
-    armCommands.score()
-    );
+        armCommands.score().withTimeout(Seconds.of(0.3)),
+        Commands.race(
+            armCommands.score(),
+            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
+        armCommands.score());
     command.setName("Score");
     return command;
   }
