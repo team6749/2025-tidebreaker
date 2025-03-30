@@ -301,6 +301,14 @@ public class RobotContainer {
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
+  private Command intakeTeleop() {
+    Command command = Commands.sequence(
+        intakeAuto(),
+        elevatorCommands.home());
+    command.setName("intake Coral teleop");
+    return command;
+  }
+
   private Command home() {
     Command command = Commands.parallel(
         armCommands.Home(),
@@ -310,38 +318,25 @@ public class RobotContainer {
   }
 
   private Command moveToLevel2() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel2(),
-        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
-            .andThen(armCommands.positionLevel2()));
-    command.setName("Level 2");
-    return command;
+    return (elevatorSubsystem.getIsCoralLimitSwitchActivated() ? intakeTeleop() : Commands.parallel(
+      elevatorCommands.positionLevel2(),
+      Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
+          .andThen(armCommands.positionLevel2())));
   }
 
   private Command moveToLevel3() {
-    Command command = Commands.sequence(
-        elevatorCommands.home(),
-        armCommands.positionLevel3(),
-        elevatorCommands.positionLevel3());
-    command.setName("Level 3");
-    return command;
+    return (elevatorSubsystem.getIsCoralLimitSwitchActivated() ? intakeTeleop() : Commands.sequence(
+      elevatorCommands.home(),
+      armCommands.positionLevel3(),
+      elevatorCommands.positionLevel3()));
   }
 
   private Command moveToLevel4() {
-    Command command = Commands.parallel(
-        elevatorCommands.positionLevel4(),
-        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
-            .andThen(armCommands.positionLevel4()));
-    command.setName("Level 4");
-    return command;
-  }
-
-  private Command intakeTeleop() {
-    Command command = Commands.sequence(
-        intakeAuto(),
-        elevatorCommands.home());
-    command.setName("intake Coral teleop");
-    return command;
+    return (elevatorSubsystem.getIsCoralLimitSwitchActivated() ? intakeTeleop()
+        : Commands.parallel(
+            elevatorCommands.positionLevel4(),
+            Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
+                .andThen(armCommands.positionLevel4())));
   }
 
   // Intake auto does not return to the home position because this saves ~0.5
