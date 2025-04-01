@@ -59,7 +59,7 @@
     "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "left",
+  "folder": "left_intake_coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -53.68788084197905

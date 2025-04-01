@@ -47,7 +47,7 @@
   "reversed": false,
   "folder": "coral_paths",
   "idealStartingState": {
-    "velocity": 0.5,
+    "velocity": 1.25,
     "rotation": 180.0
   },
   "useDefaultConstraints": false
