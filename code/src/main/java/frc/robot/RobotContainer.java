@@ -56,6 +56,7 @@ public class RobotContainer {
   ArmCommands armCommands;
   POICommands poiCommands;
   IntakeDropper intakeDropper;
+  Boolean lastCommandL2;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
@@ -302,6 +303,7 @@ public class RobotContainer {
   }
 
   private Command home() {
+    lastCommandL2 = false;
     Command command = Commands.parallel(
         armCommands.Home(),
         elevatorCommands.home());
@@ -310,6 +312,7 @@ public class RobotContainer {
   }
 
   private Command moveToLevel2() {
+    lastCommandL2 = true;
     Command command = Commands.parallel(
         elevatorCommands.positionLevel2(),
         Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
@@ -319,6 +322,7 @@ public class RobotContainer {
   }
 
   private Command moveToLevel3() {
+    lastCommandL2 = false;
     Command command = Commands.sequence(
         elevatorCommands.home(),
         armCommands.positionLevel3(),
@@ -328,6 +332,7 @@ public class RobotContainer {
   }
 
   private Command moveToLevel4() {
+    lastCommandL2 = false;
     Command command = Commands.parallel(
         elevatorCommands.positionLevel4(),
         Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
@@ -337,6 +342,7 @@ public class RobotContainer {
   }
 
   private Command intakeTeleop() {
+    lastCommandL2 = false;
     Command command = Commands.sequence(
         intakeAuto(),
         elevatorCommands.home());
@@ -369,11 +375,17 @@ public class RobotContainer {
 
   private Command scoreTeleop() {
     Command command = Commands.sequence(
-        armCommands.score().withTimeout(Seconds.of(0.7)),
-        Commands.race(
-            armCommands.score(),
-            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
-        armCommands.score());
+      armCommands.score().withTimeout(Seconds.of(0.7)),
+      Commands.race(
+          armCommands.score(),
+          swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
+      armCommands.score());
+    if(lastCommandL2) {command = Commands.sequence(
+      armCommands.scoreL2().withTimeout(Seconds.of(1)),
+      Commands.race(
+          armCommands.scoreL2(),
+          swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
+      armCommands.score());}
     command.setName("Score");
     return command;
   }
