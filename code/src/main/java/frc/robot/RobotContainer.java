@@ -369,7 +369,7 @@ public class RobotContainer {
 
   private Command scoreTeleop() {
     Command command = Commands.sequence(
-        armCommands.score().withTimeout(Seconds.of(0.3)),
+        armCommands.score().withTimeout(Seconds.of(0.7)),
         Commands.race(
             armCommands.score(),
             swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
