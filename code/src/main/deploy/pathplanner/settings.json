@@ -3,6 +3,7 @@
   "robotLength": 0.96,
   "holonomicMode": true,
   "pathFolders": [
+    "Slow_left",
     "algae_paths",
     "coral_paths",
     "intakes",

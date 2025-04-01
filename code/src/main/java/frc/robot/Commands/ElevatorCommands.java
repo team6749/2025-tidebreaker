@@ -49,7 +49,7 @@ public class ElevatorCommands {
     }
 
     public Command positionLevel4() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.651)).onlyIf(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated() == false);
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.651));
         command.setName("Elevator Score Level 4");
         return command;
     }
