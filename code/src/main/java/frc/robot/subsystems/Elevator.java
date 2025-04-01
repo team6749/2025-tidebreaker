@@ -106,6 +106,7 @@ public class Elevator extends SubsystemBase {
   private boolean isHomed = false;
   private boolean closedLoop = false;
   private boolean motorInverted = false;
+  public boolean isAtTarget = false;
 
   private PIDController elevatorPID = new PIDController(20, 0, 0);
   private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.20, 13);
@@ -201,8 +202,11 @@ public class Elevator extends SubsystemBase {
     simMotor.setRotorVelocity(simElevator.getVelocityMetersPerSecond() / outputRatio * (motorInverted ? -1 : 1));
   }
 
-  public boolean isAtTarget(Distance position) {
+  private boolean isAtTargetLocal(Distance position) {
     return getPosition().isNear(position, toleranceOnReachedGoal);
+  }
+  public boolean isAtTarget() {
+    return isAtTarget;
   }
 
   public Distance getPosition() {
@@ -273,13 +277,15 @@ public class Elevator extends SubsystemBase {
 
   /// Warning this command is unsafe, meaning it does not check for valid constraints nor is the end state well defined
   public Command getToStateCommandUnsafe(Distance targetHeight, LinearVelocity targetEndVelocity) {
+    isAtTarget = false;
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
       runClosedLoopSetGoal(targetHeight, targetEndVelocity);
-    }, this).until(() -> isAtTarget(targetHeight)).handleInterrupt(() -> {
+    }, this).until(() -> isAtTargetLocal(targetHeight)).handleInterrupt(() -> {
       System.out.println("WARNING: Elevator go to position command interrupted. Holding Current Position");
       targetState = new TrapezoidProfile.State(getPosition().in(Meters), 0);
+      isAtTarget = true;
     });
   }
 
