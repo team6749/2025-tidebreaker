@@ -61,6 +61,8 @@ import frc.robot.Robot;
 public class ConstrainedArmSubsystem extends SubsystemBase {
   private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
+  public boolean isAtTarget = false;
+
   public static Angle simStartAngle = Degrees.of(-90);
   public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.558); //-0.144 the encoder value - 0.25 for standard position.
   public static Distance armLength = Meters.of(0.2);
@@ -222,8 +224,12 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
     return Rotations.of(encoder.get()).plus(angleOffset);
   }
 
-  public Boolean isAtTarget(Angle position) {
+  private Boolean isAtTargetLocal(Angle position) {
     return getPosition().isNear(position, tolerance);
+  }
+
+  public Boolean isAtTarget() {
+    return isAtTarget;
   }
 
   public void stop() {
@@ -260,13 +266,15 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
 
 
   private Command goToPositionCommandPrivate(Angle desiredAngle) {
+    isAtTarget = false;
     return Commands.startRun(() -> {
       resetProfileState();
     }, () -> {
       runClosedLoop(desiredAngle);
-    }, this).until(() -> isAtTarget(desiredAngle)).handleInterrupt(() -> {
+    }, this).until(() -> isAtTargetLocal(desiredAngle)).handleInterrupt(() -> {
       System.out.println("WARNING: Arm go to position command interrupted. Holding Current Position");
       targetState = new TrapezoidProfile.State(getPosition().in(Radians), 0);
+      isAtTarget = true;
     });
   }
 
