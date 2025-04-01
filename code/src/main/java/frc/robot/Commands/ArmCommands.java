@@ -25,13 +25,13 @@ public class ArmCommands {
     }
 
     public Command Home() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-89));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-90));
         command.setName("Arm Idle Position");
         return command;
     }
 
     public Command positionLevel2() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-13)); //random values
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-13)); //placeholder
         command.setName("Arm Score Level 2");
         return command;
     }
@@ -49,9 +49,14 @@ public class ArmCommands {
     }
 
     public Command score() {
-        Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(1);
+        Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5));
         command.setName("Arm Score");
         return command;
+    }
+    public Command scoreL2() {
+        Command command = armSubsystem.runVoltsCommand(Volts.of(1));
+        command.setName("Arm Score L2");
+        return command; 
     }
 
 }
