@@ -31,7 +31,7 @@ public class ElevatorCommands {
     }
 
     public Command home() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.23));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.24));
         command.setName("Elevator Idle Position");
         return command;
     }

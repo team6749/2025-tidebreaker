@@ -92,7 +92,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "slow l_to_intake"
+                  "pathName": "l_to_intake"
                 }
               },
               {

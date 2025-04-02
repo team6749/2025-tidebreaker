@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,7 +29,7 @@ public class SwerveConstants {
     public static final double angleReduction = (150.0 / 7.0);
     public static final double driveReduction = 6.82;
 
-    public static final Distance wheelDiameter = Inches.of(4.0);
+    public static final Distance wheelDiameter = Millimeters.of(100);
     public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
 
     // Distance between the center of wheels along the width of the robot(Y axis)
