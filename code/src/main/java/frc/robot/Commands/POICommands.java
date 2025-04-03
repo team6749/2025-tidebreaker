@@ -11,7 +11,9 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -29,6 +31,20 @@ public class POICommands {
         // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
         // You can also use unlimited constraints, only limited by motor torque and
         // nominal battery voltage
+
+        ChassisSpeeds goSpeed = new ChassisSpeeds();
+
+        public Command slowDown () {
+                return Commands.startRun(() -> {
+                        // Get current speed
+                        goSpeed = driveSubsystem.getChassisSpeeds();
+                        System.out.println("running");
+                }, () -> {
+                        goSpeed = goSpeed.div(1.1);
+                        System.out.println(goSpeed);
+                        driveSubsystem.runChassisSpeeds(goSpeed);
+                }, driveSubsystem).until(() -> goSpeed.vxMetersPerSecond < 0.1 && goSpeed.vyMetersPerSecond < 0.1 && goSpeed.omegaRadiansPerSecond < 0.1).withTimeout(1);
+        }
 
         // Create the path using the waypoints created above
         public Command pathToCoralA() throws FileVersionException, IOException, ParseException {
