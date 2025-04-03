@@ -3,44 +3,39 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.583,
-        "y": 6.167493714036109
+        "x": 1.0773114821444278,
+        "y": 1.087930528086781
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.297695843479639,
-        "y": 6.635306168988149
+        "x": 1.8563650230545288,
+        "y": 1.7148879272738657
       },
       "isLocked": false,
-      "linkedName": "start_left"
+      "linkedName": "intake_right"
     },
     {
       "anchor": {
-        "x": 5.040465293874666,
-        "y": 5.3286731802864145
+        "x": 3.6542667369093635,
+        "y": 2.892029212471206
       },
       "prevControl": {
-        "x": 5.631038238188879,
-        "y": 6.351575525414176
+        "x": 3.123400524651113,
+        "y": 2.0445735707514885
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "coral_j"
+      "linkedName": "coral_c"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -119.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.75,
+      "minWaypointRelativePos": 0.68,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 0.5,
+        "maxVelocity": 1.0,
         "maxAcceleration": 2.0,
         "maxAngularVelocity": 180.0,
         "maxAngularAcceleration": 360.0,
@@ -52,8 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 3.75,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -61,13 +56,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.31266463330527
+    "rotation": 55.33716505572296
   },
   "useDefaultConstraints": false
 }
