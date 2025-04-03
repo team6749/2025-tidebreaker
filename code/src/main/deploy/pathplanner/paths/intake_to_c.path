@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7062052481497556,
-        "y": 1.5534387033302415
+        "x": 2.805122950819672,
+        "y": 1.141956967213115
       },
       "isLocked": false,
       "linkedName": "intake_right"
@@ -28,7 +28,12 @@
       "linkedName": "coral_c"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 59.99999999999999
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.033791764267823,
-        "y": 6.678540475527039
+        "x": 2.901024590163934,
+        "y": 7.339600409836065
       },
       "isLocked": false,
       "linkedName": "intake_left"
@@ -20,15 +20,20 @@
         "y": 5.32145794477915
       },
       "prevControl": {
-        "x": 3.539889033130096,
-        "y": 5.975034354034314
+        "x": 3.4172315489495544,
+        "y": 6.187483348563588
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "coral_k"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -59.99999999999999
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
