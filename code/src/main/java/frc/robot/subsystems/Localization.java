@@ -197,7 +197,7 @@ public class Localization extends SubsystemBase {
             Distance tagDistance, double ambiguity) {
         final Matrix<N3, N1> rejectValue = VecBuilder.fill(9999999, 9999999, 9999999);
         final Matrix<N3, N1> acceptValue = VecBuilder.fill(8, 8, 128);
-        final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 24);
+        final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 4);
         
         // Start with assuming ideal conditions
         var returnValue = idealValue;
