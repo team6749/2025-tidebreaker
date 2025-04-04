@@ -131,8 +131,8 @@ public class RobotContainer {
                                                                               // feedforwards
           new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
                                           // holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+              new PIDConstants(4.0, 0.0, 0.0), // Translation PID constants
+              new PIDConstants(4.0, 0.0, 0.0) // Rotation PID constants
           ),
           config, // The robot configuration
           () -> {
@@ -254,7 +254,7 @@ public class RobotContainer {
     buttonHome.whileTrue(home());
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
-    buttonLevel4.whileTrue(moveToLevel4());
+    buttonLevel4.whileTrue(moveToLevel4().onlyIf(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated() == false));
     buttonIntake.whileTrue(intakeTeleop());
     buttonScore.whileTrue(scoreTeleop());
   }

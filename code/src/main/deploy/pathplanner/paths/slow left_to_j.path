@@ -3,47 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.039907786885245
+        "x": 7.583,
+        "y": 6.167493714036109
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4574795081967213,
-        "y": 7.0878586065573765
+        "x": 6.297695843479639,
+        "y": 6.635306168988149
       },
       "isLocked": false,
-      "linkedName": "intake_left"
+      "linkedName": "start_left"
     },
     {
       "anchor": {
-        "x": 3.632794876204665,
-        "y": 5.150658422999656
+        "x": 5.040465293874666,
+        "y": 5.3286731802864145
       },
       "prevControl": {
-        "x": 3.132794876204665,
-        "y": 6.016683826784094
+        "x": 5.631038238188879,
+        "y": 6.351575525414176
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "coral_l"
+      "linkedName": "coral_j"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": -59.99999999999999
+      "rotationDegrees": -119.99999999999999
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.8,
+      "minWaypointRelativePos": 0.7493796526054648,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 0.5,
-        "maxAcceleration": 3.5,
+        "maxAcceleration": 2.0,
         "maxAngularVelocity": 180.0,
-        "maxAngularAcceleration": 540.0,
+        "maxAngularAcceleration": 360.0,
         "nominalVoltage": 12.0,
         "unlimited": false
       }
@@ -52,8 +52,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.75,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -61,13 +61,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "left_intake_coral",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -53.68788084197905
+    "rotation": 179.31266463330527
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
