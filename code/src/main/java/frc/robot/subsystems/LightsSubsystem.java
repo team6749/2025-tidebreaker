@@ -18,7 +18,7 @@ public class LightsSubsystem extends SubsystemBase {
         timer.reset();
     }
 
-    private static Spark lightsController = new Spark(9);
+    private static Spark lightsController = new Spark(2);
 
     
     @Override

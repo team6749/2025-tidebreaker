@@ -54,7 +54,13 @@ public class LightsCommand extends Command {
                         || _poiCommands.pathToCoralI().isScheduled() || _poiCommands.pathToCoralJ().isScheduled()
                         || _poiCommands.pathToCoralK().isScheduled() || _poiCommands.pathToCoralL().isScheduled()) {
                     _lights.green();
-                } else if (!_elevator.getIsCoralLimitSwitchActivated() && !(_arm.isAtTarget() && _elevator.isAtTarget())) {
+
+                } else if (!_elevator.getIsCoralLimitSwitchActivated() && !(_arm.isAtTarget() && _elevator.isAtTarget()) && !(_poiCommands.pathToCoralA().isScheduled() || _poiCommands.pathToCoralB().isScheduled()
+                || _poiCommands.pathToCoralC().isScheduled() || _poiCommands.pathToCoralD().isScheduled()
+                || _poiCommands.pathToCoralE().isScheduled() || _poiCommands.pathToCoralF().isScheduled()
+                || _poiCommands.pathToCoralG().isScheduled() || _poiCommands.pathToCoralH().isScheduled()
+                || _poiCommands.pathToCoralI().isScheduled() || _poiCommands.pathToCoralJ().isScheduled()
+                || _poiCommands.pathToCoralK().isScheduled() || _poiCommands.pathToCoralL().isScheduled())) {
                     if (DriverStation.getAlliance().get() == Alliance.Blue) {
                         _lights.blue();
                     } else {
