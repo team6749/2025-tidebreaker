@@ -16,7 +16,7 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorCommands {
     Elevator elevatorSubsystem;
 
-    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.3);
+    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.45);
 
     public ElevatorCommands(Elevator elevator) {
         this.elevatorSubsystem = elevator;
