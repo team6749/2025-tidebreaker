@@ -39,29 +39,7 @@ public class LightsCommand extends Command {
     public void execute() {
     if (_elevator.getIsCoralLimitSwitchActivated()) { // works
             _lights.blueViolet();
-        }else if(_poiCommands.pathToCoralA().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralB().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralC().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralD().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralE().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralF().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralG().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralH().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralI().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralJ().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralK().isScheduled()) {
-            _lights.green();
-        } else if(_poiCommands.pathToCoralL().isScheduled()) {
+        }else if(_poiCommands.pathToCoralA().isScheduled() || _poiCommands.pathToCoralB().isScheduled() || _poiCommands.pathToCoralC().isScheduled() || _poiCommands.pathToCoralD().isScheduled() || _poiCommands.pathToCoralE().isScheduled() || _poiCommands.pathToCoralF().isScheduled() || _poiCommands.pathToCoralG().isScheduled() || _poiCommands.pathToCoralH().isScheduled() || _poiCommands.pathToCoralI().isScheduled() || _poiCommands.pathToCoralJ().isScheduled() || _poiCommands.pathToCoralK().isScheduled() || _poiCommands.pathToCoralL().isScheduled()) {
             _lights.green();
         }
         else if (!_elevator.getIsCoralLimitSwitchActivated() && !(_arm.isAtTarget() && _elevator.isAtTarget())){
