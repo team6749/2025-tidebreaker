@@ -4,6 +4,12 @@
 
 package frc.robot.Commands;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
+import com.pathplanner.lib.util.FileVersionException;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,18 +43,28 @@ public class LightsCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-    if (_elevator.getIsCoralLimitSwitchActivated()) { // works
+        if (_elevator.getIsCoralLimitSwitchActivated()) { // works
             _lights.blueViolet();
-        }else if(_poiCommands.pathToCoralA().isScheduled() || _poiCommands.pathToCoralB().isScheduled() || _poiCommands.pathToCoralC().isScheduled() || _poiCommands.pathToCoralD().isScheduled() || _poiCommands.pathToCoralE().isScheduled() || _poiCommands.pathToCoralF().isScheduled() || _poiCommands.pathToCoralG().isScheduled() || _poiCommands.pathToCoralH().isScheduled() || _poiCommands.pathToCoralI().isScheduled() || _poiCommands.pathToCoralJ().isScheduled() || _poiCommands.pathToCoralK().isScheduled() || _poiCommands.pathToCoralL().isScheduled()) {
-            _lights.green();
-        }
-        else if (!_elevator.getIsCoralLimitSwitchActivated() && !(_arm.isAtTarget() && _elevator.isAtTarget())){
-            if (DriverStation.getAlliance().get() == Alliance.Blue) {
-                _lights.blue();
-            } else {
-                _lights.red();
+        } else
+            try {
+                if (_poiCommands.pathToCoralA().isScheduled() || _poiCommands.pathToCoralB().isScheduled()
+                        || _poiCommands.pathToCoralC().isScheduled() || _poiCommands.pathToCoralD().isScheduled()
+                        || _poiCommands.pathToCoralE().isScheduled() || _poiCommands.pathToCoralF().isScheduled()
+                        || _poiCommands.pathToCoralG().isScheduled() || _poiCommands.pathToCoralH().isScheduled()
+                        || _poiCommands.pathToCoralI().isScheduled() || _poiCommands.pathToCoralJ().isScheduled()
+                        || _poiCommands.pathToCoralK().isScheduled() || _poiCommands.pathToCoralL().isScheduled()) {
+                    _lights.green();
+                } else if (!_elevator.getIsCoralLimitSwitchActivated() && !(_arm.isAtTarget() && _elevator.isAtTarget())) {
+                    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+                        _lights.blue();
+                    } else {
+                        _lights.red();
+                    }
+                }
+            } catch (FileVersionException | IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        }
     }
 
     // Called once the command ends or is interrupted.
