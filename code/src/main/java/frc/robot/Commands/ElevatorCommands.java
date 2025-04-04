@@ -7,6 +7,8 @@ package frc.robot.Commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.PrimitiveIterator.OfDouble;
+
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -27,6 +29,11 @@ public class ElevatorCommands {
                 elevatorSubsystem.getToStateCommandUnsafe(Meters.of(0.0), attackVelocity),
                 elevatorSubsystem.runFeedForwardOpenLoopCommand(attackVelocity).withTimeout(0.1));
         command.setName("Elevator Intake");
+        return command;
+    }
+
+    public Command goToZero() {
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0));
         return command;
     }
 
@@ -59,9 +66,16 @@ public class ElevatorCommands {
         command.setName("Elevator Score Level 4");
         return command;
     }
+<<<<<<< Updated upstream
     public Command positionLevel1() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.27));
         command.setName("Elevator score level 1");
+=======
+
+    public Command positionLevel1() {
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.651));
+        command.setName("Elevator Score Level 4");
+>>>>>>> Stashed changes
         return command;
     }
 }

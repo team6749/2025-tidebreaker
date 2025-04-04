@@ -111,7 +111,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
-        .until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5));
+        .until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated())
+        .withTimeout(Robot.isSimulation() ? 1.25 : 2.5));
     NamedCommands.registerCommand("score", scoreAuto());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
@@ -251,6 +252,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void coralSubsystemTest() {
+    buttonLeftIntake.whileTrue(scoreLevel1());
     buttonHome.whileTrue(home());
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
@@ -297,7 +299,10 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
+<<<<<<< Updated upstream
     buttonLeftIntake.whileTrue(elevatorCommands.positionLevel1());
+=======
+>>>>>>> Stashed changes
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
@@ -306,6 +311,12 @@ public class RobotContainer {
         armCommands.Home(),
         elevatorCommands.home());
     command.setName("Home");
+    return command;
+  }
+
+  private Command scoreLevel1() {
+    Command command = Commands.sequence(Commands.parallel(armCommands.positionLevel2(),
+        elevatorCommands.goToZero()), elevatorCommands.positionLevel1());
     return command;
   }
 
