@@ -297,7 +297,7 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
+    buttonLeftIntake.whileTrue(elevatorCommands.positionLevel1());
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
