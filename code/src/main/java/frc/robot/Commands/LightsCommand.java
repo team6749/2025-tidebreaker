@@ -16,13 +16,15 @@ public class LightsCommand extends Command {
     Elevator _elevator;
     ConstrainedArmSubsystem _arm;
     LightsSubsystem _lights;
+    POICommands _poiCommands;
 
     /** Creates a new LightsCommand. */
     public LightsCommand(LightsSubsystem lights, ConstrainedArmSubsystem arm,
-            Elevator elevator) {
+            Elevator elevator, POICommands poiCommands) {
         _lights = lights;
         _arm = arm;
         _elevator = elevator;
+        _poiCommands = poiCommands;
         addRequirements(lights);
         // Use addRequirements() here to declare subsystem dependencies.
     }
@@ -37,7 +39,29 @@ public class LightsCommand extends Command {
     public void execute() {
     if (_elevator.getIsCoralLimitSwitchActivated()) { // works
             _lights.blueViolet();
-        } else if (_arm.isAtTarget() && _elevator.isAtTarget()) { // works
+        }else if(_poiCommands.pathToCoralA().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralB().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralC().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralD().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralE().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralF().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralG().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralH().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralI().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralJ().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralK().isScheduled()) {
+            _lights.green();
+        } else if(_poiCommands.pathToCoralL().isScheduled()) {
             _lights.green();
         }
         else if (!_elevator.getIsCoralLimitSwitchActivated() && !(_arm.isAtTarget() && _elevator.isAtTarget())){
