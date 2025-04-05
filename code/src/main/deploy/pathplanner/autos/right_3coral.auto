@@ -26,7 +26,7 @@
         {
           "type": "named",
           "data": {
-            "name": "score"
+            "name": "scoreLevel4"
           }
         },
         {
@@ -152,7 +152,7 @@
         {
           "type": "named",
           "data": {
-            "name": "score"
+            "name": "scoreLevel4"
           }
         },
         {
