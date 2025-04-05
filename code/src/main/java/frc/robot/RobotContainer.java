@@ -119,7 +119,6 @@ public class RobotContainer {
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
-    NamedCommands.registerCommand("scoreL4", scoreLevel4());
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
@@ -302,7 +301,6 @@ public class RobotContainer {
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
     buttonLeftIntake.whileTrue(lock());
-    buttonRightIntake.whileTrue(scoreLevel4());
   }
 
   private Command home() {
@@ -340,11 +338,6 @@ public class RobotContainer {
     return command;
   }
 
-  private Command scoreLevel4() {
-    Command command = armCommands.ScoreLevel4();
-    command.setName("Level 4");
-    return command;
-  }
 
   private Command intakeTeleop() {
     Command command = Commands.sequence(
@@ -372,7 +365,7 @@ public class RobotContainer {
 
   // Scores just level 4
   private Command scoreAuto() {
-    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.3);
+    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
     return command;
   }
