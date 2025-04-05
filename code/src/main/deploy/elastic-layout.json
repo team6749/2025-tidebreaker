@@ -153,21 +153,9 @@
         "layouts": [],
         "containers": [
           {
-            "title": "limelight-front",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 512.0,
-            "height": 512.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/limelight-front",
-              "period": 0.06
-            }
-          },
-          {
             "title": "Field",
             "x": 512.0,
-            "y": 128.0,
+            "y": 0.0,
             "width": 768.0,
             "height": 384.0,
             "type": "Field",
@@ -187,7 +175,7 @@
           {
             "title": "Limelight Toggle",
             "x": 1280.0,
-            "y": 256.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -200,7 +188,7 @@
           {
             "title": "Robot Orientation Mode",
             "x": 1280.0,
-            "y": 384.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -211,20 +199,8 @@
             }
           },
           {
-            "title": "Alerts",
-            "x": 1280.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Alerts",
-              "period": 0.06
-            }
-          },
-          {
             "title": "Match Timer",
-            "x": 512.0,
+            "x": 1280.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -239,37 +215,15 @@
             }
           },
           {
-            "title": "Coral LimitSwitch Activated",
-            "x": 896.0,
+            "title": "limelight-fleft",
+            "x": 0.0,
             "y": 0.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Boolean Box",
+            "width": 512.0,
+            "height": 512.0,
+            "type": "Camera Stream",
             "properties": {
-              "topic": "/SmartDashboard/Coral LimitSwitch Activated",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "isHomed",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Robot/m_robotContainer/elevatorSubsystem/isHomed",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "topic": "/CameraPublisher/limelight-fleft",
+              "period": 0.06
             }
           }
         ]

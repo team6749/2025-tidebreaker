@@ -16,7 +16,7 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorCommands {
     Elevator elevatorSubsystem;
 
-    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.3);
+    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.35);
 
     public ElevatorCommands(Elevator elevator) {
         this.elevatorSubsystem = elevator;
@@ -31,7 +31,7 @@ public class ElevatorCommands {
     }
 
     public Command home() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.23));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.24));
         command.setName("Elevator Idle Position");
         return command;
     }

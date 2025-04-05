@@ -1,9 +1,9 @@
 package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,9 +14,9 @@ import edu.wpi.first.units.measure.LinearVelocity;
 
 public class SwerveConstants {
 
-    public static final SlewRateLimiter driveLimiterX = new SlewRateLimiter(20);
-    public static final SlewRateLimiter driveLimiterY = new SlewRateLimiter(20);
-    public static final SlewRateLimiter driveLimiterTheta = new SlewRateLimiter(27.5);
+    public static final SlewRateLimiter driveLimiterX = new SlewRateLimiter(10);
+    public static final SlewRateLimiter driveLimiterY = new SlewRateLimiter(10);
+    public static final SlewRateLimiter driveLimiterTheta = new SlewRateLimiter(15);
 
     // Max linear velocity of the module (how fast it can spin)
     public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(3.5);
@@ -28,7 +28,7 @@ public class SwerveConstants {
     public static final double angleReduction = (150.0 / 7.0);
     public static final double driveReduction = 6.82;
 
-    public static final Distance wheelDiameter = Inches.of(4.0);
+    public static final Distance wheelDiameter = Millimeters.of(100);
     public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
 
     // Distance between the center of wheels along the width of the robot(Y axis)
