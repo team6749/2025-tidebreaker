@@ -47,6 +47,11 @@ public class ArmCommands {
         command.setName("Arm Score Level 4");
         return command;
     }
+    public Command ScoreLevel4() {
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(25));
+        command.setName("Arm Score Level 4");
+        return command;
+    }
 
     public Command score() {
         Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(1);

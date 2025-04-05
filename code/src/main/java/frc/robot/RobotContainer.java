@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -24,7 +25,9 @@ import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -116,6 +119,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
+    NamedCommands.registerCommand("scoreL4", scoreLevel4());
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();
@@ -297,8 +301,8 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
-    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
+    buttonLeftIntake.whileTrue(lock());
+    buttonRightIntake.whileTrue(scoreLevel4());
   }
 
   private Command home() {
@@ -332,6 +336,12 @@ public class RobotContainer {
         elevatorCommands.positionLevel4(),
         Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
             .andThen(armCommands.positionLevel4()));
+    command.setName("Level 4");
+    return command;
+  }
+
+  private Command scoreLevel4() {
+    Command command = armCommands.ScoreLevel4();
     command.setName("Level 4");
     return command;
   }
@@ -375,6 +385,11 @@ public class RobotContainer {
             swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
         armCommands.score());
     command.setName("Score");
+    return command;
+  }
+
+  public Command lock() {
+    Command command = swerveSubsystem.moduleLock(new SwerveModuleState (0.0,Rotation2d.fromDegrees(-35)));
     return command;
   }
 
