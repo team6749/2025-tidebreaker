@@ -6,6 +6,7 @@ package frc.robot.Commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,11 @@ public class ElevatorCommands {
         command.setName("Elevator Intake");
         return command;
     }
+    
+    public Command scoreL2() {
+        Command command = elevatorSubsystem.runVoltsCommand(Volts.of(0.4));
+        return command;
+    }
 
     public Command home() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.24));
@@ -37,7 +43,7 @@ public class ElevatorCommands {
     }
 
     public Command positionLevel2() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.15));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.054));
         command.setName("Elevator Score Level 2");
         return command;
     }

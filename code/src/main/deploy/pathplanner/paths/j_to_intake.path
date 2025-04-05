@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.540465293874666,
-        "y": 6.194698584070853
+        "x": 6.2204999999999995,
+        "y": 6.9597500000000005
       },
       "isLocked": false,
       "linkedName": "coral_j"
@@ -28,7 +28,16 @@
       "linkedName": "intake_left"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.07831715210356563,
+      "rotationDegrees": -119.99999999999999
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -53.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,7 +51,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.68788084197905
+    "rotation": -53.0
   },
   "reversed": false,
   "folder": "left",
