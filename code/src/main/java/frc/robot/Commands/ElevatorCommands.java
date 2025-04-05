@@ -16,7 +16,7 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorCommands {
     Elevator elevatorSubsystem;
 
-    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.35);
+    public static final LinearVelocity attackVelocity = MetersPerSecond.of(-0.3);
 
     public ElevatorCommands(Elevator elevator) {
         this.elevatorSubsystem = elevator;
@@ -24,7 +24,7 @@ public class ElevatorCommands {
 
     public Command intakeAction() {
         Command command = Commands.sequence(
-                elevatorSubsystem.getToStateCommandUnsafe(Meters.of(0.0), attackVelocity),
+                elevatorSubsystem.getToStateCommandUnsafe(Meters.of(0.01), attackVelocity),
                 elevatorSubsystem.runFeedForwardOpenLoopCommand(attackVelocity).withTimeout(0.1));
         command.setName("Elevator Intake");
         return command;
