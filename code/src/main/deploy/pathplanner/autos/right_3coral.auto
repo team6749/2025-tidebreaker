@@ -89,7 +89,7 @@
         {
           "type": "named",
           "data": {
-            "name": "score"
+            "name": "scoreLevel4"
           }
         },
         {
@@ -115,63 +115,6 @@
           "type": "named",
           "data": {
             "name": "wait_for_coral"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "intake_to_c"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "intake"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "l4"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "scoreLevel4"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "c_to_intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "home"
-                }
-              }
-            ]
           }
         }
       ]
