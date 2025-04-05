@@ -299,10 +299,7 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-<<<<<<< Updated upstream
     buttonLeftIntake.whileTrue(elevatorCommands.positionLevel1());
-=======
->>>>>>> Stashed changes
     buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 

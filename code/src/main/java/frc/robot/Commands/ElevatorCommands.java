@@ -66,16 +66,11 @@ public class ElevatorCommands {
         command.setName("Elevator Score Level 4");
         return command;
     }
-<<<<<<< Updated upstream
-    public Command positionLevel1() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.27));
-        command.setName("Elevator score level 1");
-=======
 
     public Command positionLevel1() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.651));
-        command.setName("Elevator Score Level 4");
->>>>>>> Stashed changes
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.27));
+        command.setName("Elevator score level 1"); 
         return command;
     }
+
 }
