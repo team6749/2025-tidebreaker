@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -24,7 +25,9 @@ import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -297,8 +300,7 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
-    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
+    buttonLeftIntake.whileTrue(lock());
   }
 
   private Command home() {
@@ -336,6 +338,7 @@ public class RobotContainer {
     return command;
   }
 
+
   private Command intakeTeleop() {
     Command command = Commands.sequence(
         intakeAuto(),
@@ -362,7 +365,7 @@ public class RobotContainer {
 
   // Scores just level 4
   private Command scoreAuto() {
-    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.3);
+    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
     return command;
   }
@@ -375,6 +378,11 @@ public class RobotContainer {
             swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
         armCommands.score());
     command.setName("Score");
+    return command;
+  }
+
+  public Command lock() {
+    Command command = swerveSubsystem.moduleLock(new SwerveModuleState (0.0,Rotation2d.fromDegrees(-35)));
     return command;
   }
 

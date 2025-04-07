@@ -40,9 +40,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "home"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "home"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -103,44 +116,19 @@
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "home"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "wait_for_coral"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "intake_to_c"
-                }
-              },
-              {
                 "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "wait",
                       "data": {
-                        "name": "intake"
+                        "waitTime": 0.5
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "l4"
+                        "name": "home"
                       }
                     }
                   ]
@@ -152,26 +140,7 @@
         {
           "type": "named",
           "data": {
-            "name": "score"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "c_to_intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "home"
-                }
-              }
-            ]
+            "name": "wait_for_coral"
           }
         }
       ]

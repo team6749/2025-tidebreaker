@@ -200,11 +200,18 @@ public class SwerveDrive extends SubsystemBase {
         setModuleStates(SwerveConstants.kinematics.toSwerveModuleStates(speeds));
     }
 
-    private void setModuleStates(SwerveModuleState[] states) {
+    public void setModuleStates(SwerveModuleState[] states) {
         loggedTargetChassisSpeeds = SwerveConstants.kinematics.toChassisSpeeds(states);
         for (int i = 0; i < states.length; i++) {
             modules[i].setClosedLoopGoal(states[i]);
         }
+    }
+    public Command moduleLock(SwerveModuleState state) {
+        Command command = Commands.run(() -> {for (int i = 0; i < 4; i++) {
+            modules[i].setClosedLoopGoal(state);
+        };
+        }, this);
+        return command;
     }
 
     public void stop() {
