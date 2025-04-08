@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,11 +21,12 @@ public class AlgaeSubsystem extends SubsystemBase {
   Voltage idleVoltage = Volts.of(0.5);
   Voltage shootVoltage = Volts.of(-1);
   DigitalInput algaeLimitSwitch;
+
   /** Creates a new ActiveClaw. */
   public AlgaeSubsystem() {
+    algaeMotor = new TalonFX(Constants.algaeMotorID); // placeholder before the algae subsystem is made
     brakeMode(true);
-    algaeMotor = new TalonFX(Constants.algaeMotorID); //placeholder before the algae subsystem is made
-    algaeLimitSwitch = new DigitalInput(5555);
+    algaeLimitSwitch = new DigitalInput(5);
   }
 
   @Override
@@ -49,10 +49,11 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   public void brakeMode(boolean isBrakeModeOn) {
-    algaeMotor.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
+    algaeMotor.setNeutralMode(isBrakeModeOn ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
+
   public double stopOnIntake() {
-    return (algaeLimitSwitch.get() ? 0:1);
+    return (algaeLimitSwitch.get() ? 0 : 1);
   }
 
 }
