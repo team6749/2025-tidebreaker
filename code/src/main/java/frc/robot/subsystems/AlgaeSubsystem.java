@@ -21,10 +21,12 @@ public class AlgaeSubsystem extends SubsystemBase {
   TalonFX algaeMotor;
   Voltage idleVoltage = Volts.of(0.5);
   Voltage shootVoltage = Volts.of(-1);
+  DigitalInput algaeLimitSwitch;
   /** Creates a new ActiveClaw. */
   public AlgaeSubsystem() {
     brakeMode(true);
-    algaeMotor = new TalonFX(Constants.algaeMotorID); //placeholder before the claw is made
+    algaeMotor = new TalonFX(Constants.algaeMotorID); //placeholder before the algae subsystem is made
+    algaeLimitSwitch = new DigitalInput(5555);
   }
 
   @Override
@@ -37,7 +39,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   public Command algaeIdleState() {
-    Command command = Commands.run(() -> runVolts(idleVoltage), this);
+    Command command = Commands.run(() -> runVolts(Volts.of(stopOnIntake())), this);
     return command;
   }
 
@@ -48,6 +50,9 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   public void brakeMode(boolean isBrakeModeOn) {
     algaeMotor.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
+  }
+  public double stopOnIntake() {
+    return (algaeLimitSwitch.get() ? 0:1);
   }
 
 }
