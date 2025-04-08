@@ -375,7 +375,7 @@ public class RobotContainer {
         armCommands.score().withTimeout(Seconds.of(0.7)),
         Commands.race(
             armCommands.score(),
-            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.3))),
+            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.2))),
         Commands.parallel(armCommands.home(),elevatorCommands.home()));
     command.setName("Score");
     return command;
