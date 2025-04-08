@@ -67,7 +67,7 @@ public class Elevator extends SubsystemBase {
   public static LinearVelocity maxVelocity = MetersPerSecond.of(0.8);
   public static LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3.5);
 
-  private final TalonFX elevatorMotor = new TalonFX(18);
+  private final TalonFX elevatorMotor = new TalonFX(Constants.elevatorMotorID);
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
   public DigitalInput bottomLimitSwitch = new DigitalInput(3);
