@@ -24,7 +24,7 @@ public class ArmCommands {
         return command;
     }
 
-    public Command Home() {
+    public Command home() {
         Command command = armSubsystem.goToPositionCommand(Degrees.of(-89));
         command.setName("Arm Idle Position");
         return command;

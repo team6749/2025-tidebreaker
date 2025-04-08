@@ -305,7 +305,7 @@ public class RobotContainer {
 
   private Command home() {
     Command command = Commands.parallel(
-        armCommands.Home(),
+        armCommands.home(),
         elevatorCommands.home());
     command.setName("Home");
     return command;
@@ -375,8 +375,8 @@ public class RobotContainer {
         armCommands.score().withTimeout(Seconds.of(0.7)),
         Commands.race(
             armCommands.score(),
-            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
-        armCommands.score());
+            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.3))),
+        Commands.parallel(armCommands.home(),elevatorCommands.home()));
     command.setName("Score");
     return command;
   }
