@@ -41,6 +41,7 @@ import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
+import frc.robot.subsystems.ActiveClawSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -50,6 +51,7 @@ import frc.robot.subsystems.IntakeDropper;
 @Logged
 public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
+  ActiveClawSubsystem clawSubsystem;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem arm;
@@ -103,6 +105,7 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     arm = new ConstrainedArmSubsystem();
+    clawSubsystem = new ActiveClawSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
@@ -176,6 +179,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
     buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
@@ -248,6 +252,8 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private void armTest() {
     a.whileTrue(arm.goToPositionCommand(Radians.of(0)));
+    b.whileTrue(clawSubsystem.clawLowShoot());
+    x.whileTrue(clawSubsystem.clawHighShoot());
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
@@ -337,7 +343,6 @@ public class RobotContainer {
     command.setName("Level 4");
     return command;
   }
-
 
   private Command intakeTeleop() {
     Command command = Commands.sequence(
