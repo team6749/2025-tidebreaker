@@ -180,7 +180,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    //clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
+    clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {

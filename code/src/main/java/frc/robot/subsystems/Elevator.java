@@ -108,7 +108,7 @@ public class Elevator extends SubsystemBase {
   private boolean motorInverted = false;
 
   private PIDController elevatorPID = new PIDController(0, 0, 0);
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.2, 13);
 
   @SuppressWarnings("removal")
   public Elevator() {

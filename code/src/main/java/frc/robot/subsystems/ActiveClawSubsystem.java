@@ -27,19 +27,17 @@ public class ActiveClawSubsystem extends SubsystemBase {
   Angle leftRotations;
   Angle rightRotations;
   Voltage idleVoltage = Volts.of(0.2);
-  Voltage shootLowVoltage = Volts.of(-0.3);
-  Voltage shootHighVoltage = Volts.of(0.3);
+  Voltage shootLowVoltage = Volts.of(-0.6);
+  Voltage shootHighVoltage = Volts.of(0.6);
   boolean clawInverted = true;
+  boolean isBrakeModeOn = true;
   DigitalInput clawLimitSwitch;
   /** Creates a new ActiveClaw. */
   public ActiveClawSubsystem() {
     clawMotorLeft = new TalonFX(Constants.clawMotorLeftID);
     clawMotorRight = new TalonFX(Constants.clawMotorRightID); 
-    clawMotorLeft.setNeutralMode(NeutralModeValue.Brake);
-    clawMotorRight.setNeutralMode(NeutralModeValue.Brake);
+  brakeMode(isBrakeModeOn);
     clawLimitSwitch = new DigitalInput(4); //placeholder before limit switch is on
-    clawMotorRight.setInverted(clawInverted);
-    clawMotorLeft.setInverted(clawInverted);
   }
 
   @Override
@@ -50,7 +48,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   private void runVolts(Voltage voltage) {
-    clawMotorLeft.setVoltage(voltage.in(Volts));
+    clawMotorLeft.setVoltage(-voltage.in(Volts));
     clawMotorRight.setVoltage(voltage.in(Volts));
   }
 
@@ -61,13 +59,13 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public Command clawLowShoot() {
-    Command command = Commands.run(() -> runVolts(shootLowVoltage), this);
+    Command command = Commands.runEnd(() -> runVolts(shootLowVoltage),() -> stop(), this);
     command.setName("clawLowShoot");
     return command;
   }
 
   public Command clawHighShoot() {
-    Command command = Commands.run(() -> runVolts(shootHighVoltage), this);
+    Command command = Commands.runEnd(() -> runVolts(shootHighVoltage),() -> stop(), this);
     command.setName("clawhighShoot");
     return command;
   }
