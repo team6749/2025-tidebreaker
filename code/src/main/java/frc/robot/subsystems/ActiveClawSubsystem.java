@@ -21,15 +21,17 @@ import frc.robot.Constants;
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
   TalonFX clawMotor;
-  Voltage idleVoltage = Volts.of(0.5);
-  Voltage shootLowVoltage = Volts.of(-1);
-  Voltage shootHighVoltage = Volts.of(1);
+  Voltage idleVoltage = Volts.of(0.2);
+  Voltage shootLowVoltage = Volts.of(-0.3);
+  Voltage shootHighVoltage = Volts.of(0.3);
+  boolean clawInverted = false;
   DigitalInput clawLimitSwitch;
   /** Creates a new ActiveClaw. */
   public ActiveClawSubsystem() {
     clawMotor = new TalonFX(Constants.clawMotorID); //placeholder before the claw is made
     brakeMode(true);
-    clawLimitSwitch = new DigitalInput(6);
+    clawLimitSwitch = new DigitalInput(6); //placeholder before limit switch is on
+    clawMotor.setInverted(clawInverted);
   }
 
   @Override

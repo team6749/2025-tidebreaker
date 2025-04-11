@@ -165,6 +165,7 @@ public class RobotContainer {
 
     coralSubsystemTest();
     configureBindings();
+    clawTest();
     // elevatorTest();
     // armTest();
     // sysIDSwerve();
@@ -179,12 +180,8 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
+    //clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
-
-    buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
-    a.whileTrue(climberSubsystem.climbCommand());
-    b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
@@ -252,10 +249,12 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private void armTest() {
     a.whileTrue(arm.goToPositionCommand(Radians.of(0)));
-    b.whileTrue(clawSubsystem.clawLowShoot());
-    x.whileTrue(clawSubsystem.clawHighShoot());
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
+  }
+  private void clawTest() {
+    b.whileTrue(clawSubsystem.clawLowShoot());
+    x.whileTrue(clawSubsystem.clawHighShoot());
   }
 
   @SuppressWarnings("unused")
