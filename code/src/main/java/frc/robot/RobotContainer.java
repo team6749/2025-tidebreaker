@@ -165,6 +165,7 @@ public class RobotContainer {
 
     coralSubsystemTest();
     configureBindings();
+    algaeTest();
     // elevatorTest();
     // armTest();
     // sysIDSwerve();
@@ -180,11 +181,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
-    x.onTrue(algaeSubsystem.algaeIntakeCommand());
 
-    buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
-    a.whileTrue(climberSubsystem.climbCommand());
-    b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
@@ -304,12 +301,12 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(shootAlgae());
+    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
   }
 
-  private Command shootAlgae() {
-    Command command = Commands.run(() -> algaeSubsystem.algaeShootCommand(), algaeSubsystem);
-    return command;
+  private void algaeTest() {
+    b.whileTrue(algaeSubsystem.algaeIntakeCommand());
+    a.whileTrue(algaeSubsystem.algaeShootCommand());
   }
 
   private Command home() {
