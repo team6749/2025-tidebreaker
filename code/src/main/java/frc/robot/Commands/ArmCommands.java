@@ -19,7 +19,7 @@ public class ArmCommands {
     }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-90));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-65.3));
         command.setName("Arm Intake Position");
         return command;
     }
