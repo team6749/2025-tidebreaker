@@ -69,8 +69,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   public static Angle maxAngle = Degrees.of(90);
   public static Angle minAngle = Degrees.of(-90);
 
-  private PIDController armPID = new PIDController(0, 0, 0);
-  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.2, 0.8);
+  private PIDController armPID = new PIDController(1, 0, 0);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.4, 0.82);
   private TalonFX armMotor = new TalonFX(Constants.armMotorID);
   private DCMotor m_armGearbox = DCMotor.getFalcon500(1);
 

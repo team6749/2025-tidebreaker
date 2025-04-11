@@ -206,11 +206,11 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
-      SmartDashboard.putData("arm/Volts0", arm.runVoltsCommand(Volts.of(0.1)));
-      SmartDashboard.putData("arm/Volts1", arm.runVoltsCommand(Volts.of(0.15)));
-      SmartDashboard.putData("arm/Volts2", arm.runVoltsCommand(Volts.of(0.2)));
-      SmartDashboard.putData("arm/Volts3", arm.runVoltsCommand(Volts.of(0.25)));
-      SmartDashboard.putData("arm/Volts4", arm.runVoltsCommand(Volts.of(0.3)));
+      SmartDashboard.putData("arm/Volts0", arm.runVoltsCommand(Volts.of(0.3)));
+      SmartDashboard.putData("arm/Volts1", arm.runVoltsCommand(Volts.of(0.35)));
+      SmartDashboard.putData("arm/Volts2", arm.runVoltsCommand(Volts.of(0.4)));
+      SmartDashboard.putData("arm/Volts3", arm.runVoltsCommand(Volts.of(0.45)));
+      SmartDashboard.putData("arm/Volts4", arm.runVoltsCommand(Volts.of(0.5)));
 
       SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
       SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
