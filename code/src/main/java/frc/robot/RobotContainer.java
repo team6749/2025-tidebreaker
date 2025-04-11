@@ -180,7 +180,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
-    algaeSubsystem.setDefaultCommand(algaeSubsystem.algaeIdleState());
+    x.onTrue(algaeSubsystem.algaeIntakeCommand());
 
     buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
     a.whileTrue(climberSubsystem.climbCommand());
@@ -308,7 +308,7 @@ public class RobotContainer {
   }
 
   private Command shootAlgae() {
-    Command command = Commands.run(() -> algaeSubsystem.algaeShoot(), algaeSubsystem);
+    Command command = Commands.run(() -> algaeSubsystem.algaeShootCommand(), algaeSubsystem);
     return command;
   }
 

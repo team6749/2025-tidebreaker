@@ -38,12 +38,12 @@ public class AlgaeSubsystem extends SubsystemBase {
     algaeMotor.setVoltage(voltage.in(Volts));
   }
 
-  public Command algaeIdleState() {
+  public Command algaeIntakeCommand() {
     Command command = Commands.run(() -> runVolts(Volts.of(stopOnIntake())), this);
     return command;
   }
 
-  public Command algaeShoot() {
+  public Command algaeShootCommand() {
     Command command = Commands.run(() -> runVolts(shootVoltage), this);
     return command;
   }
