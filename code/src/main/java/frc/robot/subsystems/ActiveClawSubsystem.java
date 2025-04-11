@@ -35,7 +35,8 @@ public class ActiveClawSubsystem extends SubsystemBase {
   public ActiveClawSubsystem() {
     clawMotorLeft = new TalonFX(Constants.clawMotorLeftID);
     clawMotorRight = new TalonFX(Constants.clawMotorRightID); 
-    brakeMode(true);
+    clawMotorLeft.setNeutralMode(NeutralModeValue.Brake);
+    clawMotorRight.setNeutralMode(NeutralModeValue.Brake);
     clawLimitSwitch = new DigitalInput(4); //placeholder before limit switch is on
     clawMotorRight.setInverted(clawInverted);
     clawMotorLeft.setInverted(clawInverted);
@@ -64,7 +65,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
     command.setName("clawLowShoot");
     return command;
   }
-  
+
   public Command clawHighShoot() {
     Command command = Commands.run(() -> runVolts(shootHighVoltage), this);
     command.setName("clawhighShoot");
