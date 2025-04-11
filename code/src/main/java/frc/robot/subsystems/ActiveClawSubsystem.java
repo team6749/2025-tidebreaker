@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -11,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,27 +22,35 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
-  TalonFX clawMotor;
+  TalonFX clawMotorLeft;
+  TalonFX clawMotorRight;
+  Angle leftRotations;
+  Angle rightRotations;
   Voltage idleVoltage = Volts.of(0.2);
   Voltage shootLowVoltage = Volts.of(-0.3);
   Voltage shootHighVoltage = Volts.of(0.3);
-  boolean clawInverted = false;
+  boolean clawInverted = true;
   DigitalInput clawLimitSwitch;
   /** Creates a new ActiveClaw. */
   public ActiveClawSubsystem() {
-    clawMotor = new TalonFX(Constants.clawMotorID); //placeholder before the claw is made
+    clawMotorLeft = new TalonFX(Constants.clawMotorLeftID);
+    clawMotorRight = new TalonFX(Constants.clawMotorRightID); 
     brakeMode(true);
-    clawLimitSwitch = new DigitalInput(6); //placeholder before limit switch is on
-    clawMotor.setInverted(clawInverted);
+    clawLimitSwitch = new DigitalInput(4); //placeholder before limit switch is on
+    clawMotorRight.setInverted(clawInverted);
+    clawMotorLeft.setInverted(clawInverted);
   }
 
   @Override
   public void periodic() {
+    leftRotations = Rotations.of(clawMotorLeft.getPosition().getValueAsDouble());
+    rightRotations = Rotations.of(clawMotorRight.getPosition().getValueAsDouble());
     // This method will be called once per scheduler run
   }
 
   private void runVolts(Voltage voltage) {
-    clawMotor.setVoltage(voltage.in(Volts));
+    clawMotorLeft.setVoltage(voltage.in(Volts));
+    clawMotorRight.setVoltage(voltage.in(Volts));
   }
 
   public Command clawIdleState() {
@@ -54,19 +64,22 @@ public class ActiveClawSubsystem extends SubsystemBase {
     command.setName("clawLowShoot");
     return command;
   }
+  
   public Command clawHighShoot() {
     Command command = Commands.run(() -> runVolts(shootHighVoltage), this);
     command.setName("clawhighShoot");
     return command;
   }
   public void brakeMode(boolean isBrakeModeOn) {
-    clawMotor.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
+    clawMotorLeft.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
+    clawMotorRight.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
   }
 
   public double stopOnIntake() {
     return (clawLimitSwitch.get() ? 0:1);
   }
   public void stop() {
-    clawMotor.stopMotor();
+    clawMotorLeft.stopMotor();
+    clawMotorRight.stopMotor();
   }
 }

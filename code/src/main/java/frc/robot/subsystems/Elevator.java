@@ -71,7 +71,7 @@ public class Elevator extends SubsystemBase {
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
   private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
   public DigitalInput bottomLimitSwitch = new DigitalInput(3);
-  public DigitalInput coralLimitSwitch = new DigitalInput(4);
+  public DigitalInput coralLimitSwitch = new DigitalInput(5);
 
 
   private final ElevatorSim simElevator = new ElevatorSim(
