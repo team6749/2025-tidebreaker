@@ -26,9 +26,9 @@ public class ActiveClawSubsystem extends SubsystemBase {
   TalonFX clawMotorRight;
   Angle leftRotations;
   Angle rightRotations;
-  Voltage idleVoltage = Volts.of(0.2);
-  Voltage shootLowVoltage = Volts.of(-0.6);
-  Voltage shootHighVoltage = Volts.of(0.6);
+  Voltage idleVoltage = Volts.of(0.1);
+  Voltage shootLowVoltage = Volts.of(-2.5);
+  Voltage shootHighVoltage = Volts.of(1);
   boolean clawInverted = true;
   boolean isBrakeModeOn = true;
   DigitalInput clawLimitSwitch;
