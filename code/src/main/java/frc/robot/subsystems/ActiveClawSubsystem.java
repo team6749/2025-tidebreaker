@@ -27,7 +27,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   Angle leftRotations;
   Angle rightRotations;
   Voltage idleVoltage = Volts.of(0.1);
-  Voltage shootLowVoltage = Volts.of(-2.5);
+  Voltage shootLowVoltage = Volts.of(-3);
   Voltage shootHighVoltage = Volts.of(1);
   boolean clawInverted = true;
   boolean isBrakeModeOn = true;
