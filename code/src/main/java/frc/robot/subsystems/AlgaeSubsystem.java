@@ -56,7 +56,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   public double stopOnIntake() {
-    return (/*algaeLimitSwitch.get() ? 0:-1*/1);
+    return (/*algaeLimitSwitch.get() ? 0:-1*/-1);
   }
 
   public void stop() {
