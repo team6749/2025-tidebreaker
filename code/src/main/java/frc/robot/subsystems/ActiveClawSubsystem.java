@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
@@ -24,6 +25,7 @@ import frc.robot.Constants;
 public class ActiveClawSubsystem extends SubsystemBase {
   TalonFX clawMotorLeft;
   TalonFX clawMotorRight;
+  ConstrainedArmSubsystem armSubsystem;
   Voltage idleVoltage = Volts.of(0.1);
   Voltage shootLowVoltage = Volts.of(-2.5);
   Voltage shootHighVoltage = Volts.of(1);
@@ -31,9 +33,10 @@ public class ActiveClawSubsystem extends SubsystemBase {
   boolean isBrakeModeOn = true;
   DigitalInput clawLimitSwitch;
   /** Creates a new ActiveClaw. */
-  public ActiveClawSubsystem() {
+  public ActiveClawSubsystem(ConstrainedArmSubsystem arm) {
     clawMotorLeft = new TalonFX(Constants.clawMotorLeftID);
     clawMotorRight = new TalonFX(Constants.clawMotorRightID); 
+    armSubsystem = arm;
   brakeMode(isBrakeModeOn);
     clawLimitSwitch = new DigitalInput(4); //placeholder before limit switch is on
   }
@@ -55,16 +58,11 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public Command clawLowShoot() {
-    Command command = Commands.runEnd(() -> runVolts(shootLowVoltage),() -> stop(), this);
+    Command command = Commands.runEnd(() -> runVolts((armSubsystem.getPosition().in(Radians) > 0) ? shootHighVoltage : shootLowVoltage),() -> stop(), this);
     command.setName("clawLowShoot");
     return command;
   }
 
-  public Command clawHighShoot() {
-    Command command = Commands.runEnd(() -> runVolts(shootHighVoltage),() -> stop(), this);
-    command.setName("clawhighShoot");
-    return command;
-  }
   public void brakeMode(boolean isBrakeModeOn) {
     clawMotorLeft.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
     clawMotorRight.setNeutralMode(isBrakeModeOn? NeutralModeValue.Brake: NeutralModeValue.Coast);
