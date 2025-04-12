@@ -41,6 +41,7 @@ import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -53,6 +54,7 @@ public class RobotContainer {
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem arm;
+  AlgaeSubsystem algaeSubsystem;
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
@@ -103,6 +105,7 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     arm = new ConstrainedArmSubsystem();
+    algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
@@ -162,6 +165,7 @@ public class RobotContainer {
 
     coralSubsystemTest();
     configureBindings();
+    algaeTest();
     // elevatorTest();
     // armTest();
     // sysIDSwerve();
@@ -178,9 +182,6 @@ public class RobotContainer {
   private void configureBindings() {
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    buttonIntakeDrop.debounce(1).whileTrue(intakeDropper.drop());
-    a.whileTrue(climberSubsystem.climbCommand());
-    b.whileTrue(climberSubsystem.unclimbCommand());
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
@@ -300,7 +301,12 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(lock());
+    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
+  }
+
+  private void algaeTest() {
+    b.whileTrue(algaeSubsystem.algaeIntakeCommand());
+    a.whileTrue(algaeSubsystem.algaeShootCommand());
   }
 
   private Command home() {
