@@ -24,10 +24,8 @@ import frc.robot.Constants;
 public class ActiveClawSubsystem extends SubsystemBase {
   TalonFX clawMotorLeft;
   TalonFX clawMotorRight;
-  Angle leftRotations;
-  Angle rightRotations;
   Voltage idleVoltage = Volts.of(0.1);
-  Voltage shootLowVoltage = Volts.of(-3);
+  Voltage shootLowVoltage = Volts.of(-2.5);
   Voltage shootHighVoltage = Volts.of(1);
   boolean clawInverted = true;
   boolean isBrakeModeOn = true;
@@ -42,8 +40,6 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    leftRotations = Rotations.of(clawMotorLeft.getPosition().getValueAsDouble());
-    rightRotations = Rotations.of(clawMotorRight.getPosition().getValueAsDouble());
     // This method will be called once per scheduler run
   }
 

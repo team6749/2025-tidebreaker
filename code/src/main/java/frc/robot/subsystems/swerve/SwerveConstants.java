@@ -39,7 +39,7 @@ public class SwerveConstants {
     public static final Translation2d[] moduleLocations = {
             // Front left
             new Translation2d(trackHeight.div(2), trackWidth.div(2)),
-            // Front right
+            // Front right y:0.176, x:0.101
             new Translation2d(trackHeight.div(2), trackWidth.div(2).unaryMinus()),
             // Back left
             new Translation2d(trackHeight.div(2).unaryMinus(), trackWidth.div(2)),

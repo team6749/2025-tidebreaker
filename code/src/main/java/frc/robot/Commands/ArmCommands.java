@@ -43,7 +43,7 @@ public class ArmCommands {
     }
 
     public Command positionLevel4() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(45));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(50));
         command.setName("Arm Score Level 4");
         return command;
     }

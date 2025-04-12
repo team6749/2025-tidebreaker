@@ -55,6 +55,14 @@ public class POICommands {
                 return pathfindingCommand;
         }
 
+        public Command pathToTestPath() throws FileVersionException, IOException, ParseException {
+                Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
+                                PathPlannerPath.fromPathFile("testPath"),
+                                constraints).finallyDo(() -> driveSubsystem.stop());
+                pathfindingCommand.setName("testPath");
+                return pathfindingCommand;
+        }
+
         public Command pathToCoralB() throws FileVersionException, IOException, ParseException {
                 Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(
                                 PathPlannerPath.fromPathFile("coral_b"),
