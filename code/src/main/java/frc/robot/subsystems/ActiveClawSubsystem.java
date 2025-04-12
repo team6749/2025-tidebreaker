@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Centimeter;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
@@ -14,6 +18,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,6 +37,9 @@ public class ActiveClawSubsystem extends SubsystemBase {
   Voltage shootHighVoltage = Volts.of(1);
   boolean clawInverted = true;
   boolean isBrakeModeOn = true;
+  boolean coralIntook;
+  LinearVelocity clawVelocity = MetersPerSecond.of(0);
+  LinearVelocity recordVelocity = MetersPerSecond.of(0);
   DigitalInput clawLimitSwitch;
   /** Creates a new ActiveClaw. */
   public ActiveClawSubsystem(ConstrainedArmSubsystem arm) {
@@ -51,6 +60,23 @@ public class ActiveClawSubsystem extends SubsystemBase {
     clawMotorRight.setVoltage(voltage.in(Volts));
   }
 
+  private boolean stallDetect() {
+    coralIntook = false;
+    clawVelocity = MetersPerSecond.of((((Math.abs(clawMotorLeft.getVelocity().getValueAsDouble())) + Math.abs(clawMotorRight.getVelocity().getValueAsDouble())) / 2) * Inches.of(4).in(Meters) * Math.PI);
+        
+    if(clawVelocity.in(MetersPerSecond) != 0) {
+        if(clawVelocity.gt(recordVelocity)) {
+            recordVelocity = clawVelocity;
+        }
+        if(clawVelocity.in(MetersPerSecond) < (recordVelocity.in(MetersPerSecond) * 0.9) && clawLimitSwitch.get() == false) {
+          coralIntook = true;
+        }
+    } else {
+        recordVelocity = MetersPerSecond.of(0);
+    }
+    return coralIntook;
+  }
+
   public Command clawIdleState() {
     Command command = Commands.runEnd(() -> runVolts(Volts.of(stopOnIntake())),() -> stop(),this);
     command.setName("clawIdleState");
@@ -69,7 +95,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public double stopOnIntake() {
-    return (clawLimitSwitch.get() ? 0:1);
+    return ((clawLimitSwitch.get() || stallDetect())  ? 0:1);
   }
   public void stop() {
     clawMotorLeft.stopMotor();
