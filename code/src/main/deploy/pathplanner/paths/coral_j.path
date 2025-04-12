@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.095015868556102,
-        "y": 5.42712190653162
+        "x": 5.095072383770148,
+        "y": 5.426079509456951
       },
       "prevControl": {
-        "x": 5.220015868556102,
-        "y": 5.6436282574777294
+        "x": 5.220072383770148,
+        "y": 5.64258586040306
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "reversed": false,
   "folder": "coral_paths",
   "idealStartingState": {
-    "velocity": 0.4,
+    "velocity": 0.7,
     "rotation": -119.99999999999999
   },
   "useDefaultConstraints": false
