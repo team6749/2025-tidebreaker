@@ -19,7 +19,7 @@ public class ArmCommands {
     }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-90));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-62));
         command.setName("Arm Intake Position");
         return command;
     }
@@ -31,7 +31,7 @@ public class ArmCommands {
     }
 
     public Command positionLevel2() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-13)); //random values
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-80)); //random values
         command.setName("Arm Score Level 2");
         return command;
     }
@@ -43,7 +43,7 @@ public class ArmCommands {
     }
 
     public Command positionLevel4() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(45));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(50));
         command.setName("Arm Score Level 4");
         return command;
     }

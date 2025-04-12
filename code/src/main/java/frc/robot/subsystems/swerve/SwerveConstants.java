@@ -19,7 +19,7 @@ public class SwerveConstants {
     public static final SlewRateLimiter driveLimiterTheta = new SlewRateLimiter(15);
 
     // Max linear velocity of the module (how fast it can spin)
-    public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(3.5);
+    public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(2.5);
 
     // This should be based on physical properties of the the max wheel speeds in a
     // circle
@@ -39,7 +39,7 @@ public class SwerveConstants {
     public static final Translation2d[] moduleLocations = {
             // Front left
             new Translation2d(trackHeight.div(2), trackWidth.div(2)),
-            // Front right
+            // Front right y:0.176, x:0.101
             new Translation2d(trackHeight.div(2), trackWidth.div(2).unaryMinus()),
             // Back left
             new Translation2d(trackHeight.div(2).unaryMinus(), trackWidth.div(2)),

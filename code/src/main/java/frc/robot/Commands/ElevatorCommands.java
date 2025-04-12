@@ -23,9 +23,8 @@ public class ElevatorCommands {
     }
 
     public Command intakeAction() {
-        Command command = Commands.sequence(
-                elevatorSubsystem.getToStateCommandUnsafe(Meters.of(0.0), attackVelocity),
-                elevatorSubsystem.runFeedForwardOpenLoopCommand(attackVelocity).withTimeout(0.1));
+        Command command = 
+                elevatorSubsystem.goToPositionCommand(Meters.of(0.434));
         command.setName("Elevator Intake");
         return command;
     }
@@ -37,7 +36,7 @@ public class ElevatorCommands {
     }
 
     public Command positionLevel2() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.15));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.367));
         command.setName("Elevator Score Level 2");
         return command;
     }

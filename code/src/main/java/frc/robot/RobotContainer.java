@@ -41,6 +41,7 @@ import frc.robot.Commands.ArmCommands;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
+import frc.robot.subsystems.ActiveClawSubsystem;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
@@ -51,6 +52,7 @@ import frc.robot.subsystems.IntakeDropper;
 @Logged
 public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
+  ActiveClawSubsystem clawSubsystem;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem arm;
@@ -105,6 +107,7 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     arm = new ConstrainedArmSubsystem();
+    clawSubsystem = new ActiveClawSubsystem();
     algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
@@ -165,6 +168,7 @@ public class RobotContainer {
 
     coralSubsystemTest();
     configureBindings();
+    clawTest();
     algaeTest();
     // elevatorTest();
     // armTest();
@@ -180,6 +184,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
     // Add Rest Pose Command
@@ -206,11 +211,11 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
-      SmartDashboard.putData("arm/Volts0", arm.runVoltsCommand(Volts.of(0.1)));
-      SmartDashboard.putData("arm/Volts1", arm.runVoltsCommand(Volts.of(0.15)));
-      SmartDashboard.putData("arm/Volts2", arm.runVoltsCommand(Volts.of(0.2)));
-      SmartDashboard.putData("arm/Volts3", arm.runVoltsCommand(Volts.of(0.25)));
-      SmartDashboard.putData("arm/Volts4", arm.runVoltsCommand(Volts.of(0.3)));
+      SmartDashboard.putData("arm/Volts0", arm.runVoltsCommand(Volts.of(0.3)));
+      SmartDashboard.putData("arm/Volts1", arm.runVoltsCommand(Volts.of(0.35)));
+      SmartDashboard.putData("arm/Volts2", arm.runVoltsCommand(Volts.of(0.4)));
+      SmartDashboard.putData("arm/Volts3", arm.runVoltsCommand(Volts.of(0.45)));
+      SmartDashboard.putData("arm/Volts4", arm.runVoltsCommand(Volts.of(0.5)));
 
       SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
       SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
@@ -228,6 +233,7 @@ public class RobotContainer {
       SmartDashboard.putData("Align/J", poiCommands.pathToCoralJ());
       SmartDashboard.putData("Align/K", poiCommands.pathToCoralK());
       SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
+      SmartDashboard.putData("Align/testPath", poiCommands.pathToTestPath());
       SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
       SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
 
@@ -251,6 +257,10 @@ public class RobotContainer {
     a.whileTrue(arm.goToPositionCommand(Radians.of(0)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
+  }
+  private void clawTest() {
+    b.whileTrue(clawSubsystem.clawLowShoot());
+    x.whileTrue(clawSubsystem.clawHighShoot());
   }
 
   @SuppressWarnings("unused")
@@ -344,11 +354,12 @@ public class RobotContainer {
     return command;
   }
 
-
   private Command intakeTeleop() {
-    Command command = Commands.sequence(
-        intakeAuto(),
-        elevatorCommands.home());
+    Command command = Commands.parallel(
+      armCommands.intakePosition(),
+      elevatorCommands.intakeAction()
+    );
+        
     command.setName("intake Coral teleop");
     return command;
   }
@@ -356,15 +367,7 @@ public class RobotContainer {
   // Intake auto does not return to the home position because this saves ~0.5
   // seconds
   private Command intakeAuto() {
-    Command command = Commands.sequence(
-        Commands.parallel(
-            elevatorCommands.home(),
-            armCommands.intakePosition()),
-        Commands.race(
-            elevatorCommands.intakeAction(),
-            // adding a damping to the arm as it lowers to keep the arm flush against the
-            // end stop as the chain has slop
-            arm.runVoltsCommand(Volts.of(-0.7))));
+    Command command = intakeTeleop();
     command.setName("intake Coral auto");
     return command;
   }
