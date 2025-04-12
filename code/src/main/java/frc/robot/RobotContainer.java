@@ -42,6 +42,7 @@ import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
 import frc.robot.subsystems.ActiveClawSubsystem;
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -55,6 +56,7 @@ public class RobotContainer {
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem arm;
+  AlgaeSubsystem algaeSubsystem;
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
@@ -106,6 +108,7 @@ public class RobotContainer {
     swerveSubsystem = new SwerveDrive();
     arm = new ConstrainedArmSubsystem();
     clawSubsystem = new ActiveClawSubsystem();
+    algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     poiCommands = new POICommands(swerveSubsystem);
@@ -166,6 +169,7 @@ public class RobotContainer {
     coralSubsystemTest();
     configureBindings();
     clawTest();
+    algaeTest();
     // elevatorTest();
     // armTest();
     // sysIDSwerve();
@@ -182,6 +186,7 @@ public class RobotContainer {
   private void configureBindings() {
     clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
+
     // Add Rest Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
@@ -228,6 +233,7 @@ public class RobotContainer {
       SmartDashboard.putData("Align/J", poiCommands.pathToCoralJ());
       SmartDashboard.putData("Align/K", poiCommands.pathToCoralK());
       SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
+      SmartDashboard.putData("Align/testPath", poiCommands.pathToTestPath());
       SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
       SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
 
@@ -305,7 +311,12 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(lock());
+    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
+  }
+
+  private void algaeTest() {
+    b.whileTrue(algaeSubsystem.algaeIntakeCommand());
+    a.whileTrue(algaeSubsystem.algaeShootCommand());
   }
 
   private Command home() {

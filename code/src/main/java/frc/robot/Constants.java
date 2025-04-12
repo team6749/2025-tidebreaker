@@ -19,6 +19,7 @@ public class Constants {
     public static final int elevatorMotorID = 18;
     public static final int clawMotorRightID = 23;
     public static final int clawMotorLeftID = 20;
+    public static final int algaeMotorID = 40;
     public static final int climberMotorPort = 20;
     public static final double deadZone = 0.06;
 
