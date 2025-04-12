@@ -40,22 +40,9 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "home"
-                      }
-                    }
-                  ]
+                  "name": "intake"
                 }
               }
             ]
@@ -78,22 +65,9 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "intake"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "l4"
-                      }
-                    }
-                  ]
+                  "name": "l4"
                 }
               }
             ]
@@ -116,22 +90,9 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "home"
-                      }
-                    }
-                  ]
+                  "name": "intake"
                 }
               }
             ]
@@ -141,6 +102,31 @@
           "type": "named",
           "data": {
             "name": "wait_for_coral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "intake_to_c"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "l4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score"
           }
         }
       ]

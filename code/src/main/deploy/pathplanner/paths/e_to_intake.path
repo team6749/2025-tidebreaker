@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.611748526051291,
-        "y": 1.7657280182723074
+        "x": 4.291598360655737,
+        "y": 2.1609118852459015
       },
       "isLocked": false,
       "linkedName": "coral_e"
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 55.33716505572296
+    "rotation": -126.0
   },
   "reversed": false,
   "folder": "right",

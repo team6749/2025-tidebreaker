@@ -37,10 +37,10 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.7035766780989786,
+      "minWaypointRelativePos": 0.7956883880450719,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 0.4,
+        "maxVelocity": 0.7,
         "maxAcceleration": 3.5,
         "maxAngularVelocity": 180.0,
         "maxAngularAcceleration": 360.0,
@@ -67,7 +67,7 @@
   "folder": "left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.31266463330527
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

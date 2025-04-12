@@ -107,7 +107,7 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
     arm = new ConstrainedArmSubsystem();
-    clawSubsystem = new ActiveClawSubsystem();
+    clawSubsystem = new ActiveClawSubsystem(arm);
     algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
@@ -120,8 +120,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
-        .until(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5));
-    NamedCommands.registerCommand("score", scoreAuto());
+        .until(() -> clawSubsystem.hasCoral()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5));
+    NamedCommands.registerCommand("score", clawSubsystem.clawLowShoot().withTimeout(Seconds.of(0.5)));
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
@@ -258,9 +258,8 @@ public class RobotContainer {
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
+
   private void clawTest() {
-    b.whileTrue(clawSubsystem.clawLowShoot());
-    x.whileTrue(clawSubsystem.clawHighShoot());
   }
 
   @SuppressWarnings("unused")
@@ -270,7 +269,7 @@ public class RobotContainer {
     buttonLevel3.whileTrue(moveToLevel3());
     buttonLevel4.whileTrue(moveToLevel4().onlyIf(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated() == false));
     buttonIntake.whileTrue(intakeTeleop());
-    buttonScore.whileTrue(scoreTeleop());
+    buttonScore.whileTrue(clawSubsystem.clawLowShoot());
   }
 
   private void sysIDSwerve() {
@@ -315,7 +314,7 @@ public class RobotContainer {
   }
 
   private void algaeTest() {
-    b.whileTrue(algaeSubsystem.algaeIntakeCommand());
+    y.whileTrue(algaeSubsystem.algaeIntakeCommand());
     a.whileTrue(algaeSubsystem.algaeShootCommand());
   }
 
@@ -337,8 +336,7 @@ public class RobotContainer {
   }
 
   private Command moveToLevel3() {
-    Command command = Commands.sequence(
-        elevatorCommands.home(),
+    Command command = Commands.parallel(
         armCommands.positionLevel3(),
         elevatorCommands.positionLevel3());
     command.setName("Level 3");
@@ -348,18 +346,16 @@ public class RobotContainer {
   private Command moveToLevel4() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel4(),
-        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
-            .andThen(armCommands.positionLevel4()));
+        armCommands.positionLevel4());
     command.setName("Level 4");
     return command;
   }
 
   private Command intakeTeleop() {
-    Command command = Commands.parallel(
-      armCommands.intakePosition(),
-      elevatorCommands.intakeAction()
-    );
-        
+    Command command = Commands.parallel(Commands.runOnce(() -> clawSubsystem.clearStallDetect(), clawSubsystem),
+        armCommands.intakePosition(),
+        elevatorCommands.intakeAction());
+
     command.setName("intake Coral teleop");
     return command;
   }
@@ -391,7 +387,7 @@ public class RobotContainer {
   }
 
   public Command lock() {
-    Command command = swerveSubsystem.moduleLock(new SwerveModuleState (0.0,Rotation2d.fromDegrees(-35)));
+    Command command = swerveSubsystem.moduleLock(new SwerveModuleState(0.0, Rotation2d.fromDegrees(-35)));
     return command;
   }
 
