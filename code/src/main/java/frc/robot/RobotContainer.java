@@ -345,8 +345,9 @@ public class RobotContainer {
 
   private Command moveToLevel4() {
     Command command = Commands.parallel(
-        elevatorCommands.positionLevel4(),
-        armCommands.positionLevel4());
+      armCommands.positionLevel4(),
+      elevatorCommands.positionLevel4()
+    );
     command.setName("Level 4");
     return command;
   }

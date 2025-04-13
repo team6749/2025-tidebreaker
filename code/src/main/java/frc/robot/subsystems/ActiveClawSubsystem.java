@@ -101,7 +101,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public boolean hasCoral () {
-    return false || debounce.calculate(isStallDetected);
+    return clawLimitSwitch.get() || debounce.calculate(isStallDetected);
   }
 
   public void brakeMode(boolean isBrakeModeOn) {
