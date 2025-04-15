@@ -55,14 +55,13 @@ public class RobotContainer {
   ActiveClawSubsystem clawSubsystem;
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
-  ConstrainedArmSubsystem arm;
+  ConstrainedArmSubsystem armSubsystem;
   AlgaeSubsystem algaeSubsystem;
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
   ArmCommands armCommands;
-  POICommands poiCommands;
-  IntakeDropper intakeDropper;
+  POICommands POICommands;
 
   private final Joystick topButtonBoard = new Joystick(Constants.kTopButtonBoardPort);
   private final Joystick bottomButtonBoard = new Joystick(Constants.kBottomButtonBoardPort);
@@ -106,16 +105,15 @@ public class RobotContainer {
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
-    arm = new ConstrainedArmSubsystem();
-    clawSubsystem = new ActiveClawSubsystem(arm);
+    armSubsystem = new ConstrainedArmSubsystem();
+    clawSubsystem = new ActiveClawSubsystem(armSubsystem);
     algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
-    poiCommands = new POICommands(swerveSubsystem);
+    POICommands = new POICommands(swerveSubsystem);
     elevatorCommands = new ElevatorCommands(elevatorSubsystem);
-    armCommands = new ArmCommands(arm);
+    armCommands = new ArmCommands(armSubsystem);
     climberSubsystem = new ClimberSubsystem();
-    intakeDropper = new IntakeDropper();
 
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
@@ -211,34 +209,31 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
-      SmartDashboard.putData("arm/Volts0", arm.runVoltsCommand(Volts.of(0.3)));
-      SmartDashboard.putData("arm/Volts1", arm.runVoltsCommand(Volts.of(0.35)));
-      SmartDashboard.putData("arm/Volts2", arm.runVoltsCommand(Volts.of(0.4)));
-      SmartDashboard.putData("arm/Volts3", arm.runVoltsCommand(Volts.of(0.45)));
-      SmartDashboard.putData("arm/Volts4", arm.runVoltsCommand(Volts.of(0.5)));
+      SmartDashboard.putData("arm/Volts0", armSubsystem.runVoltsCommand(Volts.of(0.3)));
+      SmartDashboard.putData("arm/Volts1", armSubsystem.runVoltsCommand(Volts.of(0.35)));
+      SmartDashboard.putData("arm/Volts2", armSubsystem.runVoltsCommand(Volts.of(0.4)));
+      SmartDashboard.putData("arm/Volts3", armSubsystem.runVoltsCommand(Volts.of(0.45)));
+      SmartDashboard.putData("arm/Volts4", armSubsystem.runVoltsCommand(Volts.of(0.5)));
 
-      SmartDashboard.putData("ArmSetpoints/-45", arm.goToPositionCommand(Degrees.of(-45)));
-      SmartDashboard.putData("ArmSetpoints/0", arm.goToPositionCommand(Degrees.of(0)));
-      SmartDashboard.putData("ArmSetpoints/45", arm.goToPositionCommand(Degrees.of(45)));
+      SmartDashboard.putData("ArmSetpoints/-45", armSubsystem.goToPositionCommand(Degrees.of(-45)));
+      SmartDashboard.putData("ArmSetpoints/0", armSubsystem.goToPositionCommand(Degrees.of(0)));
+      SmartDashboard.putData("ArmSetpoints/45", armSubsystem.goToPositionCommand(Degrees.of(45)));
 
-      SmartDashboard.putData("Align/A", poiCommands.pathToCoralA());
-      SmartDashboard.putData("Align/B", poiCommands.pathToCoralB());
-      SmartDashboard.putData("Align/C", poiCommands.pathToCoralC());
-      SmartDashboard.putData("Align/D", poiCommands.pathToCoralD());
-      SmartDashboard.putData("Align/E", poiCommands.pathToCoralE());
-      SmartDashboard.putData("Align/F", poiCommands.pathToCoralF());
-      SmartDashboard.putData("Align/G", poiCommands.pathToCoralG());
-      SmartDashboard.putData("Align/H", poiCommands.pathToCoralH());
-      SmartDashboard.putData("Align/I", poiCommands.pathToCoralI());
-      SmartDashboard.putData("Align/J", poiCommands.pathToCoralJ());
-      SmartDashboard.putData("Align/K", poiCommands.pathToCoralK());
-      SmartDashboard.putData("Align/L", poiCommands.pathToCoralL());
-      SmartDashboard.putData("Align/testPath", poiCommands.pathToTestPath());
-      SmartDashboard.putData("Align/IntakeLeft", poiCommands.pathToLeftIntake());
-      SmartDashboard.putData("Align/IntakeRight", poiCommands.pathToRightIntake());
-
-      SmartDashboard.putData("Intake/Drop", intakeDropper.drop());
-      SmartDashboard.putData("Intake/Hold", intakeDropper.hold());
+      SmartDashboard.putData("Align/A", POICommands.pathToCoralA());
+      SmartDashboard.putData("Align/B", POICommands.pathToCoralB());
+      SmartDashboard.putData("Align/C", POICommands.pathToCoralC());
+      SmartDashboard.putData("Align/D", POICommands.pathToCoralD());
+      SmartDashboard.putData("Align/E", POICommands.pathToCoralE());
+      SmartDashboard.putData("Align/F", POICommands.pathToCoralF());
+      SmartDashboard.putData("Align/G", POICommands.pathToCoralG());
+      SmartDashboard.putData("Align/H", POICommands.pathToCoralH());
+      SmartDashboard.putData("Align/I", POICommands.pathToCoralI());
+      SmartDashboard.putData("Align/J", POICommands.pathToCoralJ());
+      SmartDashboard.putData("Align/K", POICommands.pathToCoralK());
+      SmartDashboard.putData("Align/L", POICommands.pathToCoralL());
+      SmartDashboard.putData("Align/testPath", POICommands.pathToTestPath());
+      SmartDashboard.putData("Align/IntakeLeft", POICommands.pathToLeftIntake());
+      SmartDashboard.putData("Align/IntakeRight", POICommands.pathToRightIntake());
 
       SmartDashboard.putData("Elevator RE-HOME", elevatorCommands.reHome());
 
@@ -254,7 +249,10 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(arm.goToPositionCommand(Radians.of(0)));
+    a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
+    b.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(1)));
+    x.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(-0.7)));
+    y.whileTrue(armSubsystem.runVoltsCommand(Volts.of(-0.7)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
@@ -287,8 +285,8 @@ public class RobotContainer {
   }
 
   private void sysIDArm() {
-    a.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    b.whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    a.whileTrue(armSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    b.whileTrue(armSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // x.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // y.whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
@@ -298,20 +296,19 @@ public class RobotContainer {
   }
 
   private void autoAlignTest() throws FileVersionException, IOException, ParseException {
-    buttonCoralA.whileTrue(poiCommands.pathToCoralA());
-    buttonCoralB.whileTrue(poiCommands.pathToCoralB());
-    buttonCoralC.whileTrue(poiCommands.pathToCoralC());
-    buttonCoralD.whileTrue(poiCommands.pathToCoralD());
-    buttonCoralE.whileTrue(poiCommands.pathToCoralE());
-    buttonCoralF.whileTrue(poiCommands.pathToCoralF());
-    buttonCoralG.whileTrue(poiCommands.pathToCoralG());
-    buttonCoralH.whileTrue(poiCommands.pathToCoralH());
-    buttonCoralI.whileTrue(poiCommands.pathToCoralI());
-    buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
-    buttonCoralK.whileTrue(poiCommands.pathToCoralK());
-    buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
-    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
+    buttonCoralA.whileTrue(POICommands.pathToCoralA());
+    buttonCoralB.whileTrue(POICommands.pathToCoralB());
+    buttonCoralC.whileTrue(POICommands.pathToCoralC());
+    buttonCoralD.whileTrue(POICommands.pathToCoralD());
+    buttonCoralE.whileTrue(POICommands.pathToCoralE());
+    buttonCoralF.whileTrue(POICommands.pathToCoralF());
+    buttonCoralG.whileTrue(POICommands.pathToCoralG());
+    buttonCoralH.whileTrue(POICommands.pathToCoralH());
+    buttonCoralI.whileTrue(POICommands.pathToCoralI());
+    buttonCoralJ.whileTrue(POICommands.pathToCoralJ());
+    buttonCoralK.whileTrue(POICommands.pathToCoralK());
+    buttonCoralL.whileTrue(POICommands.pathToCoralL());
+    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
   }
 
   private void algaeTest() {
@@ -372,7 +369,7 @@ public class RobotContainer {
 
   // Scores just level 4
   private Command scoreAuto() {
-    Command command = arm.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
+    Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
     return command;
   }
