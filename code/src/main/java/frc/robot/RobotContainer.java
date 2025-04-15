@@ -185,7 +185,19 @@ public class RobotContainer {
     clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    // Add Rest Pose Command
+    buttonHome.whileTrue(home());
+    buttonLevel2.whileTrue(moveToLevel2());
+    buttonLevel3.whileTrue(moveToLevel3());
+    buttonLevel4.whileTrue(moveToLevel4());
+    buttonIntake.whileTrue(intakeTeleop());
+    buttonScore.whileTrue(clawSubsystem.clawLowShoot());
+
+    a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
+    b.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(1)));
+    x.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(-0.7)));
+    y.whileTrue(armSubsystem.runVoltsCommand(Volts.of(-0.7)));
+    
+    // Add Reset Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
     }, localizationSubsystem));
@@ -249,10 +261,6 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void armTest() {
-    a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
-    b.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(1)));
-    x.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(-0.7)));
-    y.whileTrue(armSubsystem.runVoltsCommand(Volts.of(-0.7)));
     // b.whileTrue(arm.runOpenLoopCommand(Volts.of(2), Radians.of(1)));
     // x.whileTrue(arm.runOpenLoopCommand(Volts.of(-0.5), Radians.of(1.3)));
   }
@@ -262,12 +270,6 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void coralSubsystemTest() {
-    buttonHome.whileTrue(home());
-    buttonLevel2.whileTrue(moveToLevel2());
-    buttonLevel3.whileTrue(moveToLevel3());
-    buttonLevel4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intakeTeleop());
-    buttonScore.whileTrue(clawSubsystem.clawLowShoot());
   }
 
   private void sysIDSwerve() {
@@ -308,7 +310,9 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(POICommands.pathToCoralJ());
     buttonCoralK.whileTrue(POICommands.pathToCoralK());
     buttonCoralL.whileTrue(POICommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
+    
+    buttonLeftIntake.whileTrue(POICommands.pathToLeftIntake());
+    buttonRightIntake.whileTrue(POICommands.pathToRightIntake());
   }
 
   private void algaeTest() {
