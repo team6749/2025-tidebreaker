@@ -267,7 +267,7 @@ public class RobotContainer {
     buttonHome.whileTrue(home());
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
-    buttonLevel4.whileTrue(moveToLevel4().onlyIf(() -> elevatorSubsystem.getIsCoralLimitSwitchActivated() == false));
+    buttonLevel4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(intakeTeleop());
     buttonScore.whileTrue(clawSubsystem.clawLowShoot());
   }
@@ -310,7 +310,8 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(poiCommands.pathToCoralJ());
     buttonCoralK.whileTrue(poiCommands.pathToCoralK());
     buttonCoralL.whileTrue(poiCommands.pathToCoralL());
-    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
+    buttonLeftIntake.whileTrue(poiCommands.pathToLeftIntake());
+    buttonRightIntake.whileTrue(poiCommands.pathToRightIntake());
   }
 
   private void algaeTest() {
@@ -345,8 +346,9 @@ public class RobotContainer {
 
   private Command moveToLevel4() {
     Command command = Commands.parallel(
-        elevatorCommands.positionLevel4(),
-        armCommands.positionLevel4());
+      armCommands.positionLevel4(),
+      elevatorCommands.positionLevel4()
+    );
     command.setName("Level 4");
     return command;
   }
