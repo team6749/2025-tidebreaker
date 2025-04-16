@@ -6,8 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -47,7 +45,6 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.IntakeDropper;
 
 @Logged
 public class RobotContainer {
@@ -77,31 +74,31 @@ public class RobotContainer {
   DoubleSupplier rightTrigger = () -> controller.getRawAxis(3);
   DoubleSupplier leftTrigger = () -> controller.getRawAxis(2);
 
-  JoystickButton buttonLevel2 = new JoystickButton(bottomButtonBoard, 1);
-  JoystickButton buttonLevel3 = new JoystickButton(bottomButtonBoard, 2);
-  JoystickButton buttonLevel4 = new JoystickButton(bottomButtonBoard, 3);
-  JoystickButton buttonHome = new JoystickButton(bottomButtonBoard, 4);
-  JoystickButton buttonScore = new JoystickButton(bottomButtonBoard, 5);
-  JoystickButton buttonIntake = new JoystickButton(bottomButtonBoard, 6);
-  JoystickButton buttonTopAlgae = new JoystickButton(bottomButtonBoard, 7);
-  JoystickButton buttonBottomAlgae = new JoystickButton(bottomButtonBoard, 8);
-  JoystickButton buttonCoralC = new JoystickButton(bottomButtonBoard, 9);
+  JoystickButton buttonLevel3 = new JoystickButton(bottomButtonBoard, 1);
+  JoystickButton buttonCoralC = new JoystickButton(bottomButtonBoard, 2);
+  JoystickButton buttonIntake = new JoystickButton(bottomButtonBoard, 3);
+  JoystickButton buttonLevel2 = new JoystickButton(bottomButtonBoard, 4);
+  JoystickButton buttonRightIntake = new JoystickButton(bottomButtonBoard, 5);
+  JoystickButton buttonL6 = new JoystickButton(bottomButtonBoard, 6);
+  JoystickButton buttonScore = new JoystickButton(bottomButtonBoard, 7);
+  JoystickButton buttonCoralE = new JoystickButton(bottomButtonBoard, 8);
+  JoystickButton buttonL10 = new JoystickButton(bottomButtonBoard, 9);
   JoystickButton buttonCoralD = new JoystickButton(bottomButtonBoard, 10);
-  JoystickButton buttonCoralF = new JoystickButton(bottomButtonBoard, 11);
-  JoystickButton buttonCoralE = new JoystickButton(bottomButtonBoard, 12);
+  JoystickButton buttonLevel4 = new JoystickButton(bottomButtonBoard, 11);
+  JoystickButton buttonHome = new JoystickButton(bottomButtonBoard, 12);
 
-  JoystickButton buttonCoralL = new JoystickButton(topButtonBoard, 1);
-  JoystickButton buttonCoralK = new JoystickButton(topButtonBoard, 2);
-  JoystickButton buttonCoralJ = new JoystickButton(topButtonBoard, 3);
-  JoystickButton buttonCoralI = new JoystickButton(topButtonBoard, 4);
-  JoystickButton buttonCoralB = new JoystickButton(topButtonBoard, 5);
-  JoystickButton buttonIntakeDrop = new JoystickButton(topButtonBoard, 6);
-  JoystickButton buttonCoralH = new JoystickButton(topButtonBoard, 7);
-  JoystickButton buttonCoralA = new JoystickButton(topButtonBoard, 8);
-  JoystickButton buttonCage = new JoystickButton(topButtonBoard, 9);
-  JoystickButton buttonRightIntake = new JoystickButton(topButtonBoard, 10);
-  JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 11);
-  JoystickButton buttonCoralG = new JoystickButton(topButtonBoard, 12);
+  JoystickButton buttonCoralI = new JoystickButton(topButtonBoard, 1);
+  JoystickButton buttonCoralG = new JoystickButton(topButtonBoard, 2);
+  JoystickButton buttonCoralA = new JoystickButton(topButtonBoard, 3);
+  JoystickButton buttonCoralJ = new JoystickButton(topButtonBoard, 4);
+  JoystickButton buttonCoralK = new JoystickButton(topButtonBoard, 5);
+  JoystickButton buttonLeftIntake = new JoystickButton(topButtonBoard, 6);
+  JoystickButton buttonL9 = new JoystickButton(topButtonBoard, 7);
+  JoystickButton buttonL8 = new JoystickButton(topButtonBoard, 8);
+  JoystickButton buttonCoralF = new JoystickButton(topButtonBoard, 9);
+  JoystickButton buttonCoralH = new JoystickButton(topButtonBoard, 10);
+  JoystickButton buttonCoralB = new JoystickButton(topButtonBoard, 11);
+  JoystickButton buttonCoralL = new JoystickButton(topButtonBoard, 12);
 
   public RobotContainer() {
     swerveSubsystem = new SwerveDrive();
@@ -189,14 +186,14 @@ public class RobotContainer {
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
     buttonLevel4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intakeTeleop());
+    buttonIntake.whileTrue(removeAlgaeCommand());
     buttonScore.whileTrue(clawSubsystem.clawLowShoot());
 
     a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
     b.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(1)));
     x.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(-0.7)));
     y.whileTrue(armSubsystem.runVoltsCommand(Volts.of(-0.7)));
-    
+
     // Add Reset Pose Command
     SmartDashboard.putData("Reset Pose", Commands.runOnce(() -> {
       localizationSubsystem.resetPose(Pose2d.kZero);
@@ -272,6 +269,7 @@ public class RobotContainer {
   private void coralSubsystemTest() {
   }
 
+  @SuppressWarnings("unused")
   private void sysIDSwerve() {
     a.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -279,13 +277,14 @@ public class RobotContainer {
     y.whileTrue(swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
+  @SuppressWarnings("unused")
   private void sysIDElevator() {
     a.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(elevatorSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
-
+  @SuppressWarnings("unused")
   private void sysIDArm() {
     a.whileTrue(armSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     b.whileTrue(armSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -310,14 +309,14 @@ public class RobotContainer {
     buttonCoralJ.whileTrue(POICommands.pathToCoralJ());
     buttonCoralK.whileTrue(POICommands.pathToCoralK());
     buttonCoralL.whileTrue(POICommands.pathToCoralL());
-    
+
     buttonLeftIntake.whileTrue(POICommands.pathToLeftIntake());
     buttonRightIntake.whileTrue(POICommands.pathToRightIntake());
   }
 
   private void algaeTest() {
-    y.whileTrue(algaeSubsystem.algaeIntakeCommand());
-    a.whileTrue(algaeSubsystem.algaeShootCommand());
+    rightBumper.whileTrue(algaeSubsystem.algaeIntakeCommand());
+    leftBumper.whileTrue(algaeSubsystem.dropCommand());
   }
 
   private Command home() {
@@ -347,9 +346,8 @@ public class RobotContainer {
 
   private Command moveToLevel4() {
     Command command = Commands.parallel(
-      armCommands.positionLevel4(),
-      elevatorCommands.positionLevel4()
-    );
+        armCommands.positionLevel4(),
+        elevatorCommands.positionLevel4());
     command.setName("Level 4");
     return command;
   }
@@ -372,6 +370,7 @@ public class RobotContainer {
   }
 
   // Scores just level 4
+  @SuppressWarnings("unused")
   private Command scoreAuto() {
     Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
@@ -391,6 +390,12 @@ public class RobotContainer {
 
   public Command lock() {
     Command command = swerveSubsystem.moduleLock(new SwerveModuleState(0.0, Rotation2d.fromDegrees(-35)));
+    return command;
+  }
+
+  private Command removeAlgaeCommand() {
+    Command command = Commands.runEnd(() -> armSubsystem.runVoltsCommand(Volts.of(-0.4)), () -> armSubsystem.stop(),
+        armSubsystem);
     return command;
   }
 

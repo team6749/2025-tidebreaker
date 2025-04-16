@@ -19,6 +19,7 @@ import frc.robot.Constants;
 @Logged
 public class AlgaeSubsystem extends SubsystemBase {
   TalonFX algaeMotor;
+  TalonFX dropperMotor;
   Voltage idleVoltage = Volts.of(0.1);
   Voltage shootVoltage = Volts.of(1);
   DigitalInput algaeLimitSwitch;
@@ -26,6 +27,7 @@ public class AlgaeSubsystem extends SubsystemBase {
   /** Creates a new ActiveClaw. */
   public AlgaeSubsystem() {
     algaeMotor = new TalonFX(Constants.algaeMotorID); // placeholder before the algae subsystem is made
+    dropperMotor = new TalonFX(0);
     brakeMode(true);
     algaeLimitSwitch = new DigitalInput(0);
   }
@@ -37,6 +39,11 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   private void runVolts(Voltage voltage) {
     algaeMotor.setVoltage(voltage.in(Volts));
+  }
+
+  public Command dropCommand() {
+    Command command = Commands.runEnd(() -> runVolts(idleVoltage), () -> dropperMotor.stopMotor(), this);
+    return command;
   }
 
   public Command algaeIntakeCommand() {
