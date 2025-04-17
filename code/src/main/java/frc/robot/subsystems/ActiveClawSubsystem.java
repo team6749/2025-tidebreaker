@@ -14,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -31,8 +32,10 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   private TalonFX clawMotorLeft;
   private TalonFX clawMotorRight;
+
+  @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
-  private  Debouncer debounce = new Debouncer(0.1);
+  private  Debouncer debounce = new Debouncer(0.15);
 
 
   private boolean isBrakeModeOn = true;
@@ -58,7 +61,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
     clawVelocity = MetersPerSecond.of((((Math.abs(clawMotorLeft.getVelocity().getValueAsDouble()))
         + Math.abs(clawMotorRight.getVelocity().getValueAsDouble())) / 2) * Inches.of(4).in(Meters) * Math.PI);
 
-    LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(1));
+    LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(1.3));
     if (possibleNewTriggerVelocity.gt(triggerVelocity)) {
       triggerVelocity = possibleNewTriggerVelocity;
     }
@@ -92,7 +95,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
     return command;
   }
 
-  public Command clawLowShoot() {
+  public Command clawShoot() {
     Command command = Commands.runEnd(
         () -> runVolts((armSubsystem.getPosition().in(Radians) > 0) ? shootHighVoltage : shootLowVoltage), () -> stop(),
         this);
@@ -102,6 +105,10 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   public boolean hasCoral () {
     return clawLimitSwitch.get() || debounce.calculate(isStallDetected);
+  }
+
+  public boolean isLimitSwitch() {
+    return clawLimitSwitch.get();
   }
 
   public void brakeMode(boolean isBrakeModeOn) {
