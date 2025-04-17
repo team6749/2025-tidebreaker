@@ -14,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -31,6 +32,8 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   private TalonFX clawMotorLeft;
   private TalonFX clawMotorRight;
+
+  @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
   private  Debouncer debounce = new Debouncer(0.15);
 
