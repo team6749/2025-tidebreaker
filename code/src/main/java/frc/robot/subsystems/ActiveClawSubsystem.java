@@ -58,7 +58,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
     clawVelocity = MetersPerSecond.of((((Math.abs(clawMotorLeft.getVelocity().getValueAsDouble()))
         + Math.abs(clawMotorRight.getVelocity().getValueAsDouble())) / 2) * Inches.of(4).in(Meters) * Math.PI);
 
-    LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(1));
+    LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(1.3));
     if (possibleNewTriggerVelocity.gt(triggerVelocity)) {
       triggerVelocity = possibleNewTriggerVelocity;
     }
@@ -92,7 +92,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
     return command;
   }
 
-  public Command clawLowShoot() {
+  public Command clawShoot() {
     Command command = Commands.runEnd(
         () -> runVolts((armSubsystem.getPosition().in(Radians) > 0) ? shootHighVoltage : shootLowVoltage), () -> stop(),
         this);

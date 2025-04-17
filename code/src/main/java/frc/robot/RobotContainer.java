@@ -116,7 +116,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("intake", intakeAuto());
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
         .until(() -> clawSubsystem.isLimitSwitch()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5)); // less trust on stall detect. At least for the first 3 corals where the ls isn't broken
-    NamedCommands.registerCommand("score", clawSubsystem.clawLowShoot().withTimeout(Seconds.of(0.5)));
+    NamedCommands.registerCommand("score", clawSubsystem.clawShoot().withTimeout(Seconds.of(0.5)));
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
@@ -182,12 +182,12 @@ public class RobotContainer {
     clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    buttonHome.whileTrue(removeAlgae());
+    buttonHome.whileTrue(intakeTeleop());
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
     buttonLevel4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(intakeTeleop());
-    buttonScore.whileTrue(clawSubsystem.clawLowShoot());
+    buttonIntake.whileTrue(removeAlgae());
+    buttonScore.whileTrue(clawSubsystem.clawShoot());
 
     a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
     b.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(1)));
