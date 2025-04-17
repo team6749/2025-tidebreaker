@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,8 +34,6 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
-  private  Debouncer debounce = new Debouncer(0.15);
-
 
   private boolean isBrakeModeOn = true;
   private LinearVelocity clawVelocity = MetersPerSecond.of(0);
@@ -104,7 +101,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public boolean hasCoral () {
-    return clawLimitSwitch.get() || debounce.calculate(isStallDetected);
+    return clawLimitSwitch.get();
   }
 
   public boolean isLimitSwitch() {

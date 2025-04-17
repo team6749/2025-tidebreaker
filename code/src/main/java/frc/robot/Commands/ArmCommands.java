@@ -21,8 +21,7 @@ public class ArmCommands {
     }
     
     public Command removeAlgae() {
-        Command command = Commands.runEnd(() -> armSubsystem.runVoltsCommand(Volts.of(-2)), () -> armSubsystem.stop(),
-        armSubsystem);
+        Command command = armSubsystem.runVoltsCommand(Volts.of(-2));
         return command;
     }
 
