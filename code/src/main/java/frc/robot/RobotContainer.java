@@ -115,7 +115,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
-        .until(() -> clawSubsystem.hasCoral()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5));
+        .until(() -> clawSubsystem.isLimitSwitch()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5)); // less trust on stall detect. At least for the first 3 corals where the ls isn't broken
     NamedCommands.registerCommand("score", clawSubsystem.clawLowShoot().withTimeout(Seconds.of(0.5)));
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
@@ -182,11 +182,11 @@ public class RobotContainer {
     clawSubsystem.setDefaultCommand(clawSubsystem.clawIdleState());
     swerveSubsystem.setDefaultCommand(swerveSubsystem.basicDriveCommand(controller, localizationSubsystem));
 
-    buttonHome.whileTrue(home());
+    buttonHome.whileTrue(removeAlgae());
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
     buttonLevel4.whileTrue(moveToLevel4());
-    buttonIntake.whileTrue(removeAlgaeCommand());
+    buttonIntake.whileTrue(intakeTeleop());
     buttonScore.whileTrue(clawSubsystem.clawLowShoot());
 
     a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
@@ -284,6 +284,7 @@ public class RobotContainer {
     // x.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // y.whileTrue(elevatorSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
+
   @SuppressWarnings("unused")
   private void sysIDArm() {
     a.whileTrue(armSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -310,8 +311,8 @@ public class RobotContainer {
     buttonCoralK.whileTrue(POICommands.pathToCoralK());
     buttonCoralL.whileTrue(POICommands.pathToCoralL());
 
-    buttonLeftIntake.whileTrue(POICommands.pathToLeftIntake());
-    buttonRightIntake.whileTrue(POICommands.pathToRightIntake());
+    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
+    buttonRightIntake.whileTrue(algaeSubsystem.undropCommand());
   }
 
   private void algaeTest() {
@@ -393,10 +394,8 @@ public class RobotContainer {
     return command;
   }
 
-  private Command removeAlgaeCommand() {
-    Command command = Commands.runEnd(() -> armSubsystem.runVoltsCommand(Volts.of(-0.4)), () -> armSubsystem.stop(),
-        armSubsystem);
-    return command;
+  private Command removeAlgae() {
+    return armCommands.removeAlgae();
   }
 
 }

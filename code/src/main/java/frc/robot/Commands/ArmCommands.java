@@ -5,9 +5,11 @@
 package frc.robot.Commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -17,9 +19,15 @@ public class ArmCommands {
     public ArmCommands(ConstrainedArmSubsystem arm) {
         this.armSubsystem = arm;
     }
+    
+    public Command removeAlgae() {
+        Command command = Commands.runEnd(() -> armSubsystem.runVoltsCommand(Volts.of(-2)), () -> armSubsystem.stop(),
+        armSubsystem);
+        return command;
+    }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(-62));
+        Command command = armSubsystem.goToPositionCommand(Radians.of(-1.08)); //at worlds and internet is down.
         command.setName("Arm Intake Position");
         return command;
     }

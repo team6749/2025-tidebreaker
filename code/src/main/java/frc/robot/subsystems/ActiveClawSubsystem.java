@@ -32,7 +32,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   private TalonFX clawMotorLeft;
   private TalonFX clawMotorRight;
   private ConstrainedArmSubsystem armSubsystem;
-  private  Debouncer debounce = new Debouncer(0.1);
+  private  Debouncer debounce = new Debouncer(0.15);
 
 
   private boolean isBrakeModeOn = true;
@@ -102,6 +102,10 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   public boolean hasCoral () {
     return clawLimitSwitch.get() || debounce.calculate(isStallDetected);
+  }
+
+  public boolean isLimitSwitch() {
+    return clawLimitSwitch.get();
   }
 
   public void brakeMode(boolean isBrakeModeOn) {
