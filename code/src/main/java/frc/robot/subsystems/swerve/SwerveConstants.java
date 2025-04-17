@@ -11,7 +11,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-
 public class SwerveConstants {
 
     public static final SlewRateLimiter driveLimiterX = new SlewRateLimiter(10);
@@ -19,12 +18,11 @@ public class SwerveConstants {
     public static final SlewRateLimiter driveLimiterTheta = new SlewRateLimiter(15);
 
     // Max linear velocity of the module (how fast it can spin)
-    public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(2.5);
+    public static final LinearVelocity maxLinearVelocity = MetersPerSecond.of(3.5);
 
     // This should be based on physical properties of the the max wheel speeds in a
     // circle
     public static final AngularVelocity maxAngularVelocity = DegreesPerSecond.of(90);
-
     public static final double angleReduction = (150.0 / 7.0);
     public static final double driveReduction = 6.82;
 
