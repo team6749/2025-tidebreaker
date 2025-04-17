@@ -115,7 +115,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("home", home());
     NamedCommands.registerCommand("intake", intakeAuto());
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
-        .until(() -> clawSubsystem.isLimitSwitch()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5)); // less trust on stall detect. At least for the first 3 corals where the ls isn't broken
+        .until(() -> clawSubsystem.hasCoral()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5)); // less trust on stall detect. At least for the first 3 corals where the ls isn't broken
     NamedCommands.registerCommand("score", clawSubsystem.clawShoot().withTimeout(Seconds.of(0.5)));
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
