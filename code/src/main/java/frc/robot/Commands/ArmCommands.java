@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -50,7 +49,7 @@ public class ArmCommands {
     }
 
     public Command positionLevel4() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(50));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(53));
         command.setName("Arm Score Level 4");
         return command;
     }

@@ -120,6 +120,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
+    NamedCommands.registerCommand("remove_algae", removeAlgae().withTimeout(1.5));
 
     try {
       RobotConfig config = RobotConfig.fromGUISettings();

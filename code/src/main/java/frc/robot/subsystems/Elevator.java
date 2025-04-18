@@ -55,9 +55,9 @@ public class Elevator extends SubsystemBase {
   public static Distance minHeight = Meters.of(0);
   public static Distance maxHeight = Meters.of(0.665);
   public static Distance simStartHeight = Meters.of(0.665);
-  public static double gearboxRatio = (4.0 / 1.0) * (5.0 / 1.0);
-  public static Mass carriageMass = Kilograms.of(4);
-  public static double simulationFriction = 0.6; // fudge factor to simulate loss due to friction to make the simulated elevator match the real one
+  public static double gearboxRatio = 4 * 5;
+  public static Mass carriageMass = Kilograms.of(5.3);
+  public static double simulationFriction = 1.2; // fudge factor to simulate loss due to friction to make the simulated elevator match the real one
   public static Distance sprocketDiameter = Centimeters.of(5.3);
   public BooleanSupplier isBottomLimitSwitchActivated;
   public BooleanSupplier isCoralLimitSwitchActivated;
@@ -69,16 +69,16 @@ public class Elevator extends SubsystemBase {
 
   private final TalonFX elevatorMotor = new TalonFX(Constants.elevatorMotorID);
   private final TalonFXSimState simMotor = elevatorMotor.getSimState();
-  private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1);
+  private final DCMotor elevatorGearbox = DCMotor.getFalcon500(1).withReduction(gearboxRatio);
   public DigitalInput bottomLimitSwitch = new DigitalInput(3);
   public DigitalInput coralLimitSwitch = new DigitalInput(5);
 
 
   private final ElevatorSim simElevator = new ElevatorSim(
       elevatorGearbox,
-      gearboxRatio,
+      1,
       carriageMass.in(Kilograms),
-      sprocketDiameter.in(Meters),
+      sprocketDiameter.div(2).in(Meters),
       minHeight.in(Meters),
       maxHeight.in(Meters),
       true,
