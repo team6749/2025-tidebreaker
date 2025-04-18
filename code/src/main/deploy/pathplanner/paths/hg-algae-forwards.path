@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.577180495172112,
-        "y": 4.201462511569791
+        "x": 7.0,
+        "y": 4.03475
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.327180495172112,
-        "y": 4.201462511569791
+        "x": 6.2876492261532935,
+        "y": 4.03475
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "algae-hg-back"
     },
     {
       "anchor": {
-        "x": 6.005,
-        "y": 4.201462511569791
+        "x": 5.8695,
+        "y": 4.03475
       },
       "prevControl": {
-        "x": 6.255,
-        "y": 4.201462511569791
+        "x": 6.406547134802897,
+        "y": 4.03475
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "coral_h"
+      "linkedName": "hg-algae"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.7,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.75,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 360.0,
@@ -45,10 +45,10 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "coral_paths",
+  "folder": null,
   "idealStartingState": {
-    "velocity": 0.7,
+    "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
