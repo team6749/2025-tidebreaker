@@ -27,6 +27,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
@@ -177,6 +178,7 @@ public class Localization extends SubsystemBase {
             double ySpeedMetersPerSecond = swerve.getChassisSpeeds().vyMetersPerSecond;
 
             var trust = calculateMeasurementTrust(
+                mt1.pose,
                     MetersPerSecond.of(Math.hypot(xSpeedMetersPerSecond, ySpeedMetersPerSecond)),
                     DegreesPerSecond.of(gyro.getRate()), dist, ambiguity);
 
@@ -190,40 +192,46 @@ public class Localization extends SubsystemBase {
 
     // ambiguity is a limelight specific term, with values between 0 and 1, and 1 is
     // the "worst", anything greater than 0.7 is "bad"
-    Matrix<N3, N1> calculateMeasurementTrust(LinearVelocity robotSpeedMetersPerSecond,
+    Matrix<N3, N1> calculateMeasurementTrust(Pose2d measurement, LinearVelocity robotSpeedMetersPerSecond,
             AngularVelocity robotAnglePerSecond,
             Distance tagDistance, double ambiguity) {
         final Matrix<N3, N1> rejectValue = VecBuilder.fill(9999999, 9999999, 9999999);
-        final Matrix<N3, N1> acceptValue = VecBuilder.fill(8, 8, 128);
+        final Matrix<N3, N1> acceptValue = VecBuilder.fill(4, 4, 128);
         final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 4);
         
         // Start with assuming ideal conditions
         var returnValue = idealValue;
 
         // Not Ideal but still accept with reduced confidence Conditions
-        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(0.75))) {
+        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(1.25))) {
+            // use accelerometer instead
             returnValue = acceptValue;
         }
-        if (robotAnglePerSecond.in(DegreesPerSecond) > 10) {
+        if (robotAnglePerSecond.in(DegreesPerSecond) > 20) {
             returnValue = acceptValue;
         }
         if (tagDistance.in(Meters) > 1.75) {
             returnValue = acceptValue;
         }
+         // if (Math.abs(getRobotPose().relativeTo(measurement).getRotation().getDegrees()) > 45) {
+        //     returnValue = acceptValue;
+        // }
+        // if (Math.abs(getRobotPose().relativeTo(measurement).getTranslation().getNorm()) > 0.4) {
+        //     returnValue = acceptValue;
+        // }
 
         // Reject Conditions
         if (ambiguity > 0.7) {
             returnValue = rejectValue;
         }
-        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(2))) {
+        if (robotAnglePerSecond.in(DegreesPerSecond) > 45) {
             returnValue = rejectValue;
         }
-        if (robotAnglePerSecond.in(DegreesPerSecond) > 30) {
+        if (DriverStation.isDisabled() == false && tagDistance.in(Meters) > 2.5) {
+            // ignore tag distance when disabled due to low risk
             returnValue = rejectValue;
         }
-        if (tagDistance.in(Meters) > 2) {
-            returnValue = rejectValue;
-        }
+
         // Speed range: 0 - 3 m/s
         // Rotation Range: 0 - 60 deg/s
         // Distance: 0 - 3 m
