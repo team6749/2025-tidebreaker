@@ -81,7 +81,8 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     // Initialize Robot
     m_robotContainer = new RobotContainer();
-    
+    CameraServer.startAutomaticCapture();
+
     // Outputting the audit data is intentionally done last to be confident that the robot
     // did not crash during the initial start-up, and can be confident the deploy succeeded
     audit.updateSmartDashboard();
@@ -128,7 +129,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    CameraServer.startAutomaticCapture();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
