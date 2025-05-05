@@ -40,7 +40,6 @@ import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
 import frc.robot.subsystems.ActiveClawSubsystem;
-import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -53,7 +52,6 @@ public class RobotContainer {
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem armSubsystem;
-  AlgaeSubsystem algaeSubsystem;
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
@@ -104,7 +102,6 @@ public class RobotContainer {
     swerveSubsystem = new SwerveDrive();
     armSubsystem = new ConstrainedArmSubsystem();
     clawSubsystem = new ActiveClawSubsystem(armSubsystem);
-    algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     POICommands = new POICommands(swerveSubsystem);
@@ -165,7 +162,6 @@ public class RobotContainer {
     coralSubsystemTest();
     configureBindings();
     clawTest();
-    algaeTest();
     // elevatorTest();
     // armTest();
     // sysIDSwerve();
@@ -312,13 +308,6 @@ public class RobotContainer {
     buttonCoralK.whileTrue(POICommands.pathToCoralK());
     buttonCoralL.whileTrue(POICommands.pathToCoralL());
 
-    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
-    buttonRightIntake.whileTrue(algaeSubsystem.undropCommand());
-  }
-
-  private void algaeTest() {
-    rightBumper.whileTrue(algaeSubsystem.algaeIntakeCommand());
-    leftBumper.whileTrue(algaeSubsystem.dropCommand());
   }
 
   private Command home() {
