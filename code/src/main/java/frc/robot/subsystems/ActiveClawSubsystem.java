@@ -50,12 +50,12 @@ public class ActiveClawSubsystem extends SubsystemBase {
   Timer stallDetectResetTimer = new Timer();
 
   // Default to allow for easy preload without limit switch
-  boolean instantStallDetected = true;
-  boolean isStalled = true;
+  boolean instantStallDetected = false;
+  boolean isStalled = false;
 
   /** Creates a new ActiveClaw. */
   public ActiveClawSubsystem(ConstrainedArmSubsystem arm) {
-    clawMotor = new TalonFX(Constants.clawMotorLeftID);
+    clawMotor = new TalonFX(Constants.clawMotorID);
     armSubsystem = arm;
     brakeMode(isBrakeModeOn);
     stallDetectResetTimer.start();
@@ -68,15 +68,15 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
     clawVelocity = getClawVelocity();
 
-    LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(0.5));
-    if (stallDetectResetTimer.hasElapsed(stallDetectResetTimerDuration.in(Seconds))
-        && possibleNewTriggerVelocity.gt(triggerVelocity)) {
-      triggerVelocity = possibleNewTriggerVelocity;
-    }
+    // LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(0.5));
+    // if (stallDetectResetTimer.hasElapsed(stallDetectResetTimerDuration.in(Seconds))
+    //     && possibleNewTriggerVelocity.gt(triggerVelocity)) {
+    //   triggerVelocity = possibleNewTriggerVelocity;
+    // }
 
-    if (clawVelocity.lt(triggerVelocity) && triggerVelocity.gt(MetersPerSecond.of(0))) {
-      instantStallDetected = true;
-    }
+    // if (clawVelocity.lt(triggerVelocity) && triggerVelocity.gt(MetersPerSecond.of(0))) {
+    //   instantStallDetected = true;
+    // }
   }
 
   public LinearVelocity getClawVelocity() {
@@ -98,11 +98,12 @@ public class ActiveClawSubsystem extends SubsystemBase {
   public Command clawIdleState() {
     Command command = Commands.run(
        () -> {
-      if (hasCoral()) {
-        stop();
-      } else {
         runVolts(idleVoltage);
-      }
+      // if (hasCoral()) {
+      //   stop();
+      // } else {
+      //   runVolts(idleVoltage);
+      // }
     }, this).finallyDo(() -> stop());
     command.setName("clawIdleState");
     return command;
