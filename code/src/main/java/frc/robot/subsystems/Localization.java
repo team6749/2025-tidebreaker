@@ -4,11 +4,14 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.sim.Pigeon2SimState;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.epilogue.Logged;
@@ -57,7 +60,7 @@ public class Localization extends SubsystemBase {
     @NotLogged
     SwerveDriveOdometry odometry;
 
-    ADIS16470_IMU gyro = new ADIS16470_IMU();
+    Pigeon2 gyro = new Pigeon2(67);
 
     Pose2d frontLeftLimelight = null;
     Pose2d frontRightLimelight = null;
@@ -68,7 +71,7 @@ public class Localization extends SubsystemBase {
     SwerveDrivePoseEstimator poseEstimator;
 
     // Simulation
-    ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
+    Pigeon2SimState gyroSim = new Pigeon2SimState(gyro);
 
     Field2d dashboardField = new Field2d();
 
@@ -77,7 +80,7 @@ public class Localization extends SubsystemBase {
     public Localization(SwerveDrive swerve) {
 
         if (RobotBase.isReal()) {
-            gyro.calibrate();
+            gyro.reset();
         }
 
 
@@ -112,7 +115,7 @@ public class Localization extends SubsystemBase {
 
     /// THIS IS THE RAW GYRO ANGLE NOT THE ESTIMATED ROBOT ANGLE
     private Rotation2d getGyroAngle() {
-        return Rotation2d.fromDegrees(gyro.getAngle());
+        return gyro.getRotation2d(); //ccw +
     }
 
     public Pose2d getRobotPose() {
@@ -178,7 +181,7 @@ public class Localization extends SubsystemBase {
 
             var trust = calculateMeasurementTrust(
                     MetersPerSecond.of(Math.hypot(xSpeedMetersPerSecond, ySpeedMetersPerSecond)),
-                    DegreesPerSecond.of(gyro.getRate()), dist, ambiguity);
+                    DegreesPerSecond.of(gyro.getAngularVelocityZWorld().getValueAsDouble()), dist, ambiguity);
 
             poseEstimator.setVisionMeasurementStdDevs(trust);
             poseEstimator.addVisionMeasurement(
@@ -242,7 +245,7 @@ public class Localization extends SubsystemBase {
                 .toChassisSpeeds(swerve.getModuleStates());
 
         // Update the gyro with the simulated data
-        gyroSim.setGyroRateZ(Rotation2d.fromRadians(chassisSpeedsFromKinematics.omegaRadiansPerSecond).getDegrees());
-        gyroSim.setGyroAngleZ(gyro.getAngle() + (gyro.getRate() * Constants.simulationTimestep.in(Seconds)));
+        gyroSim.setAngularVelocityZ(Rotation2d.fromRadians(chassisSpeedsFromKinematics.omegaRadiansPerSecond).getDegrees());
+        gyroSim.setRawYaw(Degrees.of(gyro.getYaw().getValueAsDouble()).plus(Degrees.of((gyro.getAngularVelocityZWorld().getValueAsDouble())).times(Constants.simulationTimestep.in(Seconds))));
     }
 }
