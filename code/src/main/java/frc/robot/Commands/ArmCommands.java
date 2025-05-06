@@ -25,7 +25,7 @@ public class ArmCommands {
     }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionCommand(Radians.of(-1.08)); //at worlds and internet is down.
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-28)); //at worlds and internet is down.
         command.setName("Arm Intake Position");
         return command;
     }

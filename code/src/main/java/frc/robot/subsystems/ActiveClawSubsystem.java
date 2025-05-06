@@ -31,7 +31,7 @@ import frc.robot.Constants;
 
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
-  static Voltage idleVoltage = Volts.of(1.5);
+  static Voltage idleVoltage = Volts.of(3);
   static Voltage shootLowVoltage = Volts.of(-2.5);
   static Voltage shootHighVoltage = Volts.of(-2);
   static Time stallDetectResetTimerDuration = Seconds.of(0.5);
@@ -40,7 +40,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
-  private Debouncer debounce = new Debouncer(0.15);
+  private Debouncer debounce = new Debouncer(.8);
 
   private boolean isBrakeModeOn = true;
   private LinearVelocity clawVelocity = MetersPerSecond.of(0);
@@ -64,19 +64,9 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    isStalled = debounce.calculate(instantStallDetected);
+    isbeamBreak();
+    isStalled = debounce.calculate(isbeamBreak());
 
-    clawVelocity = getClawVelocity();
-
-    LinearVelocity possibleNewTriggerVelocity = clawVelocity.minus(MetersPerSecond.of(0.5));
-    if (stallDetectResetTimer.hasElapsed(stallDetectResetTimerDuration.in(Seconds))
-        && possibleNewTriggerVelocity.gt(triggerVelocity)) {
-      triggerVelocity = possibleNewTriggerVelocity;
-    }
-
-    if (clawVelocity.lt(triggerVelocity) && triggerVelocity.gt(MetersPerSecond.of(0))) {
-      instantStallDetected = true;
-    }
   }
 
   public LinearVelocity getClawVelocity() {
@@ -98,12 +88,16 @@ public class ActiveClawSubsystem extends SubsystemBase {
   public Command clawIdleState() {
     Command command = Commands.run(
        () -> {
-        runVolts(idleVoltage);
-      if (hasCoral()) {
-        stop();
-      } else {
-        runVolts(idleVoltage);
-      }
+      // if (hasCoral()) {
+      //   stop();
+      // } else {
+      //   runVolts(idleVoltage);
+      // }
+      if(hasCoral()) {
+      runVolts(idleVoltage);
+    } else {
+      stop();
+    }
     }, this).finallyDo(() -> stop());
     command.setName("clawIdleState");
     return command;
@@ -118,7 +112,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public boolean hasCoral() {
-    return beamBreakInput.get() || isStalled;
+    return isStalled;
   }
 
   public boolean isbeamBreak() {
