@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
@@ -40,7 +41,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
-  private Debouncer debounce = new Debouncer(.8);
+  private Debouncer debounce = new Debouncer(.8,DebounceType.kBoth);
 
   private boolean isBrakeModeOn = true;
   private LinearVelocity clawVelocity = MetersPerSecond.of(0);
@@ -64,9 +65,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    isbeamBreak();
-    isStalled = debounce.calculate(isbeamBreak());
-
+    isStalled = debounce.calculate(isNotBeamBreak());
   }
 
   public LinearVelocity getClawVelocity() {
@@ -88,15 +87,10 @@ public class ActiveClawSubsystem extends SubsystemBase {
   public Command clawIdleState() {
     Command command = Commands.run(
        () -> {
-      // if (hasCoral()) {
-      //   stop();
-      // } else {
-      //   runVolts(idleVoltage);
-      // }
       if(hasCoral()) {
-      runVolts(idleVoltage);
-    } else {
       stop();
+    } else {
+      runVolts(idleVoltage);
     }
     }, this).finallyDo(() -> stop());
     command.setName("clawIdleState");
@@ -115,8 +109,8 @@ public class ActiveClawSubsystem extends SubsystemBase {
     return isStalled;
   }
 
-  public boolean isbeamBreak() {
-    return beamBreakInput.get();
+  public boolean isNotBeamBreak() {
+    return !beamBreakInput.get();
   }
 
   public void brakeMode(boolean isBrakeModeOn) {
