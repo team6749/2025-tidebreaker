@@ -32,7 +32,7 @@ import frc.robot.Constants;
 
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
-  static Voltage idleVoltage = Volts.of(3);
+  static Voltage idleVoltage = Volts.of(3.387);
   static Voltage shootLowVoltage = Volts.of(-2.5);
   static Voltage shootHighVoltage = Volts.of(-2);
   static Time stallDetectResetTimerDuration = Seconds.of(0.5);
@@ -41,7 +41,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
-  private Debouncer debounce = new Debouncer(.8,DebounceType.kBoth);
+  private Debouncer debounce = new Debouncer(.03);
 
   private boolean isBrakeModeOn = true;
   private LinearVelocity clawVelocity = MetersPerSecond.of(0);
