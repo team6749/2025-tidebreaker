@@ -23,7 +23,7 @@ public class ElevatorCommands {
 
     public Command intakeAction() {
         Command command = 
-                elevatorSubsystem.goToPositionCommand(Meters.of(0.283));
+                elevatorSubsystem.goToPositionCommand(Meters.of(0.275));
         command.setName("Elevator Intake");
         return command;
     }

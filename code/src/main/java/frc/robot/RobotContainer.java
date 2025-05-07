@@ -198,7 +198,7 @@ public class RobotContainer {
 
     try {
       SmartDashboard.putData("Command/Home", home());
-      SmartDashboard.putData("Command/Score", scoreTeleop());
+      SmartDashboard.putData("Command/Score", clawSubsystem.clawShoot());
       SmartDashboard.putData("Command/Intake", intakeTeleop());
       SmartDashboard.putData("Command/L2", moveToLevel2());
       SmartDashboard.putData("Command/L3", moveToLevel3());
@@ -215,11 +215,11 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
-      SmartDashboard.putData("arm/Volts0", armSubsystem.runVoltsCommand(Volts.of(0.3)));
-      SmartDashboard.putData("arm/Volts1", armSubsystem.runVoltsCommand(Volts.of(0.35)));
-      SmartDashboard.putData("arm/Volts2", armSubsystem.runVoltsCommand(Volts.of(0.4)));
-      SmartDashboard.putData("arm/Volts3", armSubsystem.runVoltsCommand(Volts.of(0.45)));
-      SmartDashboard.putData("arm/Volts4", armSubsystem.runVoltsCommand(Volts.of(0.5)));
+      SmartDashboard.putData("arm/Volts0", armSubsystem.runVoltsCommand(Volts.of(0.41)));
+      SmartDashboard.putData("arm/Volts1", armSubsystem.runVoltsCommand(Volts.of(0.42)));
+      SmartDashboard.putData("arm/Volts2", armSubsystem.runVoltsCommand(Volts.of(0.43)));
+      SmartDashboard.putData("arm/Volts3", armSubsystem.runVoltsCommand(Volts.of(0.44)));
+      SmartDashboard.putData("arm/Volts4", armSubsystem.runVoltsCommand(Volts.of(0.45)));
 
       SmartDashboard.putData("ArmSetpoints/-45", armSubsystem.goToPositionCommand(Degrees.of(-45)));
       SmartDashboard.putData("ArmSetpoints/0", armSubsystem.goToPositionCommand(Degrees.of(0)));
