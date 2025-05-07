@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
 
   static Audit audit = new Audit();
   Pose3d[] zeroedComponentPoses = new Pose3d[] {new Pose3d(), new Pose3d()};
+  Pose3d[] finalComponentPoses;
 
   @SuppressWarnings("unused")
   public Robot() {
