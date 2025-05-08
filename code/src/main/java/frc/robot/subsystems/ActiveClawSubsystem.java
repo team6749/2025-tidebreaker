@@ -106,7 +106,6 @@ public class ActiveClawSubsystem extends SubsystemBase {
   public Voltage shootVoltageLogic() {
     Voltage shootingVolts;
     shootingVolts = armSubsystem.getPosition().in(Radians) > 0 ? shootHighVoltage : shootL2Voltage;
-    shootingVolts = CommandScheduler.getInstance().isScheduled(robotContainer.moveToLevel1()) ? shootL1Voltage : shootL2Voltage;
     return shootingVolts;
   }
 
