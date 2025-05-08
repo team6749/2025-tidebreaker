@@ -23,14 +23,17 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
   static Voltage idleVoltage = Volts.of(3.387);
-  static Voltage shootLowVoltage = Volts.of(-5);
+  static Voltage shootL2Voltage = Volts.of(-5);
+  static Voltage shootL1Voltage = Volts.of(-1);
   static Voltage shootHighVoltage = Volts.of(3);
   static Time stallDetectResetTimerDuration = Seconds.of(0.5);
 
@@ -38,6 +41,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
+  private RobotContainer robotContainer;
   private Debouncer debounce = new Debouncer(.03);
 
   private boolean isBrakeModeOn = true;
@@ -93,10 +97,17 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   public Command clawShoot() {
     Command command = Commands.runEnd(
-        () -> runVolts((armSubsystem.getPosition().in(Radians) > 0) ? shootHighVoltage : shootLowVoltage), () -> stop(),
+        () -> runVolts(shootVoltageLogic()), () -> stop(),
         this);
     command.setName("clawLowShoot");
     return command;
+  }
+
+  public Voltage shootVoltageLogic() {
+    Voltage shootingVolts;
+    shootingVolts = armSubsystem.getPosition().in(Radians) > 0 ? shootHighVoltage : shootL2Voltage;
+    shootingVolts = CommandScheduler.getInstance().isScheduled(robotContainer.moveToLevel1()) ? shootL1Voltage : shootL2Voltage;
+    return shootingVolts;
   }
 
   public boolean hasCoral() {
