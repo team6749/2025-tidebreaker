@@ -183,7 +183,7 @@ public class RobotContainer {
     buttonLevel3.whileTrue(moveToLevel3());
     buttonLevel4.whileTrue(moveToLevel4());
     buttonIntake.whileTrue(removeAlgae());
-    buttonScore.whileTrue(clawSubsystem.clawShoot());
+    buttonScore.onTrue(clawSubsystem.clawShoot().withTimeout(0.2));
 
     a.whileTrue(armSubsystem.runVoltsCommand(Volts.of(1)));
     b.whileTrue(elevatorSubsystem.runVoltsCommand(Volts.of(1)));
