@@ -24,7 +24,6 @@ import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -365,17 +364,6 @@ public class RobotContainer {
   private Command scoreAuto() {
     Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
-    return command;
-  }
-
-  private Command scoreTeleop() {
-    Command command = Commands.sequence(
-        armCommands.score().withTimeout(Seconds.of(0.7)),
-        Commands.race(
-            armCommands.score(),
-            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
-        armCommands.score());
-    command.setName("Score");
     return command;
   }
 

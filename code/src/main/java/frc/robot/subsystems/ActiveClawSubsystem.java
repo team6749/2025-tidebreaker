@@ -11,15 +11,12 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.time.Duration;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
@@ -44,8 +41,6 @@ public class ActiveClawSubsystem extends SubsystemBase {
   private Debouncer debounce = new Debouncer(.03);
 
   private boolean isBrakeModeOn = true;
-  private LinearVelocity clawVelocity = MetersPerSecond.of(0);
-  private LinearVelocity triggerVelocity = MetersPerSecond.of(0);
   private DigitalInput beamBreakInput;
 
   Timer stallDetectResetTimer = new Timer();
@@ -81,7 +76,6 @@ public class ActiveClawSubsystem extends SubsystemBase {
     instantStallDetected = false;
     isStalled = false;
     stallDetectResetTimer.reset();
-    triggerVelocity = MetersPerSecond.zero();
   }
 
   public Command clawIdleState() {
