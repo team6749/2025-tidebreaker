@@ -35,7 +35,7 @@ public class ArmCommands {
         return command;
     }
 
-    public Command positionLevelLow() {
+    public Command positionLevel2() {
         Command command = armSubsystem.goToPositionCommand(Degrees.of(-80)); //random values
         command.setName("Arm Score Level 2");
         return command;

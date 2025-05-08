@@ -34,12 +34,6 @@ public class ElevatorCommands {
         return command;
     }
 
-    public Command positionLevel1() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0));
-        command.setName("Elevator Score Level 2");
-        return command;
-    }
-
     public Command positionLevel2() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.244));
         command.setName("Elevator Score Level 2");

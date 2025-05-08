@@ -317,20 +317,11 @@ public class RobotContainer {
     return command;
   }
 
-  public Command moveToLevel1() {
-    Command command = Commands.parallel(
-      elevatorCommands.positionLevel1(),
-      Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
-          .andThen(armCommands.positionLevelLow()));
-  command.setName("Level 2");
-  return command;
-  }
-
   private Command moveToLevel2() {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel2(),
         Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
-            .andThen(armCommands.positionLevelLow()));
+            .andThen(armCommands.positionLevel2()));
     command.setName("Level 2");
     return command;
   }
