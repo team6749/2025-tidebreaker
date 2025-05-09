@@ -23,7 +23,7 @@ public class ElevatorCommands {
 
     public Command intakeAction() {
         Command command = 
-                elevatorSubsystem.goToPositionCommand(Meters.of(0.442));
+                elevatorSubsystem.goToPositionCommand(Meters.of(0.275));
         command.setName("Elevator Intake");
         return command;
     }
@@ -35,19 +35,19 @@ public class ElevatorCommands {
     }
 
     public Command positionLevel2() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.367));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.244));
         command.setName("Elevator Score Level 2");
         return command;
     }
 
     public Command positionLevel3() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.033));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.115));
         command.setName("Elevator Score Level 3");
         return command;
     }
 
     public Command positionLevel4() {
-        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.651));
+        Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.625));
         command.setName("Elevator Score Level 4");
         return command;
     }

@@ -5,7 +5,6 @@
 package frc.robot.Commands;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,7 +24,7 @@ public class ArmCommands {
     }
 
     public Command intakePosition() {
-        Command command = armSubsystem.goToPositionCommand(Radians.of(-1.08)); //at worlds and internet is down.
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-61.707)); 
         command.setName("Arm Intake Position");
         return command;
     }
@@ -49,7 +48,7 @@ public class ArmCommands {
     }
 
     public Command positionLevel4() {
-        Command command = armSubsystem.goToPositionCommand(Degrees.of(53));
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(82)); //53 old value
         command.setName("Arm Score Level 4");
         return command;
     }

@@ -24,7 +24,6 @@ import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -40,7 +39,6 @@ import frc.robot.Commands.ElevatorCommands;
 import frc.robot.subsystems.ConstrainedArmSubsystem;
 import frc.robot.Commands.POICommands;
 import frc.robot.subsystems.ActiveClawSubsystem;
-import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -53,7 +51,6 @@ public class RobotContainer {
   ClimberSubsystem climberSubsystem;
   SwerveDrive swerveSubsystem;
   ConstrainedArmSubsystem armSubsystem;
-  AlgaeSubsystem algaeSubsystem;
   Localization localizationSubsystem;
   Elevator elevatorSubsystem;
   ElevatorCommands elevatorCommands;
@@ -104,7 +101,6 @@ public class RobotContainer {
     swerveSubsystem = new SwerveDrive();
     armSubsystem = new ConstrainedArmSubsystem();
     clawSubsystem = new ActiveClawSubsystem(armSubsystem);
-    algaeSubsystem = new AlgaeSubsystem();
     localizationSubsystem = new Localization(swerveSubsystem);
     elevatorSubsystem = new Elevator();
     POICommands = new POICommands(swerveSubsystem);
@@ -165,7 +161,6 @@ public class RobotContainer {
     coralSubsystemTest();
     configureBindings();
     clawTest();
-    algaeTest();
     // elevatorTest();
     // armTest();
     // sysIDSwerve();
@@ -202,7 +197,7 @@ public class RobotContainer {
 
     try {
       SmartDashboard.putData("Command/Home", home());
-      SmartDashboard.putData("Command/Score", scoreTeleop());
+      SmartDashboard.putData("Command/Score", clawSubsystem.clawShoot());
       SmartDashboard.putData("Command/Intake", intakeTeleop());
       SmartDashboard.putData("Command/L2", moveToLevel2());
       SmartDashboard.putData("Command/L3", moveToLevel3());
@@ -219,11 +214,11 @@ public class RobotContainer {
       SmartDashboard.putData("ElevatorSetpoints/0.4", elevatorSubsystem.goToPositionCommand(Meters.of(0.4)));
       SmartDashboard.putData("ElevatorSetpoints/0.6", elevatorSubsystem.goToPositionCommand(Meters.of(0.6)));
 
-      SmartDashboard.putData("arm/Volts0", armSubsystem.runVoltsCommand(Volts.of(0.3)));
-      SmartDashboard.putData("arm/Volts1", armSubsystem.runVoltsCommand(Volts.of(0.35)));
-      SmartDashboard.putData("arm/Volts2", armSubsystem.runVoltsCommand(Volts.of(0.4)));
-      SmartDashboard.putData("arm/Volts3", armSubsystem.runVoltsCommand(Volts.of(0.45)));
-      SmartDashboard.putData("arm/Volts4", armSubsystem.runVoltsCommand(Volts.of(0.5)));
+      SmartDashboard.putData("arm/Volts0", armSubsystem.runVoltsCommand(Volts.of(0.41)));
+      SmartDashboard.putData("arm/Volts1", armSubsystem.runVoltsCommand(Volts.of(0.42)));
+      SmartDashboard.putData("arm/Volts2", armSubsystem.runVoltsCommand(Volts.of(0.43)));
+      SmartDashboard.putData("arm/Volts3", armSubsystem.runVoltsCommand(Volts.of(0.44)));
+      SmartDashboard.putData("arm/Volts4", armSubsystem.runVoltsCommand(Volts.of(0.45)));
 
       SmartDashboard.putData("ArmSetpoints/-45", armSubsystem.goToPositionCommand(Degrees.of(-45)));
       SmartDashboard.putData("ArmSetpoints/0", armSubsystem.goToPositionCommand(Degrees.of(0)));
@@ -312,13 +307,6 @@ public class RobotContainer {
     buttonCoralK.whileTrue(POICommands.pathToCoralK());
     buttonCoralL.whileTrue(POICommands.pathToCoralL());
 
-    buttonLeftIntake.whileTrue(algaeSubsystem.algaeShootCommand());
-    buttonRightIntake.whileTrue(algaeSubsystem.undropCommand());
-  }
-
-  private void algaeTest() {
-    rightBumper.whileTrue(algaeSubsystem.algaeIntakeCommand());
-    leftBumper.whileTrue(algaeSubsystem.dropCommand());
   }
 
   private Command home() {
@@ -376,17 +364,6 @@ public class RobotContainer {
   private Command scoreAuto() {
     Command command = armSubsystem.runVoltsCommand(Volts.of(-1.5)).withTimeout(0.4);
     command.setName("Score Auto");
-    return command;
-  }
-
-  private Command scoreTeleop() {
-    Command command = Commands.sequence(
-        armCommands.score().withTimeout(Seconds.of(0.7)),
-        Commands.race(
-            armCommands.score(),
-            swerveSubsystem.constantChassisSpeedsCommand(new ChassisSpeeds(-0.4, 0, 0)).withTimeout(Seconds.of(0.75))),
-        armCommands.score());
-    command.setName("Score");
     return command;
   }
 

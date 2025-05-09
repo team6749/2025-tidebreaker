@@ -61,7 +61,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   private Alert encoderDisconnectedAlert = new Alert("Arm Encoder Disconnected", AlertType.kError);
 
   public static Angle simStartAngle = Degrees.of(-90);
-  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.41); //-0.144 the encoder value - 0.25 for standard position.
+  public static Angle angleOffset = Rotations.of(RobotBase.isSimulation() ? 0 : -0.388); //-0.144 the encoder value - 0.25 for standard position.
   public static Distance armLength = Meters.of(0.55);
   public static Mass armMass = Kilograms.of(2.75);
   public static Angle tolerance = Degrees.of(4);
@@ -70,8 +70,8 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   public static Angle minAngle = Degrees.of(-90);
   public static double sprocketRatio = 16.0 / 30.0;
 
-  private PIDController armPID = new PIDController(1, 0, 0);
-  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.4, 0.82);
+  private PIDController armPID = new PIDController(0.7, 0, 0);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.41, 0.7);
   private TalonFX armMotor = new TalonFX(Constants.armMotorID);
   private DCMotor m_armGearbox = DCMotor.getFalcon500(1).withReduction(gearboxRatio);
 

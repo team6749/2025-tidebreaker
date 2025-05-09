@@ -11,8 +11,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.time.Duration;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -31,85 +29,63 @@ import frc.robot.Constants;
 
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
-  static Voltage idleVoltage = Volts.of(0.75);
-  static Voltage shootLowVoltage = Volts.of(-2.5);
-  static Voltage shootHighVoltage = Volts.of(1);
+  static Voltage idleVoltage = Volts.of(3.387);
+  static Voltage shootLowVoltage = Volts.of(-5);
+  static Voltage shootHighVoltage = Volts.of(5);
   static Time stallDetectResetTimerDuration = Seconds.of(0.5);
 
-  private TalonFX clawMotorLeft;
-  private TalonFX clawMotorRight;
+  private TalonFX clawMotor;
 
   @NotLogged
   private ConstrainedArmSubsystem armSubsystem;
-  private Debouncer debounce = new Debouncer(0.15);
+  private Debouncer debounce = new Debouncer(.03);
 
   private boolean isBrakeModeOn = true;
-  private LinearVelocity averageClawVelocity = MetersPerSecond.of(0);
-  private LinearVelocity triggerVelocity = MetersPerSecond.of(0);
-  private DigitalInput clawLimitSwitch;
+  private DigitalInput beamBreakInput;
 
   Timer stallDetectResetTimer = new Timer();
 
-  // Default to allow for easy preload without limit switch
+  // Default to allow for easy preload
   boolean instantStallDetected = true;
   boolean isStalled = true;
 
   /** Creates a new ActiveClaw. */
   public ActiveClawSubsystem(ConstrainedArmSubsystem arm) {
-    clawMotorLeft = new TalonFX(Constants.clawMotorLeftID);
-    clawMotorRight = new TalonFX(Constants.clawMotorRightID);
+    clawMotor = new TalonFX(Constants.clawMotorID);
     armSubsystem = arm;
     brakeMode(isBrakeModeOn);
     stallDetectResetTimer.start();
-    clawLimitSwitch = new DigitalInput(4); // placeholder before limit switch is on
+    beamBreakInput = new DigitalInput(4); 
   }
 
   @Override
   public void periodic() {
-    isStalled = debounce.calculate(instantStallDetected);
-
-    averageClawVelocity = getLeftClawVelocity().plus(getRightClawVelocity()).div(2);
-
-    LinearVelocity possibleNewTriggerVelocity = averageClawVelocity.minus(MetersPerSecond.of(0.5));
-    if (stallDetectResetTimer.hasElapsed(stallDetectResetTimerDuration.in(Seconds))
-        && possibleNewTriggerVelocity.gt(triggerVelocity)) {
-      triggerVelocity = possibleNewTriggerVelocity;
-    }
-
-    if (averageClawVelocity.lt(triggerVelocity) && triggerVelocity.gt(MetersPerSecond.of(0))) {
-      instantStallDetected = true;
-    }
+    isStalled = debounce.calculate(isNotBeamBreak());
   }
 
-  public LinearVelocity getLeftClawVelocity() {
-    return MetersPerSecond.of(-clawMotorLeft.getVelocity().getValueAsDouble() / 2.0 * Inches.of(4).in(Meters) * Math.PI);
-  }
-
-  public LinearVelocity getRightClawVelocity() {
-    return MetersPerSecond
-        .of(clawMotorRight.getVelocity().getValueAsDouble() / 2.0 * Inches.of(4).in(Meters) * Math.PI);
+  public LinearVelocity getClawVelocity() {
+    //gear ratio of 4:1
+    return MetersPerSecond.of(-clawMotor.getVelocity().getValueAsDouble() / 2.0 * Inches.of(4).in(Meters) / 4.0 * Math.PI);
   }
 
   private void runVolts(Voltage voltage) {
-    clawMotorLeft.setVoltage(-voltage.in(Volts));
-    clawMotorRight.setVoltage(voltage.in(Volts));
+    clawMotor.setVoltage(-voltage.in(Volts));
   }
 
   public void clearStallDetect() {
     instantStallDetected = false;
     isStalled = false;
     stallDetectResetTimer.reset();
-    triggerVelocity = MetersPerSecond.zero();
   }
 
   public Command clawIdleState() {
     Command command = Commands.run(
        () -> {
-      if (hasCoral()) {
-        stop();
-      } else {
-        runVolts(idleVoltage);
-      }
+      if(hasCoral()) {
+      stop();
+    } else {
+      runVolts(idleVoltage);
+    }
     }, this).finallyDo(() -> stop());
     command.setName("clawIdleState");
     return command;
@@ -124,20 +100,18 @@ public class ActiveClawSubsystem extends SubsystemBase {
   }
 
   public boolean hasCoral() {
-    return clawLimitSwitch.get() || isStalled;
+    return isStalled;
   }
 
-  public boolean isLimitSwitch() {
-    return clawLimitSwitch.get();
+  public boolean isNotBeamBreak() {
+    return !beamBreakInput.get();
   }
 
   public void brakeMode(boolean isBrakeModeOn) {
-    clawMotorLeft.setNeutralMode(isBrakeModeOn ? NeutralModeValue.Brake : NeutralModeValue.Coast);
-    clawMotorRight.setNeutralMode(isBrakeModeOn ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    clawMotor.setNeutralMode(isBrakeModeOn ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
   public void stop() {
-    clawMotorLeft.stopMotor();
-    clawMotorRight.stopMotor();
+    clawMotor.stopMotor();
   }
 }
