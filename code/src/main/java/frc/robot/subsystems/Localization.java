@@ -194,17 +194,17 @@ public class Localization extends SubsystemBase {
             AngularVelocity robotAnglePerSecond,
             Distance tagDistance, double ambiguity) {
         final Matrix<N3, N1> rejectValue = VecBuilder.fill(9999999, 9999999, 9999999);
-        final Matrix<N3, N1> acceptValue = VecBuilder.fill(8, 8, 128);
+        final Matrix<N3, N1> acceptValue = VecBuilder.fill(4, 4, 64);
         final Matrix<N3, N1> idealValue = VecBuilder.fill(0.5, 0.5, 4);
         
         // Start with assuming ideal conditions
         var returnValue = idealValue;
 
         // Not Ideal but still accept with reduced confidence Conditions
-        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(0.75))) {
+        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(1))) {
             returnValue = acceptValue;
         }
-        if (robotAnglePerSecond.in(DegreesPerSecond) > 10) {
+        if (robotAnglePerSecond.in(DegreesPerSecond) > 20) {
             returnValue = acceptValue;
         }
         if (tagDistance.in(Meters) > 1.75) {
@@ -218,7 +218,7 @@ public class Localization extends SubsystemBase {
         if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(2))) {
             returnValue = rejectValue;
         }
-        if (robotAnglePerSecond.in(DegreesPerSecond) > 30) {
+        if (robotAnglePerSecond.in(DegreesPerSecond) > 45) {
             returnValue = rejectValue;
         }
         if (tagDistance.in(Meters) > 2) {
