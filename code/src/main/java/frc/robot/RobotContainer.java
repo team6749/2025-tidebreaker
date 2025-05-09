@@ -113,6 +113,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("wait_for_coral", Commands.idle(elevatorSubsystem)
         .until(() -> clawSubsystem.hasCoral()).withTimeout(Robot.isSimulation() ? 1.25 : 2.5)); // less trust on stall detect. At least for the first 3 corals where the ls isn't broken
     NamedCommands.registerCommand("score", clawSubsystem.clawShoot().withTimeout(Seconds.of(0.5)));
+    NamedCommands.registerCommand("l1", moveToLevel1());
     NamedCommands.registerCommand("l2", moveToLevel2());
     NamedCommands.registerCommand("l3", moveToLevel3());
     NamedCommands.registerCommand("l4", moveToLevel4());
@@ -314,6 +315,15 @@ public class RobotContainer {
         armCommands.Home(),
         elevatorCommands.home());
     command.setName("Home");
+    return command;
+  }
+
+  private Command moveToLevel1() {
+    Command command = Commands.parallel(
+        elevatorCommands.positionLevel1(),
+        Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
+            .andThen(armCommands.positionLevel2()));
+    command.setName("Level 2");
     return command;
   }
 
