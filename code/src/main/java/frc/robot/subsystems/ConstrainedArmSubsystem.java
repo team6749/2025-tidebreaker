@@ -71,7 +71,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
   public static double sprocketRatio = 16.0 / 30.0;
 
   private PIDController armPID = new PIDController(0.7, 0, 0);
-  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.41, 0.8);
+  private ArmFeedforward feedForward = new ArmFeedforward(0, 0.41, 0.7);
   private TalonFX armMotor = new TalonFX(Constants.armMotorID);
   private DCMotor m_armGearbox = DCMotor.getFalcon500(1).withReduction(gearboxRatio);
 
