@@ -5,22 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "right_to_e"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "l3"
-                }
-              }
-            ]
+            "pathName": "left_to_l1_kl1"
           }
         },
         {
@@ -36,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "e_to_intake"
+                  "pathName": "l1kl1_to_left_intake"
                 }
               },
               {
@@ -59,15 +46,65 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "intake_to_d"
+                  "name": "l1"
                 }
               },
               {
+                "type": "path",
+                "data": {
+                  "pathName": "left_intake_to_l1kl2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "wait_for_coral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
                 "type": "named",
                 "data": {
-                  "name": "l3"
+                  "name": "intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "l1kl2_to_left_intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "l1"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "left_intake_to_l1ab1"
                 }
               }
             ]
@@ -86,7 +123,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "d_to_intake"
+                  "pathName": "l1ab1_to_left_intake"
                 }
               },
               {
@@ -109,15 +146,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "intake_to_c"
+                  "name": "l1"
                 }
               },
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "l3"
+                  "pathName": "left_intake_to_l1ab1"
                 }
               }
             ]
