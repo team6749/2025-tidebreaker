@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.569262295081967,
-        "y": 3.8687472613786373
+        "x": 6.681461729156201,
+        "y": 4.341391641798521
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.319262295081967,
-        "y": 3.8687472613786373
+        "x": 6.460990731506038,
+        "y": 4.199660286166273
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 3.8687472613786373
       },
       "prevControl": {
-        "x": 6.25684747968948,
-        "y": 3.8687472613786373
+        "x": 6.276936622229122,
+        "y": 4.006165257484005
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "coral_paths",
   "idealStartingState": {
     "velocity": 0.7,
-    "rotation": 180.0
+    "rotation": 162.1858229732796
   },
   "useDefaultConstraints": false
 }
