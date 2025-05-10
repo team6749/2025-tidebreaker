@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.648708431084993,
-        "y": 6.012764864019447
+        "x": 3.103705787529384,
+        "y": 3.8499703685218174
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.520703141637956,
-        "y": 5.798021654875175
+        "x": 1.911297598792041,
+        "y": 3.736696218693071
+      },
+      "isLocked": false,
+      "linkedName": "coral_b"
+    },
+    {
+      "anchor": {
+        "x": 2.2656762295081965,
+        "y": 5.625358606557377
+      },
+      "prevControl": {
+        "x": 2.129713730007195,
+        "y": 5.103556892275048
+      },
+      "nextControl": {
+        "x": 2.401638729009198,
+        "y": 6.147160320839706
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.180069005931891,
-        "y": 5.213586517350757
+        "x": 0.6473360655696453,
+        "y": 6.620338114754901
       },
       "prevControl": {
-        "x": 5.308144319262533,
-        "y": 5.428287970804751
+        "x": 1.8820696721311476,
+        "y": 7.147797131147541
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Station_Left"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -120.96375653207352
+    "rotation": 125.676408221862
   },
   "reversed": false,
-  "folder": "algae_paths",
+  "folder": "l1Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -121.17134902771984
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -1,0 +1,95 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.588217213114754,
+        "y": 7.567366803278689
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.653176229504982,
+        "y": 6.872079918039803
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8290983606557374,
+        "y": 6.8481045081967205
+      },
+      "prevControl": {
+        "x": 3.9423131848568973,
+        "y": 7.560561995685463
+      },
+      "nextControl": {
+        "x": 1.9300204918032784,
+        "y": 6.272694672131147
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.301639344262295,
+        "y": 5.265727459016393
+      },
+      "prevControl": {
+        "x": 2.2536885245901637,
+        "y": 5.937038934426229
+      },
+      "nextControl": {
+        "x": 2.3509810844988834,
+        "y": 4.574943095704153
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.103705787529384,
+        "y": 3.8499703685218174
+      },
+      "prevControl": {
+        "x": 2.0019467213082613,
+        "y": 3.383657786892262
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "coral_b"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9605911330049239,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.6798029556650196,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 100.0,
+    "maxAngularAcceleration": 400.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "l1Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}
