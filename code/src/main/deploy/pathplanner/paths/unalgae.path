@@ -28,7 +28,12 @@
       "linkedName": "start_mid"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.25020781379883733,
+      "rotationDegrees": -165.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
