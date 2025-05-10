@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.logging.FileBackend;
@@ -80,7 +81,8 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     // Initialize Robot
     m_robotContainer = new RobotContainer();
-    
+    CameraServer.startAutomaticCapture();
+
     // Outputting the audit data is intentionally done last to be confident that the robot
     // did not crash during the initial start-up, and can be confident the deploy succeeded
     audit.updateSmartDashboard();
