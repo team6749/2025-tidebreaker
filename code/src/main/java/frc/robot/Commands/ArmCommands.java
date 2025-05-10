@@ -23,7 +23,7 @@ public class ArmCommands {
         return command;
     }
 
-    public Command intakePosition() {
+    public Command intakePosition() {//.227 angle
         Command command = armSubsystem.goToPositionCommand(Degrees.of(-61.707)); 
         command.setName("Arm Intake Position");
         return command;
@@ -41,7 +41,7 @@ public class ArmCommands {
         return command;
     }
 
-    public Command positionLevel3() {
+    public Command positionLevel3() { //
         Command command = armSubsystem.goToPositionCommand(Degrees.of(50));
         command.setName("Arm Score Level 3");
         return command;
