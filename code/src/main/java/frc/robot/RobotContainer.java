@@ -182,7 +182,7 @@ public class RobotContainer {
     buttonHome.whileTrue(intakeTeleop());
     buttonLevel2.whileTrue(moveToLevel2());
     buttonLevel3.whileTrue(moveToLevel3());
-    buttonLevel4.whileTrue(moveToLevel4());
+    buttonLevel4.whileTrue(moveToLevel1());
     buttonIntake.whileTrue(removeAlgae());
     buttonScore.whileTrue(clawSubsystem.clawShoot());
 
