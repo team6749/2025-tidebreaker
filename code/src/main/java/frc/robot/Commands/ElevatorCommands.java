@@ -39,7 +39,7 @@ public class ElevatorCommands {
         command.setName("Elevator Score Level 1");
         return command;
     }
-
+    
     public Command positionLevel2() {
         Command command = elevatorSubsystem.goToPositionCommand(Meters.of(0.197));
         command.setName("Elevator Score Level 2");
