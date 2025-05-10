@@ -35,6 +35,12 @@ public class ArmCommands {
         return command;
     }
 
+    public Command positionLevel1() {
+        Command command = armSubsystem.goToPositionCommand(Degrees.of(-90)); //random values
+        command.setName("Arm Score Level 1");
+        return command;
+    }
+
     public Command positionLevel2() {
         Command command = armSubsystem.goToPositionCommand(Degrees.of(-80)); //random values
         command.setName("Arm Score Level 2");

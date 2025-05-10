@@ -30,8 +30,8 @@ import frc.robot.Constants;
 @Logged
 public class ActiveClawSubsystem extends SubsystemBase {
   static Voltage idleVoltage = Volts.of(3.387);
-  static Voltage shootLowVoltage = Volts.of(-4.7);
-  static Voltage shootHighVoltage = Volts.of(4);
+  static Voltage shootLowDownVoltage = Volts.of(-4.7);
+  static Voltage shootHighUpVoltage = Volts.of(4);
   static Time stallDetectResetTimerDuration = Seconds.of(0.5);
 
   private TalonFX clawMotor;
@@ -93,7 +93,7 @@ public class ActiveClawSubsystem extends SubsystemBase {
 
   public Command clawShoot() {
     Command command = Commands.runEnd(
-        () -> runVolts((armSubsystem.getPosition().in(Radians) > 0) ? shootHighVoltage : shootLowVoltage), () -> stop(),
+        () -> runVolts((armSubsystem.getPosition().in(Radians) > 0) ? shootHighUpVoltage : shootLowDownVoltage), () -> stop(),
         this);
     command.setName("clawLowShoot");
     return command;

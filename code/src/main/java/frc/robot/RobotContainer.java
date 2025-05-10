@@ -200,6 +200,7 @@ public class RobotContainer {
       SmartDashboard.putData("Command/Home", home());
       SmartDashboard.putData("Command/Score", clawSubsystem.clawShoot());
       SmartDashboard.putData("Command/Intake", intakeTeleop());
+      SmartDashboard.putData("Command/L1", moveToLevel1());
       SmartDashboard.putData("Command/L2", moveToLevel2());
       SmartDashboard.putData("Command/L3", moveToLevel3());
       SmartDashboard.putData("Command/L4", moveToLevel4());
@@ -322,7 +323,7 @@ public class RobotContainer {
     Command command = Commands.parallel(
         elevatorCommands.positionLevel1(),
         Commands.waitUntil(() -> elevatorSubsystem.getPosition().gt(Constants.armClearance))
-            .andThen(armCommands.positionLevel2()));
+            .andThen(armCommands.positionLevel1()));
     command.setName("Level 2");
     return command;
   }
