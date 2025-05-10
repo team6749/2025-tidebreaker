@@ -201,7 +201,7 @@ public class Localization extends SubsystemBase {
         var returnValue = idealValue;
 
         // Not Ideal but still accept with reduced confidence Conditions
-        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(1))) {
+        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(1.75))) {
             returnValue = acceptValue;
         }
         if (robotAnglePerSecond.in(DegreesPerSecond) > 20) {
@@ -215,13 +215,10 @@ public class Localization extends SubsystemBase {
         if (ambiguity > 0.7) {
             returnValue = rejectValue;
         }
-        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(2))) {
+        if (robotSpeedMetersPerSecond.gt(MetersPerSecond.of(2.5))) {
             returnValue = rejectValue;
         }
         if (robotAnglePerSecond.in(DegreesPerSecond) > 45) {
-            returnValue = rejectValue;
-        }
-        if (tagDistance.in(Meters) > 2) {
             returnValue = rejectValue;
         }
         // Speed range: 0 - 3 m/s
