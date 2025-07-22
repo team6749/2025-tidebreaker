@@ -5,15 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "l3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "go_algae"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "l3"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "go_algae"
+                }
+              }
+            ]
           }
         },
         {
@@ -42,15 +49,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "l3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "mid to h"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "l3"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "mid to h"
+                }
+              }
+            ]
           }
         },
         {
