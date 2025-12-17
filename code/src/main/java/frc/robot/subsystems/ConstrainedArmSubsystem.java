@@ -117,7 +117,7 @@ public class ConstrainedArmSubsystem extends SubsystemBase {
           0.5,
           simStartAngle.in(Degrees),
           3,
-          new Color8Bit(Color.kYellow)));
+          new Color8Bit(Color.kYellow)));//AAAAAAAAAAAAAAA
 
   TrapezoidProfile.State targetState = new State(0, 0);
   TrapezoidProfile.State setpointState = new State(0, 0);
